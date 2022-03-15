@@ -1,0 +1,146 @@
+<?xml version="1.0"?> 
+<robot name="tree">
+ <material name="brown">
+  <color rgba="0.65 0.39 0.15 0.65"/>
+ </material>
+    <!-- Base Frame of tree --> 
+    <link name="base_link">
+        <visual> 
+            <geometry> 
+                <cylinder length="4" radius="0.25"/>
+            </geometry>
+           <origin rpy="0 0 0" xyz="0 0 0"/>
+           <material name="brown"/>
+        </visual>
+        <!-- <collision> -->
+         <!-- <geometry> -->
+         <!-- for tree to stand on the plane -->
+         <!-- <box size="2.0 2.0 0.5"/>   -->
+         <!-- </geometry> -->
+        <!-- </collision> -->
+        <inertial>
+         <mass value="100"/>
+          <inertia ixx="800.0" ixy="0.0" ixz="0.0" iyy="800" iyz="0.0" izz="800"/>
+        </inertial>
+    </link>
+
+    <!-- <joint name="base_to_virtual_link2" type="fixed">
+        
+        <origin rpy="0 0 0" xyz="0 0 1.75"/>
+        <axis xyz="1 0 0"/>
+        <material name="brown"/>
+        <parent link="base_link"/>
+        <child link="virtual_link2"/>
+        <dynamics damping="0.01" friction="0.01"/>
+        <limit effort="1000" velocity="0.001" lower="0.001" upper="0.001" />
+    </joint>
+
+    <link name="virtual_link2">
+        <visual> 
+           <geometry>
+             <cylinder length="0.2" radius="0.1"/>
+           </geometry>
+           <origin rpy="0 0 0" xyz="0 -0.1 0"/>
+           <material name="brown"/>
+        </visual>
+        <inertial>
+          <mass value="0.0001"/>
+          <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+        </inertial>
+    </link> -->
+
+    <!-- <joint name="virtual_link2_to_virtual_link" type="revolute">
+        <axis xyz="1 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <material name="brown"/>
+        <parent link="virtual_link2"/>
+        <child link="virtual_link"/>
+        <dynamics damping="0.01" friction="0.01"/>
+        <limit effort="1000" velocity="0.5" lower="-1.1" upper="1.3" />
+    </joint> -->
+    <joint name="base_to_virtual_link" type="revolute">
+        <axis xyz="0 0 1"/>
+        <origin rpy="0 0 0" xyz="0 0 1.75"/>
+        <material name="brown"/>
+        <parent link="base_link"/>
+        <child link="virtual_link"/>
+        <dynamics damping="0.01" friction="0.01"/>
+        <limit effort="1000" velocity="0.5" lower="-0.3" upper="0.3" />
+    </joint>
+
+
+    <link name="virtual_link">
+        <visual> 
+            <geometry> 
+                <cylinder length="0.0" radius="0.0"/>
+            </geometry>
+           <origin rpy="0 0 0" xyz="0 0.0 0"/>
+           <material name="brown"/>
+        </visual>
+        <inertial>
+          <mass value="0.0001"/>
+          <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+        </inertial>
+    </link>
+    <!-- <link name="virtual_link">
+        <visual> 
+            <geometry> 
+                <cylinder length="1.5" radius="0.1"/>
+            </geometry>
+           <origin rpy="0 0 0" xyz="0 0 0"/>
+           <material name="brown"/>
+        </visual>
+        <collision>
+         <geometry>
+          <cylinder length="1.5" radius="0.1"/>
+         </geometry>
+         <origin rpy="0 0 0" xyz="0 0 0"/>
+          
+        </collision>
+        <inertial>
+         <mass value="0.05"/>
+          <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+        </inertial>
+    </link> -->
+
+
+    <!-- <joint name="joint2" type="revolute">
+        <axis xyz="0 0 1"/>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <material name="brown"/>
+        <parent link="virtual_link"/>
+        <child link="treebranch_link"/>  
+        <dynamics damping="0.01" friction="0.01"/>
+        <limit effort="1000" velocity="0.5" lower="-0.3" upper="0.3" />
+    </joint> -->
+
+    <joint name="joint2" type="revolute">
+        <axis xyz="1 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <material name="brown"/>
+        <parent link="virtual_link"/>
+        <child link="treebranch_link"/>  
+        <dynamics damping="0.01" friction="0.01"/>
+        <limit effort="1000" velocity="0.5" lower="-1.1" upper="1.3" />
+    </joint>
+
+    <link name="treebranch_link">
+        <visual> 
+            <geometry> 
+                <cylinder length="1.5" radius="0.1"/>
+            </geometry>
+           <origin rpy="1.57 0 0" xyz="0 -0.75 0"/>
+           <material name="brown"/>
+        </visual>
+        <collision>
+         <geometry>
+          <cylinder length="1.5" radius="0.1"/>
+         </geometry>
+         <origin rpy="1.57 0 0" xyz="0 -0.75 0"/>
+        </collision>
+        <inertial>
+         <mass value="0.05"/>
+          <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+        </inertial>
+    </link>
+</robot>
