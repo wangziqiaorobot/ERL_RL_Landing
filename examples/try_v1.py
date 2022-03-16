@@ -181,11 +181,14 @@ if __name__ == "__main__":
     #### Save the simulation results ###########################
     # logger.save()
     # logger.save_as_csv("pid") # Optional CSV save
-
+    
+    
+    
     #### Plot the simulation results ###########################
     if ARGS.plot:
         #logger.plot()
-        save_path=os.path.join('/home/ziqiao/RL/gym-pybullet-drones/files/logs',datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+        task_path = os.path.dirname(os.path.realpath(__file__))
+        save_path=os.path.join(task_path+"/../files/logs",datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
         plt.figure()
         plt.plot(target_rpy_e[0,:],label="r")
        
