@@ -983,7 +983,9 @@ class BaseAviary(gym.Env):
         #            )
         
         #fileName= 
-        p.loadURDF("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf",
+        task_path = os.path.dirname(os.path.realpath(__file__))
+        urdf_path=os.path.join(task_path+"/../assets/treebranch.urdf")
+        p.loadURDF(urdf_path,
         
                    [0, 0, 0],
                    p.getQuaternionFromEuler([0, 0, 0]),
