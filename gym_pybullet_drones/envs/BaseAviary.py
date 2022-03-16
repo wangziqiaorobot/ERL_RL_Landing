@@ -971,11 +971,11 @@ class BaseAviary(gym.Env):
         # p.loadURDF("samurai.urdf",
         #            physicsClientId=self.CLIENT
         #            )
-        p.loadURDF("duck_vhacd.urdf",
-                   [0, 1, 3],
-                   p.getQuaternionFromEuler([0, 0, 0]),
-                   physicsClientId=self.CLIENT
-                   )
+        # p.loadURDF("duck_vhacd.urdf",
+        #            [0, 1, 3],
+        #            p.getQuaternionFromEuler([0, 0, 0]),
+        #            physicsClientId=self.CLIENT
+        #            )
         # p.loadURDF("~/RL/gym-pybullet-drones/gym_pybullet_drones/assets/table2.urdf",
         #            [-.5, -.5, 5],
         #         #    p.getQuaternionFromEuler([0, 0, 0]),
@@ -992,11 +992,11 @@ class BaseAviary(gym.Env):
                    physicsClientId=self.CLIENT,
                    useFixedBase=True,
                    )
-        p.loadURDF("sphere2.urdf",
-                   [0, 1, 5],
-                   p.getQuaternionFromEuler([0,0,0]),
-                   physicsClientId=self.CLIENT
-                   )
+        # p.loadURDF("sphere2.urdf",
+        #            [0, 1, 5],
+        #            p.getQuaternionFromEuler([0,0,0]),
+        #            physicsClientId=self.CLIENT
+        #            )
     
     ################################################################################
     
