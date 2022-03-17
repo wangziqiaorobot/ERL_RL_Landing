@@ -108,6 +108,19 @@ class BaseSingleAgentAviary(BaseAviary):
                     self.TUNED_D_ATT = np.array([.3, .3, .5])
             else:
                 print("[ERROR] in BaseSingleAgentAviary.__init()__, no controller is available for the specified drone_model")
+        #### Create integrated controllers  for the landing task #########################
+        if act in [ActionType.LD]:
+            os.environ['KMP_DUPLICATE_LIB_OK']='True'
+            
+            if drone_model == DroneModel.HB:
+                self.ctrl = SimplePIDControl(drone_model=DroneModel.HB)
+                if act == ActionType.LD:
+                    
+                    self.TUNED_P_ATT = np.array([1.0, 0.8, .05])
+                    #self.TUNED_I_ATT = np.array([.0001, .0001, .0001])
+                    self.TUNED_D_ATT = np.array([.2, .18, .3]) 
+            else:
+                print("[ERROR] in BaseSingleAgentAviary.__init()__, no controller is available for the specified drone_model")
         super().__init__(drone_model=drone_model,
                          num_drones=1,
                          initial_xyzs=initial_xyzs,
@@ -294,12 +307,11 @@ class BaseSingleAgentAviary(BaseAviary):
                                                  )
             return rpm
         elif self.ACT_TYPE == ActionType.LD:
-            action, _, _ = self.ctrl.computeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-                                                 cur_pos=state[0:3],
+            #set up the low level attitude controller
+            torque, _, _ = self.ctrl._simplePIDAttitudeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
+                                                 thrust=action[0],
                                                  cur_quat=state[3:7],
-                                                 cur_vel=state[10:13],
-                                                 cur_ang_vel=state[13:16],
-                                                 target_pos=state[0:3]+0.1*action
+                                                 target_rpy=action[1:3],
                                                  )
 
         else:
