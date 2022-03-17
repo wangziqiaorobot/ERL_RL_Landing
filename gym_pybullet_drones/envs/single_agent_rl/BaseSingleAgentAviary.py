@@ -13,6 +13,7 @@ from gym_pybullet_drones.control.SimplePIDControl import SimplePIDControl
 
 class ActionType(Enum):
     """Action type enumeration class."""
+    LD= "ld" # 4d action space for the landing task, 
     RPM = "rpm"                 # RPMS
     DYN = "dyn"                 # Desired thrust and torques
     PID = "pid"                 # PID control
@@ -175,7 +176,7 @@ class BaseSingleAgentAviary(BaseAviary):
         """
         if self.ACT_TYPE == ActionType.TUN:
             size = 6
-        elif self.ACT_TYPE in [ActionType.RPM, ActionType.DYN, ActionType.VEL]:
+        elif self.ACT_TYPE in [ActionType.RPM, ActionType.DYN, ActionType.VEL,ActionType.LD]:
             size = 4
         elif self.ACT_TYPE == ActionType.PID:
             size = 3
@@ -292,6 +293,15 @@ class BaseSingleAgentAviary(BaseAviary):
                                                  target_pos=state[0:3]+0.1*np.array([0,0,action[0]])
                                                  )
             return rpm
+        elif self.ACT_TYPE == ActionType.LD:
+            action, _, _ = self.ctrl.computeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
+                                                 cur_pos=state[0:3],
+                                                 cur_quat=state[3:7],
+                                                 cur_vel=state[10:13],
+                                                 cur_ang_vel=state[13:16],
+                                                 target_pos=state[0:3]+0.1*action
+                                                 )
+
         else:
             print("[ERROR] in BaseSingleAgentAviary._preprocessAction()")
 
