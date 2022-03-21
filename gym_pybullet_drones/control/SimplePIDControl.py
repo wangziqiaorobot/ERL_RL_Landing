@@ -236,7 +236,7 @@ class SimplePIDControl(BaseControl):
         target_torques = np.multiply(self.P_COEFF_TOR, rpy_e) \
                          + np.multiply(self.D_COEFF_TOR, d_rpy_e)
                         #   + np.multiply(self.I_COEFF_TOR, self.integral_rpy_e) \
-        return nnlsRPM(thrust=thrust,
+        return target_torques,nnlsRPM(thrust=thrust,
                        x_torque=target_torques[0],
                        y_torque=target_torques[1],
                        z_torque=target_torques[2],

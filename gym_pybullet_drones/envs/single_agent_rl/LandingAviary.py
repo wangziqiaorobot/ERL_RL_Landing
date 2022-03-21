@@ -10,7 +10,7 @@ class LandingAviary(BaseSingleAgentAviary):
     ################################################################################
 
     def __init__(self,
-                 drone_model: DroneModel=DroneModel.CF2P,
+                 drone_model: DroneModel=DroneModel.HB,
                  initial_xyzs=None,
                  initial_rpys=None,
                  physics: Physics=Physics.DYN, #change the physics to the DYN inorder to the dynamics information

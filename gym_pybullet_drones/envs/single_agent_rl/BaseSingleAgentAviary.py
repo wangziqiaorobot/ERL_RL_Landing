@@ -86,28 +86,28 @@ class BaseSingleAgentAviary(BaseAviary):
         self.ACT_TYPE = act
         self.EPISODE_LEN_SEC = 5
         #### Create integrated controllers #########################
-        if act in [ActionType.PID, ActionType.VEL, ActionType.TUN, ActionType.ONE_D_PID]:
-            os.environ['KMP_DUPLICATE_LIB_OK']='True'
-            if drone_model in [DroneModel.CF2X, DroneModel.CF2P]:
-                self.ctrl = DSLPIDControl(drone_model=DroneModel.CF2X)
-                if act == ActionType.TUN:
-                    self.TUNED_P_POS = np.array([.4, .4, 1.25])
-                    self.TUNED_I_POS = np.array([.05, .05, .05])
-                    self.TUNED_D_POS = np.array([.2, .2, .5])
-                    self.TUNED_P_ATT = np.array([70000., 70000., 60000.])
-                    self.TUNED_I_ATT = np.array([.0, .0, 500.])
-                    self.TUNED_D_ATT = np.array([20000., 20000., 12000.])
-            elif drone_model == DroneModel.HB:
-                self.ctrl = SimplePIDControl(drone_model=DroneModel.HB)
-                if act == ActionType.TUN:
-                    self.TUNED_P_POS = np.array([.1, .1, .2])
-                    self.TUNED_I_POS = np.array([.0001, .0001, .0001])
-                    self.TUNED_D_POS = np.array([.3, .3, .4])
-                    self.TUNED_P_ATT = np.array([.3, .3, .05])
-                    self.TUNED_I_ATT = np.array([.0001, .0001, .0001])
-                    self.TUNED_D_ATT = np.array([.3, .3, .5])
-            else:
-                print("[ERROR] in BaseSingleAgentAviary.__init()__, no controller is available for the specified drone_model")
+        # if act in [ActionType.PID, ActionType.VEL, ActionType.TUN, ActionType.ONE_D_PID]:
+        #     os.environ['KMP_DUPLICATE_LIB_OK']='True'
+        #     if drone_model in [DroneModel.CF2X, DroneModel.CF2P]:
+        #         self.ctrl = DSLPIDControl(drone_model=DroneModel.CF2X)
+        #         if act == ActionType.TUN:
+        #             self.TUNED_P_POS = np.array([.4, .4, 1.25])
+        #             self.TUNED_I_POS = np.array([.05, .05, .05])
+        #             self.TUNED_D_POS = np.array([.2, .2, .5])
+        #             self.TUNED_P_ATT = np.array([70000., 70000., 60000.])
+        #             self.TUNED_I_ATT = np.array([.0, .0, 500.])
+        #             self.TUNED_D_ATT = np.array([20000., 20000., 12000.])
+        #     elif drone_model == DroneModel.HB:
+        #         self.ctrl = SimplePIDControl(drone_model=DroneModel.HB)
+        #         if act == ActionType.TUN:
+        #             self.TUNED_P_POS = np.array([.1, .1, .2])
+        #             self.TUNED_I_POS = np.array([.0001, .0001, .0001])
+        #             self.TUNED_D_POS = np.array([.3, .3, .4])
+        #             self.TUNED_P_ATT = np.array([.3, .3, .05])
+        #             self.TUNED_I_ATT = np.array([.0001, .0001, .0001])
+        #             self.TUNED_D_ATT = np.array([.3, .3, .5])
+        #     else:
+        #         print("[ERROR] in BaseSingleAgentAviary.__init()__, no controller is available for the specified drone_model")
         #### Create integrated controllers  for the landing task #########################
         if act in [ActionType.LD]:
             os.environ['KMP_DUPLICATE_LIB_OK']='True'
@@ -297,6 +297,7 @@ class BaseSingleAgentAviary(BaseAviary):
                            gui=self.GUI
                            )
         elif self.ACT_TYPE == ActionType.ONE_D_PID:
+            
             state = self._getDroneStateVector(0)
             rpm, _, _ = self.ctrl.computeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
                                                  cur_pos=state[0:3],
@@ -307,12 +308,14 @@ class BaseSingleAgentAviary(BaseAviary):
                                                  )
             return rpm
         elif self.ACT_TYPE == ActionType.LD:
+            state = self._getDroneStateVector(0)
             #set up the low level attitude controller
-            torque, _, _ = self.ctrl._simplePIDAttitudeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
+            targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
                                                  thrust=action[0],
                                                  cur_quat=state[3:7],
-                                                 target_rpy=action[1:3],
+                                                 target_rpy=action[1:4],
                                                  )
+            return rpm
 
         else:
             print("[ERROR] in BaseSingleAgentAviary._preprocessAction()")
