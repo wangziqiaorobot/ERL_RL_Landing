@@ -58,10 +58,10 @@ if __name__ == "__main__":
 
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning experiments script')
-    parser.add_argument('--env',        default='hover',      type=str,             choices=['takeoff', 'hover', 'flythrugate', 'tune'], help='Task (default: hover)', metavar='')
+    parser.add_argument('--env',        default='landing',      type=str,             choices=['takeoff', 'hover', 'flythrugate', 'tune'], help='Task (default: hover)', metavar='')
     parser.add_argument('--algo',       default='ppo',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
-    parser.add_argument('--act',        default='one_d_rpm',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
+    parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
     parser.add_argument('--cpu',        default='1',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
     ARGS = parser.parse_args()
 
@@ -110,18 +110,7 @@ if __name__ == "__main__":
     onpolicy_kwargs = dict(activation_fn=torch.nn.ReLU,
                            net_arch=[512, 512, dict(vf=[256, 128], pi=[256, 128])]
                            ) # or None
-    # if ARGS.algo == 'a2c':
-    #     model = A2C(a2cppoMlpPolicy,
-    #                 train_env,
-    #                 policy_kwargs=onpolicy_kwargs,
-    #                 tensorboard_log=filename+'/tb/',
-    #                 verbose=1
-    #                 ) if ARGS.obs == ObservationType.KIN else A2C(a2cppoCnnPolicy,
-    #                                                               train_env,
-    #                                                               policy_kwargs=onpolicy_kwargs,
-    #                                                               tensorboard_log=filename+'/tb/',
-    #                                                               verbose=1
-    #                                                               )
+   
     if ARGS.algo == 'ppo':
         model = PPO(a2cppoMlpPolicy,
                     train_env,
@@ -135,46 +124,7 @@ if __name__ == "__main__":
                                                                   verbose=1
                                                                   )
 
-    # #### Off-policy algorithms #################################
-    # offpolicy_kwargs = dict(activation_fn=torch.nn.ReLU,
-    #                         net_arch=[512, 512, 256, 128]
-    #                         ) # or None # or dict(net_arch=dict(qf=[256, 128, 64, 32], pi=[256, 128, 64, 32]))
-    # if ARGS.algo == 'sac':
-    #     model = SAC(sacMlpPolicy,
-    #                 train_env,
-    #                 policy_kwargs=offpolicy_kwargs,
-    #                 tensorboard_log=filename+'/tb/',
-    #                 verbose=1
-    #                 ) if ARGS.obs==ObservationType.KIN else SAC(sacCnnPolicy,
-    #                                                             train_env,
-    #                                                             policy_kwargs=offpolicy_kwargs,
-    #                                                             tensorboard_log=filename+'/tb/',
-    #                                                             verbose=1
-    #                                                             )
-    # if ARGS.algo == 'td3':
-    #     model = TD3(td3ddpgMlpPolicy,
-    #                 train_env,
-    #                 policy_kwargs=offpolicy_kwargs,
-    #                 tensorboard_log=filename+'/tb/',
-    #                 verbose=1
-    #                 ) if ARGS.obs==ObservationType.KIN else TD3(td3ddpgCnnPolicy,
-    #                                                             train_env,
-    #                                                             policy_kwargs=offpolicy_kwargs,
-    #                                                             tensorboard_log=filename+'/tb/',
-    #                                                             verbose=1
-    #                                                             )
-    # if ARGS.algo == 'ddpg':
-    #     model = DDPG(td3ddpgMlpPolicy,
-    #                 train_env,
-    #                 policy_kwargs=offpolicy_kwargs,
-    #                 tensorboard_log=filename+'/tb/',
-    #                 verbose=1
-    #                 ) if ARGS.obs==ObservationType.KIN else DDPG(td3ddpgCnnPolicy,
-    #                                                             train_env,
-    #                                                             policy_kwargs=offpolicy_kwargs,
-    #                                                             tensorboard_log=filename+'/tb/',
-    #                                                             verbose=1
-    #                                                             )
+    
 
     #### Create eveluation environment #########################
     eval_env = gym.make("landing-aviary-v0",
