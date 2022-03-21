@@ -81,7 +81,7 @@ class BaseSingleAgentAviary(BaseAviary):
 
         """
         vision_attributes = True if obs == ObservationType.RGB else False
-        dynamics_attributes = True if act in [ActionType.DYN, ActionType.ONE_D_DYN] else False
+        dynamics_attributes = True if act in [ActionType.DYN, ActionType.ONE_D_DYN, ActionType.LD] else False
         self.OBS_TYPE = obs
         self.ACT_TYPE = act
         self.EPISODE_LEN_SEC = 5
@@ -311,10 +311,12 @@ class BaseSingleAgentAviary(BaseAviary):
             state = self._getDroneStateVector(0)
             #set up the low level attitude controller
             targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-                                                 thrust=action[0],
+                                                 thrust=(self.GRAVITY*(action[0]+1)),
                                                  cur_quat=state[3:7],
                                                  target_rpy=action[1:4],
                                                  )
+            print(rpm)
+            print(targettorque)
             return rpm
 
         else:
