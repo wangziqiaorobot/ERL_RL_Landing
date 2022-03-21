@@ -60,10 +60,10 @@ if __name__ == "__main__":
 
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning experiments script')
-    parser.add_argument('--env',        default='hover',      type=str,             choices=['takeoff', 'hover', 'flythrugate', 'tune'], help='Task (default: hover)', metavar='')
+    parser.add_argument('--env',        default='landing',      type=str,             choices=['takeoff', 'hover', 'flythrugate', 'tune'], help='Task (default: hover)', metavar='')
     parser.add_argument('--algo',       default='ppo',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
-    parser.add_argument('--act',        default='one_d_rpm',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
+    parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
     parser.add_argument('--cpu',        default='1',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
     ARGS = parser.parse_args()
 
@@ -72,11 +72,7 @@ if __name__ == "__main__":
     if not os.path.exists(filename):
         os.makedirs(filename+'/')
 
-    #### Print out current git commit hash #####################
-    if platform == "linux" or platform == "darwin":
-        git_commit = subprocess.check_output(["git", "describe", "--tags"]).strip()
-        with open(filename+'/git_commit.txt', 'w+') as f:
-            f.write(str(git_commit))
+   
 
     #### Warning ###############################################
     if ARGS.env == 'tune' and ARGS.act != ActionType.TUN:
@@ -100,36 +96,14 @@ if __name__ == "__main__":
     env_name = ARGS.env+"-aviary-v0"
     sa_env_kwargs = dict(aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act)
     # train_env = gym.make(env_name, aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act) # single environment instead of a vectorized one    
-    if env_name == "takeoff-aviary-v0":
-        train_env = make_vec_env(TakeoffAviary,
+    
+    
+    train_env = make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
                                  n_envs=ARGS.cpu,
                                  seed=0
                                  )
-    if env_name == "hover-aviary-v0":
-        train_env = make_vec_env(HoverAviary,
-                                 env_kwargs=sa_env_kwargs,
-                                 n_envs=ARGS.cpu,
-                                 seed=0
-                                 )
-    if env_name == "flythrugate-aviary-v0":
-        train_env = make_vec_env(FlyThruGateAviary,
-                                 env_kwargs=sa_env_kwargs,
-                                 n_envs=ARGS.cpu,
-                                 seed=0
-                                 )
-    if env_name == "tune-aviary-v0":
-        train_env = make_vec_env(TuneAviary,
-                                 env_kwargs=sa_env_kwargs,
-                                 n_envs=ARGS.cpu,
-                                 seed=0
-                                 )
-    if env_name == "landing-aviary-v0":
-        train_env = make_vec_env(LandingAviary,
-                                 env_kwargs=sa_env_kwargs,
-                                 n_envs=ARGS.cpu,
-                                 seed=0
-                                 )
+
     print("[INFO] Action space:", train_env.action_space)
     print("[INFO] Observation space:", train_env.observation_space)
     # check_env(train_env, warn=True, skip_render_check=True)
