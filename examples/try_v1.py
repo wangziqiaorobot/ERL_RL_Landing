@@ -132,6 +132,7 @@ if __name__ == "__main__":
    
     target_rpy_e = np.zeros(shape=(3, test_step))
     pos_e = np.zeros(shape=(3, test_step))
+    target_torques=np.zeros(shape=(3, test_step))
     ################################
     
     
@@ -150,7 +151,7 @@ if __name__ == "__main__":
            
             #### Compute control for the current way point #############
         for j in range(ARGS.num_drones):
-                action[str(j)], pos_e[:,i], target_rpy_e[:,i] = ctrl[j].computeControlFromState(control_timestep=CTRL_EVERY_N_STEPS*env.TIMESTEP,
+                action[str(j)], pos_e[:,i], target_rpy_e[:,i],target_torques[:,i] = ctrl[j].computeControlFromState(control_timestep=CTRL_EVERY_N_STEPS*env.TIMESTEP,
                                                                        state=obs[str(j)]["state"],
                                                                        target_pos=np.hstack([TARGET_POS[wp_counters[j], 0:2], INIT_XYZS[j, 2]]),
                                                                        #target_pos=INIT_XYZS[j, :] + TARGET_POS[wp_counters[j], :],
@@ -224,4 +225,16 @@ if __name__ == "__main__":
         plt.legend()
         plt.title('pos_error')
         plt.savefig(save_path+'pos_error.jpg')
+
+        plt.figure()
+        plt.plot(target_torques[0,:],label="x")
+        plt.plot(target_torques[1,:],label="y")
+        plt.plot(target_torques[2,:],label="z")
+        plt.grid()
+        plt.legend()
+        plt.title('target_torques')
+        plt.savefig(save_path+'target_torques.jpg')
+
+
+        
         ################TO DO  PRINT the POS_e and RYP_e ###################
