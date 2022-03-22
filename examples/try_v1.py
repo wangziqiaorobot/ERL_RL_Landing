@@ -23,6 +23,7 @@ import pdb
 import math
 import random
 import datetime
+from typing_extensions import Self
 import numpy as np
 import pybullet as p
 import matplotlib.pyplot as plt
