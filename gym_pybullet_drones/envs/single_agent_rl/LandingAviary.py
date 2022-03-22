@@ -13,7 +13,7 @@ class LandingAviary(BaseSingleAgentAviary):
                  drone_model: DroneModel=DroneModel.HB,
                  initial_xyzs=None,
                  initial_rpys=None,
-                 physics: Physics=Physics.PYB, #change the physics to the DYN inorder to the dynamics information
+                 physics: Physics=Physics.DYN, #change the physics to the DYN inorder to the dynamics information
                  freq: int=240,
                  aggregate_phy_steps: int=1,
                  gui=False,
