@@ -133,13 +133,13 @@ class SimplePIDControl(BaseControl):
         #                                      cur_quat,
         #                                      computed_target_rpy
         #                                      )
-        rpm = self._simplePIDAttitudeControl(control_timestep,
+        target_torques,rpm = self._simplePIDAttitudeControl(control_timestep,
                                              thrust,
                                              cur_quat,
                                              computed_target_rpy
                                              )
         cur_rpy = p.getEulerFromQuaternion(cur_quat)
-        return rpm, pos_e, computed_target_rpy - cur_rpy
+        return rpm, pos_e, computed_target_rpy - cur_rpy, target_torques
 
     ################################################################################
 
@@ -236,6 +236,14 @@ class SimplePIDControl(BaseControl):
         target_torques = np.multiply(self.P_COEFF_TOR, rpy_e) \
                          + np.multiply(self.D_COEFF_TOR, d_rpy_e)
                         #   + np.multiply(self.I_COEFF_TOR, self.integral_rpy_e) \
+        #### add the torque Constraints #######
+        # print('MAX_XY_TORQUE:',self.MAX_XY_TORQUE)
+        # print('MAX_Z_TORQUE:',self.MAX_Z_TORQUE)
+        # print('thrust:',thrust)
+        target_torques[0]= np.clip(target_torques[0], -self.MAX_XY_TORQUE, self.MAX_XY_TORQUE)
+        target_torques[1]= np.clip(target_torques[1], -self.MAX_XY_TORQUE, self.MAX_XY_TORQUE)
+        target_torques[2]= np.clip(target_torques[2], -self.MAX_Z_TORQUE, self.MAX_Z_TORQUE)
+        
         return target_torques,nnlsRPM(thrust=thrust,
                        x_torque=target_torques[0],
                        y_torque=target_torques[1],
