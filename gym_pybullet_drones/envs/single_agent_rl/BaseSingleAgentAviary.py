@@ -187,22 +187,30 @@ class BaseSingleAgentAviary(BaseAviary):
             A Box() of size 1, 3, 4, or 6 depending on the action type.
 
         """
-        if self.ACT_TYPE == ActionType.TUN:
-            size = 6
-        elif self.ACT_TYPE in [ActionType.RPM, ActionType.DYN, ActionType.VEL,ActionType.LD]:
+        if self.ACT_TYPE == ActionType.LD:
             size = 4
-        elif self.ACT_TYPE == ActionType.PID:
-            size = 3
-        elif self.ACT_TYPE in [ActionType.ONE_D_RPM, ActionType.ONE_D_DYN, ActionType.ONE_D_PID]:
-            size = 1
+            return spaces.Box(low=np.array([0,-1,-1,-1]),
+            # return spaces.Box(low=np.zeros(size),  # Alternative action space, see PR #32
+                            high=np.ones(size),
+                            dtype=np.float32
+                            )
         else:
-            print("[ERROR] in BaseSingleAgentAviary._actionSpace()")
-            exit()
-        return spaces.Box(low=-1*np.ones(size),
-        # return spaces.Box(low=np.zeros(size),  # Alternative action space, see PR #32
-                          high=np.ones(size),
-                          dtype=np.float32
-                          )
+            if self.ACT_TYPE == ActionType.TUN:
+                size = 6
+            elif self.ACT_TYPE in [ActionType.RPM, ActionType.DYN, ActionType.VEL]:
+                size = 4
+            elif self.ACT_TYPE == ActionType.PID:
+                size = 3
+            elif self.ACT_TYPE in [ActionType.ONE_D_RPM, ActionType.ONE_D_DYN, ActionType.ONE_D_PID]:
+                size = 1
+            else:
+                print("[ERROR] in BaseSingleAgentAviary._actionSpace()")
+                exit()
+            return spaces.Box(low=-1*np.ones(size),
+            # return spaces.Box(low=np.zeros(size),  # Alternative action space, see PR #32
+                            high=np.ones(size),
+                            dtype=np.float32
+                            )
 
     ################################################################################
 
@@ -310,13 +318,15 @@ class BaseSingleAgentAviary(BaseAviary):
         elif self.ACT_TYPE == ActionType.LD:
             state = self._getDroneStateVector(0)
             #set up the low level attitude controller
+            # print('target_rpy',action[1:4])
+            
             targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-                                                 thrust=(self.GRAVITY*(action[0]+1)),
+                                                 thrust=(self.MAX_THRUST*(action[0])),
                                                  cur_quat=state[3:7],
-                                                 target_rpy=action[1:4],
+                                                 target_rpy=np.array([action[1]*self.MAX_ROLL_PITCH,action[2]*self.MAX_ROLL_PITCH,action[3]*self.MAX_ROLL_PITCH])
                                                  )
-            print(rpm)
-            print(targettorque)
+            # print('rpm',rpm)
+            # print('targettorque',targettorque)
             return rpm
 
         else:
