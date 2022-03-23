@@ -16,8 +16,8 @@ class LandingAviary(BaseSingleAgentAviary):
                  physics: Physics=Physics.DYN, #change the physics to the DYN inorder to the dynamics information
                  freq: int=240,
                  aggregate_phy_steps: int=1,
-                 gui=False,
-                 record=False, 
+                 gui=True,
+                 record=True, 
                  obs: ObservationType=ObservationType.KIN,
                  act: ActionType=ActionType.LD
                  ):
@@ -73,11 +73,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
         """
         state = self._getDroneStateVector(0)
-        # return state[2]/10.  # Alternative reward space, see PR #32
-        if state[2] < 0.02:
-            return -5
-        else:
-            return -1 / (10*state[2])
+        return -1 * np.linalg.norm(np.array([0, 0, 1])-state[0:3])**2*0.01
 
     ################################################################################
     
