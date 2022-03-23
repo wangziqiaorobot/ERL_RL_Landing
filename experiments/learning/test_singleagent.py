@@ -37,6 +37,7 @@ from gym_pybullet_drones.envs.single_agent_rl.TakeoffAviary import TakeoffAviary
 from gym_pybullet_drones.envs.single_agent_rl.HoverAviary import HoverAviary
 from gym_pybullet_drones.envs.single_agent_rl.FlyThruGateAviary import FlyThruGateAviary
 from gym_pybullet_drones.envs.single_agent_rl.TuneAviary import TuneAviary
+from gym_pybullet_drones.envs.single_agent_rl.LandingAviary import LandingAviary
 from gym_pybullet_drones.envs.single_agent_rl.BaseSingleAgentAviary import ActionType, ObservationType
 
 import shared_constants
@@ -87,7 +88,8 @@ if __name__ == "__main__":
         ACT = ActionType.ONE_D_DYN
     elif ARGS.exp.split("-")[4] == 'one_d_pid':
         ACT = ActionType.ONE_D_PID
-
+    elif ARGS.exp.split("-")[4] == 'ld':
+        ACT = ActionType.LD
     #### Evaluate the model ####################################
     eval_env = gym.make(env_name,
                         aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
