@@ -223,6 +223,8 @@ class SimplePIDControl(BaseControl):
 
         """
         cur_rpy = p.getEulerFromQuaternion(cur_quat)
+        # print('cur_rpy:',cur_rpy)
+        # print('target_rpy:',target_rpy)
         rpy_e = target_rpy - np.array(cur_rpy).reshape(3,)
         if rpy_e[2] > np.pi:
             rpy_e[2] = rpy_e[2] - 2*np.pi
