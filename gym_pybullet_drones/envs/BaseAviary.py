@@ -61,7 +61,7 @@ class BaseAviary(gym.Env):
                  freq: int=240,
                  aggregate_phy_steps: int=1,
                  gui=False,
-                 record=False,
+                 record=True,
                  obstacles=False,
                  user_debug_gui=True,
                  vision_attributes=False,
@@ -150,7 +150,7 @@ class BaseAviary(gym.Env):
             self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)
         self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)
         self.GND_EFF_H_CLIP = 0.25 * self.PROP_RADIUS * np.sqrt((15 * self.MAX_RPM**2 * self.KF * self.GND_EFF_COEFF) / self.MAX_THRUST)
-        self.MAX_ROLL_PITCH = np.pi/3
+        self.MAX_ROLL_PITCH = np.pi/6
         #### Create attributes for vision tasks ####################
         self.VISION_ATTR = vision_attributes
         if self.VISION_ATTR:
