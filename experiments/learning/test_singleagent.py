@@ -11,6 +11,8 @@ To run the script, type in a terminal:
 """
 import os
 import time
+import matplotlib.pyplot as plt
+import math
 from datetime import datetime
 import argparse
 import re
@@ -51,7 +53,7 @@ if __name__ == "__main__":
 
     #### Load the model from file ##############################
     algo = ARGS.exp.split("-")[2]
-
+    
     if os.path.isfile(ARGS.exp+'/success_model.zip'):
         path = ARGS.exp+'/success_model.zip'
     elif os.path.isfile(ARGS.exp+'/best_model.zip'):
@@ -98,10 +100,10 @@ if __name__ == "__main__":
                         )
     mean_reward, std_reward = evaluate_policy(model,
                                               eval_env,
-                                              n_eval_episodes=10
+                                              n_eval_episodes=1
                                               )
     print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
-
+    
     #### Show, record a video, and log the model's performance #
     test_env = gym.make(env_name,
                         gui=True,
@@ -110,31 +112,86 @@ if __name__ == "__main__":
                         obs=OBS,
                         act=ACT
                         )
+    print('test',test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS)
+    print(test_env.MAX_THRUST)
+    print(test_env.MAX_ROLL_PITCH)
     logger = Logger(logging_freq_hz=int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS),
                     num_drones=1
                     )
     obs = test_env.reset()
     start = time.time()
-    for i in range(6*int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS)): # Up to 6''
+    
+    # for i in range(10*int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS)): # Up to 6''
+    #     # print('test',test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS,'#####################################')
+    #     action, _states = model.predict(obs,
+    #                                     deterministic=True # OPTIONAL 'deterministic=False'
+    #                                     )
+    #     obs, reward, done, info = test_env.step(action)
+    #     test_env.render()
+    #     if OBS==ObservationType.KIN:
+    #         logger.log(drone=0,
+    #                    timestamp=i/test_env.SIM_FREQ,
+    #                    state= np.hstack([obs[0:3], np.zeros(4), obs[3:15],  np.resize(action, (4))]),
+    #                    control=np.zeros(12)
+    #                    )
+    #     sync(np.floor(i*test_env.AGGR_PHY_STEPS), start, test_env.TIMESTEP)
+    #     # if done: obs = test_env.reset() # OPTIONAL EPISODE HALT
+    # test_env.close()
+    # logger.save_as_csv("sa") # Optional CSV save
+    # logger.plot()
+
+    ### new log try ####
+    test_steps=2000
+    actions = np.zeros(
+        shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
+    # obs = np.zeros(
+    #     shape=(test_env.observation_space.shape[0], test_steps), dtype=np.float32)
+    for i in range(test_steps):
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
                                         )
         obs, reward, done, info = test_env.step(action)
-        test_env.render()
-        if OBS==ObservationType.KIN:
-            logger.log(drone=0,
-                       timestamp=i/test_env.SIM_FREQ,
-                       state= np.hstack([obs[0:3], np.zeros(4), obs[3:15],  np.resize(action, (4))]),
-                       control=np.zeros(12)
-                       )
-        sync(np.floor(i*test_env.AGGR_PHY_STEPS), start, test_env.TIMESTEP)
-        # if done: obs = test_env.reset() # OPTIONAL EPISODE HALT
-    test_env.close()
-    logger.save_as_csv("sa") # Optional CSV save
-    logger.plot()
+        actions[:,i]=action
+
+
 
     # with np.load(ARGS.exp+'/evaluations.npz') as data:
     #     print(data.files)
     #     print(data['timesteps'])
     #     print(data['results'])
     #     print(data['ep_lengths'])
+    
+    ############### Plot the states & actions
+    save_path = os.path.join(ARGS.exp)
+    plt.figure()
+    plt.plot(test_env.MAX_THRUST/2*(actions[0,:]*0.05+1),label="r")
+    plt.plot((actions[0,:]),label="b")
+    plt.grid()
+    plt.legend()
+    plt.title('action0_thrust')
+    plt.savefig(save_path + '/action1_thrust.jpg')
+    
+    plt.figure()
+    # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
+    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="r")
+    plt.grid()
+    plt.legend()
+    plt.title('action1_roll')
+    plt.savefig(save_path + '/action1_roll.jpg')
+
+    plt.figure()
+    # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
+    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="r")
+    plt.grid()
+    plt.legend()
+    plt.title('action2_pitch')
+    plt.savefig(save_path + '/action2_pitch.jpg')
+
+    plt.figure()
+    # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
+    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi*180*0.02),label="r")
+    plt.grid()
+    plt.legend()
+    plt.title('action3_yaw')
+    plt.savefig(save_path + '/action3_yaw.jpg')
+
