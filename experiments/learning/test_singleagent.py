@@ -98,11 +98,11 @@ if __name__ == "__main__":
                         obs=OBS,
                         act=ACT
                         )
-    mean_reward, std_reward = evaluate_policy(model,
-                                              eval_env,
-                                              n_eval_episodes=1
-                                              )
-    print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
+    # mean_reward, std_reward = evaluate_policy(model,
+    #                                           eval_env,
+    #                                           n_eval_episodes=1
+    #                                           )
+    # print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
     
     #### Show, record a video, and log the model's performance #
     test_env = gym.make(env_name,
@@ -112,16 +112,14 @@ if __name__ == "__main__":
                         obs=OBS,
                         act=ACT
                         )
-    print('test',test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS)
-    print(test_env.MAX_THRUST)
-    print(test_env.MAX_ROLL_PITCH)
+    
     logger = Logger(logging_freq_hz=int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS),
-                    num_drones=1
+                     num_drones=1
                     )
     obs = test_env.reset()
     start = time.time()
     
-    # for i in range(10*int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS)): # Up to 6''
+    # for i in range(3*int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS)): # Up to 6''
     #     # print('test',test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS,'#####################################')
     #     action, _states = model.predict(obs,
     #                                     deterministic=True # OPTIONAL 'deterministic=False'
@@ -140,18 +138,23 @@ if __name__ == "__main__":
     # logger.save_as_csv("sa") # Optional CSV save
     # logger.plot()
 
-    ### new log try ####
+    # new log try ####
     test_steps=2000
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
-    # obs = np.zeros(
-    #     shape=(test_env.observation_space.shape[0], test_steps), dtype=np.float32)
+    observation = np.zeros(
+        shape=(test_env.observation_space.shape[0], test_steps), dtype=np.float32)
     for i in range(test_steps):
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
                                         )
         obs, reward, done, info = test_env.step(action)
+        # test_env.render()
         actions[:,i]=action
+        observation[:,i]=obs
+        #reward[:,i]=obs
+        sync(np.floor(i*test_env.AGGR_PHY_STEPS), start, test_env.TIMESTEP)
+    test_env.close()
 
 
 
@@ -164,16 +167,16 @@ if __name__ == "__main__":
     ############### Plot the states & actions
     save_path = os.path.join(ARGS.exp)
     plt.figure()
-    plt.plot(test_env.MAX_THRUST/2*(actions[0,:]*0.05+1),label="r")
-    plt.plot((actions[0,:]),label="b")
+    plt.plot(test_env.MAX_THRUST/2*(actions[0,:]*0.05+1),label="thrust")
+    #plt.plot((actions[0,:]),label="b")
     plt.grid()
     plt.legend()
     plt.title('action0_thrust')
-    plt.savefig(save_path + '/action1_thrust.jpg')
+    plt.savefig(save_path + '/action0_thrust.jpg')
     
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="r")
+    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="roll")
     plt.grid()
     plt.legend()
     plt.title('action1_roll')
@@ -181,7 +184,7 @@ if __name__ == "__main__":
 
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="r")
+    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="pitch")
     plt.grid()
     plt.legend()
     plt.title('action2_pitch')
@@ -189,9 +192,86 @@ if __name__ == "__main__":
 
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi*180*0.02),label="r")
+    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi*180*0.02),label="yaw")
     plt.grid()
     plt.legend()
     plt.title('action3_yaw')
     plt.savefig(save_path + '/action3_yaw.jpg')
 
+    ## observation
+    MAX_LIN_VEL_XY = 3 
+    MAX_LIN_VEL_Z = 1
+
+    MAX_XY = MAX_LIN_VEL_XY*test_env.EPISODE_LEN_SEC
+    MAX_Z = MAX_LIN_VEL_Z*test_env.EPISODE_LEN_SEC
+    MAX_PITCH_ROLL = np.pi # Full range
+    
+
+##### x\y\z
+    plt.figure()
+    plt.plot(observation[0,:]*MAX_XY,label="x")
+    plt.grid()
+    plt.legend()
+    plt.title('obs0_x')
+    plt.savefig(save_path + '/obs0_x.jpg')
+
+
+    plt.figure()
+    plt.plot(observation[1,:]*MAX_XY,label="y")
+    plt.grid()
+    plt.legend()
+    plt.title('obs1_y')
+    plt.savefig(save_path + '/obs1_y.jpg')
+
+    plt.figure()
+    plt.plot(observation[2,:]*MAX_Z,label="z")
+    plt.grid()
+    plt.legend()
+    plt.title('obs2_y')
+    plt.savefig(save_path + '/obs2_.jpg')
+
+##### r\p\y
+
+    plt.figure()
+    plt.plot(observation[3,:]*MAX_PITCH_ROLL,label="roll")
+    plt.grid()
+    plt.legend()
+    plt.title('obs3_roll')
+    plt.savefig(save_path + '/obs3_roll.jpg')
+
+
+    plt.figure()
+    plt.plot(observation[4,:]*MAX_PITCH_ROLL,label="pitch")
+    plt.grid()
+    plt.legend()
+    plt.title('obs4_pitch')
+    plt.savefig(save_path + '/obs4_pitch.jpg')
+
+    plt.figure()
+    plt.plot(observation[5,:]*MAX_PITCH_ROLL,label="yaw")
+    plt.grid()
+    plt.legend()
+    plt.title('obs5_yaw')
+    plt.savefig(save_path + '/obs5_yaw.jpg')
+
+### line_v
+
+    plt.figure()
+    plt.plot(observation[6,:]*MAX_PITCH_ROLL,label="x_vel")
+    plt.plot(observation[7,:]*MAX_PITCH_ROLL,label="y_vel")
+    plt.plot(observation[8,:]*MAX_LIN_VEL_Z,label="z_vel")
+    plt.grid()
+    plt.legend()
+    plt.title('lin_vel')
+    plt.savefig(save_path + '/lin_vel.jpg')
+
+## ang_vel
+    plt.figure()
+    plt.plot(observation[9,:]*MAX_PITCH_ROLL,label="x_ang_vel")
+    plt.plot(observation[10,:]*MAX_PITCH_ROLL,label="y_ang_vel")
+    plt.plot(observation[11,:]*MAX_LIN_VEL_Z,label="z_ang_vel")
+    plt.grid()
+    plt.legend()
+    plt.title('lin_vel')
+    plt.savefig(save_path + '/ang_vel.jpg')
+ 
