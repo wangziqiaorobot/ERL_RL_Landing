@@ -60,7 +60,7 @@ class BaseAviary(gym.Env):
                  physics: Physics=Physics.PYB,
                  freq: int=240,
                  aggregate_phy_steps: int=1,
-                 gui=False,
+                 gui=True,
                  record=True,
                  obstacles=False,
                  user_debug_gui=True,
@@ -525,15 +525,15 @@ class BaseAviary(gym.Env):
         The video is saved under folder `files/videos`.
 
         """
-        if self.RECORD and self.GUI:
+        if self.RECORD : #and self.GUI
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
                                                 fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+".mp4",
                                                 physicsClientId=self.CLIENT
                                                 )
-        if self.RECORD and not self.GUI:
-            self.FRAME_NUM = 0
-            self.IMG_PATH = os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+"/"
-            os.makedirs(os.path.dirname(self.IMG_PATH), exist_ok=True)
+        # if self.RECORD and not self.GUI:
+        #     self.FRAME_NUM = 0
+        #     self.IMG_PATH = os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+"/"
+        #     os.makedirs(os.path.dirname(self.IMG_PATH), exist_ok=True)
     
     ################################################################################
 
