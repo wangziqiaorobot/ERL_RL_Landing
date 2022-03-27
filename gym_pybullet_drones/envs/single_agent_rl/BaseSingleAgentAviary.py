@@ -44,8 +44,8 @@ class BaseSingleAgentAviary(BaseAviary):
                  physics: Physics=Physics.PYB,
                  freq: int=240,
                  aggregate_phy_steps: int=1,
-                 gui=False,
-                 record=False, 
+                 gui=True,
+                 record=True, 
                  obs: ObservationType=ObservationType.KIN,
                  act: ActionType=ActionType.RPM
                  ):
