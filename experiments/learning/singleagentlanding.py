@@ -62,7 +62,7 @@ if __name__ == "__main__":
     parser.add_argument('--algo',       default='ppo',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
     parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
-    parser.add_argument('--cpu',        default='1',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
+    parser.add_argument('--cpu',        default='5',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
     ARGS = parser.parse_args()
 
     #### Save directory ########################################
@@ -98,8 +98,8 @@ if __name__ == "__main__":
     
     train_env = make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
-                                 n_envs=ARGS.cpu,
-                                 seed=0
+                                 n_envs=4, # The number of Parallel environments
+                                 seed=ARGS.cpu
                                  )
    
     print("[INFO] Action space:", train_env.action_space)
@@ -149,7 +149,7 @@ if __name__ == "__main__":
                                  deterministic=True,
                                  render=False
                                  )
-    model.learn(total_timesteps=2000*2000, #int(1e12),
+    model.learn(total_timesteps=1000*2000, #int(1e12),
                 callback=eval_callback,
                 log_interval=100,
                 )
