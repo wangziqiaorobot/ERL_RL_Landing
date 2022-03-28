@@ -226,12 +226,15 @@ class BaseAviary(gym.Env):
             self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
                                         np.array([y*4*self.L for y in range(self.NUM_DRONES)]), \
                                         np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)]).transpose().reshape(self.NUM_DRONES, 3)
+            # print('INF_INIT_XYZS',self.INIT_XYZS)
+            
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
             self.INIT_XYZS = initial_xyzs
         else:
             print("[ERROR] invalid initial_xyzs in BaseAviary.__init__(), try initial_xyzs.reshape(NUM_DRONES,3)")
         if initial_rpys is None:
             self.INIT_RPYS = np.zeros((self.NUM_DRONES, 3))
+            # print('INF_INIT_RPYS',self.INIT_RPYS)
         elif np.array(initial_rpys).shape == (self.NUM_DRONES, 3):
             self.INIT_RPYS = initial_rpys
         else:
@@ -299,23 +302,23 @@ class BaseAviary(gym.Env):
 
         """
         #### Save PNG video frames if RECORD=True and GUI=False ####
-        if self.RECORD and not self.GUI and self.step_counter%self.CAPTURE_FREQ == 0:
-            [w, h, rgb, dep, seg] = p.getCameraImage(width=self.VID_WIDTH,
-                                                     height=self.VID_HEIGHT,
-                                                     shadow=1,
-                                                     viewMatrix=self.CAM_VIEW,
-                                                     projectionMatrix=self.CAM_PRO,
-                                                     renderer=p.ER_TINY_RENDERER,
-                                                     flags=p.ER_SEGMENTATION_MASK_OBJECT_AND_LINKINDEX,
-                                                     physicsClientId=self.CLIENT
-                                                     )
-            (Image.fromarray(np.reshape(rgb, (h, w, 4)), 'RGBA')).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
-            #### Save the depth or segmentation view instead #######
-            # dep = ((dep-np.min(dep)) * 255 / (np.max(dep)-np.min(dep))).astype('uint8')
-            # (Image.fromarray(np.reshape(dep, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
-            # seg = ((seg-np.min(seg)) * 255 / (np.max(seg)-np.min(seg))).astype('uint8')
-            # (Image.fromarray(np.reshape(seg, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
-            self.FRAME_NUM += 1
+        # if self.RECORD and not self.GUI and self.step_counter%self.CAPTURE_FREQ == 0:
+        #     [w, h, rgb, dep, seg] = p.getCameraImage(width=self.VID_WIDTH,
+        #                                              height=self.VID_HEIGHT,
+        #                                              shadow=1,
+        #                                              viewMatrix=self.CAM_VIEW,
+        #                                              projectionMatrix=self.CAM_PRO,
+        #                                              renderer=p.ER_TINY_RENDERER,
+        #                                              flags=p.ER_SEGMENTATION_MASK_OBJECT_AND_LINKINDEX,
+        #                                              physicsClientId=self.CLIENT
+        #                                              )
+        #     (Image.fromarray(np.reshape(rgb, (h, w, 4)), 'RGBA')).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
+        #     #### Save the depth or segmentation view instead #######
+        #     # dep = ((dep-np.min(dep)) * 255 / (np.max(dep)-np.min(dep))).astype('uint8')
+        #     # (Image.fromarray(np.reshape(dep, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
+        #     # seg = ((seg-np.min(seg)) * 255 / (np.max(seg)-np.min(seg))).astype('uint8')
+        #     # (Image.fromarray(np.reshape(seg, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
+        #     self.FRAME_NUM += 1
         #### Read the GUI's input parameters #######################
         if self.GUI and self.USER_DEBUG:
             current_input_switch = p.readUserDebugParameter(self.INPUT_SWITCH, physicsClientId=self.CLIENT)
@@ -491,14 +494,18 @@ class BaseAviary(gym.Env):
                                               flags = p.URDF_USE_INERTIA_FROM_FILE,
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
-        for i in range(self.NUM_DRONES):
-            #### Show the frame of reference of the drone, note that ###
-            #### It severly slows down the GUI #########################
-            if self.GUI and self.USER_DEBUG:
-                self._showDroneLocalAxes(i)
-            #### Disable collisions between drones' and the ground plane
-            #### E.g., to start a drone at [0,0,0] #####################
-            # p.setCollisionFilterPair(bodyUniqueIdA=self.PLANE_ID, bodyUniqueIdB=self.DRONE_IDS[i], linkIndexA=-1, linkIndexB=-1, enableCollision=0, physicsClientId=self.CLIENT)
+        
+        # add the local axes to the drone, but this will slows down the GUI
+        self._showDroneLocalAxes(0)
+
+        # for i in range(self.NUM_DRONES):
+        #     #### Show the frame of reference of the drone, note that ###
+        #     #### It severly slows down the GUI #########################
+        #     if self.GUI and self.USER_DEBUG:
+        #         self._showDroneLocalAxes(i)
+        #     #### Disable collisions between drones' and the ground plane
+        #     #### E.g., to start a drone at [0,0,0] #####################
+        #     # p.setCollisionFilterPair(bodyUniqueIdA=self.PLANE_ID, bodyUniqueIdB=self.DRONE_IDS[i], linkIndexA=-1, linkIndexB=-1, enableCollision=0, physicsClientId=self.CLIENT)
         if self.OBSTACLES:
             self._addObstacles()
     
