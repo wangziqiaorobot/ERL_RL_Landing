@@ -144,6 +144,8 @@ if __name__ == "__main__":
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
         shape=(test_env.observation_space.shape[0], test_steps), dtype=np.float32)
+    rewards = np.zeros(
+        shape=(1, test_steps), dtype=np.float32)
     for i in range(test_steps):
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
@@ -152,7 +154,7 @@ if __name__ == "__main__":
         # test_env.render()
         actions[:,i]=action
         observation[:,i]=obs
-        #reward[:,i]=obs
+        rewards[:,i]=reward
         sync(np.floor(i*test_env.AGGR_PHY_STEPS), start, test_env.TIMESTEP)
     test_env.close()
 
@@ -228,12 +230,13 @@ if __name__ == "__main__":
     plt.grid()
     plt.legend()
     plt.title('obs2_y')
-    plt.savefig(save_path + '/obs2_.jpg')
+    plt.savefig(save_path + '/obs2_z.jpg')
 
 ##### r\p\y
 
     plt.figure()
-    plt.plot(observation[3,:]*MAX_PITCH_ROLL,label="roll")
+    plt.plot(observation[3,:]*MAX_PITCH_ROLL/math.pi*180,label="roll")
+    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_roll")
     plt.grid()
     plt.legend()
     plt.title('obs3_roll')
@@ -241,14 +244,16 @@ if __name__ == "__main__":
 
 
     plt.figure()
-    plt.plot(observation[4,:]*MAX_PITCH_ROLL,label="pitch")
+    plt.plot(observation[4,:]*MAX_PITCH_ROLL/math.pi*180,label="pitch")
+    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_pitch")
     plt.grid()
     plt.legend()
     plt.title('obs4_pitch')
     plt.savefig(save_path + '/obs4_pitch.jpg')
 
     plt.figure()
-    plt.plot(observation[5,:]*MAX_PITCH_ROLL,label="yaw")
+    plt.plot(observation[5,:]*MAX_PITCH_ROLL/math.pi*180,label="yaw")
+    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi*180*0.02),label="command(action)_yaw")
     plt.grid()
     plt.legend()
     plt.title('obs5_yaw')
@@ -274,4 +279,13 @@ if __name__ == "__main__":
     plt.legend()
     plt.title('lin_vel')
     plt.savefig(save_path + '/ang_vel.jpg')
+
+## rewards
+
+    plt.figure()
+    plt.plot(rewards[0,:],label="rewards")
+    plt.grid()
+    plt.legend()
+    plt.title('reward')
+    plt.savefig(save_path + '/reward.jpg')
  
