@@ -73,7 +73,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
         """
         state = self._getDroneStateVector(0)
-        return -1 * np.linalg.norm(np.array([0, 0, 1])-state[0:3])**2*0.01
+        return  -1 * ((0-state[0])**2+(0-state[1])**2+(1-state[2])**2)*0.05                  #-1 * np.linalg.norm(np.array([0, 0, 1])-state[0:3])**2*0.01
 
     ################################################################################
     
