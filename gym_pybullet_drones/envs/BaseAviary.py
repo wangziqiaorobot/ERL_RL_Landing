@@ -533,6 +533,7 @@ class BaseAviary(gym.Env):
 
         """
         if self.RECORD : #and self.GUI
+            print('start recording ....')
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
                                                 fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+".mp4",
                                                 physicsClientId=self.CLIENT
