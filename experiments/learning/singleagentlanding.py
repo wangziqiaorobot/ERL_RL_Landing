@@ -98,8 +98,8 @@ if __name__ == "__main__":
     
     train_env = make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
-                                 n_envs=4, # The number of Parallel environments
-                                 seed=ARGS.cpu
+                                 n_envs=ARGS.cpu,# The number of Parallel environments
+                                 seed=1
                                  )
    
     print("[INFO] Action space:", train_env.action_space)
@@ -130,24 +130,26 @@ if __name__ == "__main__":
     eval_env = gym.make("landing-aviary-v0",
                             aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
                             obs=ARGS.obs,
-                            act=ARGS.act
+                            act=ARGS.act,
+                            gui=True,
+                            record=True
                             )
     
         
 
     #### Train the model #######################################
-    checkpoint_callback = CheckpointCallback(save_freq=1000, save_path=filename+'-logs/', name_prefix='rl_model')
+    checkpoint_callback = CheckpointCallback(save_freq=2000, save_path=filename+'-logs/', name_prefix='rl_model')
     callback_on_best = StopTrainingOnRewardThreshold(reward_threshold=EPISODE_REWARD_THRESHOLD,
                                                      verbose=1
                                                      )
     eval_callback = EvalCallback(eval_env,
                                  callback_on_new_best=callback_on_best,
                                  verbose=1,
-                                 best_model_save_path=filename+'/',
+                                 best_model_save_path=filename+'/'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"),
                                  log_path=filename+'/',
-                                 eval_freq=int(2000/ARGS.cpu),
+                                 eval_freq=int(6000/ARGS.cpu),
                                  deterministic=True,
-                                 render=False
+                                 render=True
                                  )
     model.learn(total_timesteps=1000*2000, #int(1e12),
                 callback=eval_callback,
