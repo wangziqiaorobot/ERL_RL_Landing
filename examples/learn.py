@@ -28,7 +28,7 @@ from ray.tune import register_env
 from ray.rllib.agents import ppo
 
 from gym_pybullet_drones.utils.Logger import Logger
-from gym_pybullet_drones.envs.single_agent_rl.LandingAviary import LandingAviary
+from gym_pybullet_drones.envs.single_agent_rl.HoverAviary import HoverAviary
 from gym_pybullet_drones.utils.utils import sync, str2bool
 
 if __name__ == "__main__":
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     ARGS = parser.parse_args()
     
     #### Check the environment's spaces ########################
-    env = gym.make("landing-aviary-v0")
+    env = gym.make("hover-aviary-v0")
     print("[INFO] Action space:", env.action_space)
     print("[INFO] Observation space:", env.observation_space)
     check_env(env,
@@ -55,15 +55,15 @@ if __name__ == "__main__":
                     env,
                     verbose=1
                     )
-        model.learn(total_timesteps=10000) # Typically not enough
+        model.learn(total_timesteps=100000) # Typically not enough
     else:
         ray.shutdown()
         ray.init(ignore_reinit_error=True)
-        register_env("landing-aviary-v0", lambda _: LandingAviary())
+        register_env("hover-aviary-v0", lambda _: HoverAviary())
         config = ppo.DEFAULT_CONFIG.copy()
-        config["num_workers"] = 1
+        config["num_workers"] = 4
         config["framework"] = "torch"
-        config["env"] = "landing-aviary-v0"
+        config["env"] = "hover-aviary-v0"
         agent = ppo.PPOTrainer(config)
         for i in range(3): # Typically not enough
             results = agent.train()
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         ray.shutdown()
 
     #### Show (and record a video of) the model's performance ##
-    env = LandingAviary(gui=True,
+    env = HoverAviary(gui=True,
                         record=True
                         )
     logger = Logger(logging_freq_hz=int(env.SIM_FREQ/env.AGGR_PHY_STEPS),
