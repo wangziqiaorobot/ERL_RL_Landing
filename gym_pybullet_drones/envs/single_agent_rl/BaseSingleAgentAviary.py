@@ -13,7 +13,7 @@ from gym_pybullet_drones.control.SimplePIDControl import SimplePIDControl
 
 class ActionType(Enum):
     """Action type enumeration class."""
-    LD= "ld" # 4d action space for the landing task, 
+    LD= "ld" # 4d action space for the landing task, desired thrust and r\p\y
     RPM = "rpm"                 # RPMS
     DYN = "dyn"                 # Desired thrust and torques
     PID = "pid"                 # PID control
@@ -84,7 +84,7 @@ class BaseSingleAgentAviary(BaseAviary):
         dynamics_attributes = True if act in [ActionType.DYN, ActionType.ONE_D_DYN, ActionType.LD] else False
         self.OBS_TYPE = obs
         self.ACT_TYPE = act
-        self.EPISODE_LEN_SEC = 5  # the longth of each epsoid
+        self.EPISODE_LEN_SEC = 10  # the longth of each epsoid
         #### Create integrated controllers #########################
         # if act in [ActionType.PID, ActionType.VEL, ActionType.TUN, ActionType.ONE_D_PID]:
         #     os.environ['KMP_DUPLICATE_LIB_OK']='True'
@@ -248,8 +248,7 @@ class BaseSingleAgentAviary(BaseAviary):
         elif self.ACT_TYPE == ActionType.RPM:
             return np.array(self.HOVER_RPM * (1+0.05*action))
         elif self.ACT_TYPE == ActionType.DYN: #
-            print('GRAVITY:',self.GRAVITY)
-            print('action:', action)
+            
             return nnlsRPM(thrust=(self.GRAVITY*(action[0]+1)),
                            x_torque=(0.05*self.MAX_XY_TORQUE*action[1]),
                            y_torque=(0.05*self.MAX_XY_TORQUE*action[2]),
@@ -322,7 +321,7 @@ class BaseSingleAgentAviary(BaseAviary):
             # print('target_rpy',action[1:4])
             
             targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-                                                 thrust=(self.MAX_THRUST/2*(action[0]*0.05+1)),
+                                                 thrust=(self.MAX_THRUST/2*(action[0]+1)), #gravity:4.9; thrust :9.8
                                                  cur_quat=state[3:7],
                                                  target_rpy=np.array([action[1]*self.MAX_ROLL_PITCH,action[2]*self.MAX_ROLL_PITCH,action[3]*self.MAX_ROLL_PITCH*0.02])
                                                  )

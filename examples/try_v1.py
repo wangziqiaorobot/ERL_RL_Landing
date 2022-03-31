@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
         #### Step the simulation ###################################
         obs, reward, done, info = env.step(action)
-
+        
         #### Compute control at the desired frequency ##############
         # if i%CTRL_EVERY_N_STEPS == 0:
            
