@@ -1,3 +1,4 @@
+from cv2 import exp
 import numpy as np
 from gym import spaces
 
@@ -73,7 +74,10 @@ class LandingAviary(BaseSingleAgentAviary):
 
         """
         state = self._getDroneStateVector(0)
-        return  -1 * ((0-state[0])**2+(0-state[1])**2+(0.5-state[2])**2)*0.5                  #-1 * np.linalg.norm(np.array([0, 0, 1])-state[0:3])**2*0.01
+        diff_act= self.current_action-state[16:20]
+        return 0.1 * (np.exp(- np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.01*np.linalg.norm(diff_act)**2+ 0.05
+        # return -1 *(np.exp(-(0-state[0])**2)-3+np.exp(-(0-state[1])**2)+np.exp(-(0.5-state[2])**2))
+        # return  -1 * ((0-state[0])**2+(0-state[1])**2+(0.5-state[2])**2)*0.5                  #-1 * np.linalg.norm(np.array([0, 0, 1])-state[0:3])**2*0.01
 
     ################################################################################
     
@@ -86,7 +90,7 @@ class LandingAviary(BaseSingleAgentAviary):
             Whether the current episode is done.
 
         """
-        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC:
+        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC :# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
         # Alternative done condition, see PR #32
         # if (self.step_counter/self.SIM_FREQ > (self.EPISODE_LEN_SEC)) or ((self._getDroneStateVector(0))[2] < 0.05):
             return True
