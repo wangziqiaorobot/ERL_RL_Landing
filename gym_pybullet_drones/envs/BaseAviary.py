@@ -319,6 +319,9 @@ class BaseAviary(gym.Env):
         #     # seg = ((seg-np.min(seg)) * 255 / (np.max(seg)-np.min(seg))).astype('uint8')
         #     # (Image.fromarray(np.reshape(seg, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
         #     self.FRAME_NUM += 1
+
+        self.current_action = action
+
         #### Read the GUI's input parameters #######################
         if self.GUI and self.USER_DEBUG:
             current_input_switch = p.readUserDebugParameter(self.INPUT_SWITCH, physicsClientId=self.CLIENT)
@@ -472,8 +475,10 @@ class BaseAviary(gym.Env):
         self.GUI_INPUT_TEXT = -1*np.ones(self.NUM_DRONES)
         self.USE_GUI_RPM=False
         self.last_input_switch = 0
-        self.last_action = -1*np.ones((self.NUM_DRONES, 4))
+        self.current_action = np.zeros((self.NUM_DRONES, 4)) # the current output of RL MLP
+        self.last_action = np.zeros((self.NUM_DRONES, 4)) # the history output of RL MLP#-1*np.ones((self.NUM_DRONES, 4))
         self.last_clipped_action = np.zeros((self.NUM_DRONES, 4))
+        # self.last_output_action= np.zeros((self.NUM_DRONES, 4)) # the history output of RL MLP
         self.gui_input = np.zeros(4)
         #### Initialize the drones kinemaatic information ##########
         self.pos = np.zeros((self.NUM_DRONES, 3))
@@ -566,7 +571,7 @@ class BaseAviary(gym.Env):
 
         """
         state = np.hstack([self.pos[nth_drone, :], self.quat[nth_drone, :], self.rpy[nth_drone, :],
-                           self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_clipped_action[nth_drone, :]])
+                           self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_action[nth_drone, :]])
         return state.reshape(20,)
 
     ################################################################################
