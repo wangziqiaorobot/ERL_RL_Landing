@@ -352,16 +352,16 @@ class BaseSingleAgentAviary(BaseAviary):
         elif self.OBS_TYPE == ObservationType.KIN:
             ############################################################
             #### OBS OF SIZE 20 (WITH QUATERNION AND RPMS)
-            #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ       P0            P1            P2            P3
-            # obs_lower_bound = np.array([-1,      -1,      0,      -1,  -1,  -1,  -1,  -1,     -1,     -1,     -1,      -1,      -1,      -1,      -1,      -1,      -1,           -1,           -1,           -1])
-            # obs_upper_bound = np.array([1,       1,       1,      1,   1,   1,   1,   1,      1,      1,      1,       1,       1,       1,       1,       1,       1,            1,            1,            1])          
-            # return spaces.Box( low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32 )
+            #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ       A0            A1            A2            A3
+            obs_lower_bound = np.array([-1,      -1,      0,      -1,  -1,  -1,  -1,  -1,     -1,     -1,     -1,      -1,      -1,      -1,      -1,      -1,      -1,           -1,           -1,           -1])
+            obs_upper_bound = np.array([1,       1,       1,      1,   1,   1,   1,   1,      1,      1,      1,       1,       1,       1,       1,       1,       1,            1,            1,            1])          
+            return spaces.Box( low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32 )
             ############################################################
             #### OBS SPACE OF SIZE 12
-            return spaces.Box(low=np.array([-1,-1,0, -1,-1,-1, -1,-1,-1, -1,-1,-1]),
-                              high=np.array([1,1,1, 1,1,1, 1,1,1, 1,1,1]),
-                              dtype=np.float32
-                              )
+            # return spaces.Box(low=np.array([-1,-1,0, -1,-1,-1, -1,-1,-1, -1,-1,-1]),
+            #                   high=np.array([1,1,1, 1,1,1, 1,1,1, 1,1,1]),
+            #                   dtype=np.float32
+            #                   )
             ############################################################
         else:
             print("[ERROR] in BaseSingleAgentAviary._observationSpace()")
@@ -394,10 +394,10 @@ class BaseSingleAgentAviary(BaseAviary):
             obs = self._clipAndNormalizeState(self._getDroneStateVector(0))
             ############################################################
             #### OBS OF SIZE 20 (WITH QUATERNION AND RPMS)
-            # return obs
+            return obs
             ############################################################
             #### OBS SPACE OF SIZE 12
-            return np.hstack([obs[0:3], obs[7:10], obs[10:13], obs[13:16]]).reshape(12,)
+            # return np.hstack([obs[0:3], obs[7:10], obs[10:13], obs[13:16]]).reshape(12,)
             ############################################################
         else:
             print("[ERROR] in BaseSingleAgentAviary._computeObs()")
