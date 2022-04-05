@@ -34,12 +34,12 @@ class SimplePIDControl(BaseControl):
             print("[ERROR] in SimplePIDControl.__init__(), SimplePIDControl requires DroneModel.HB")
             exit()
         #PID parameter of position controller
-        self.P_COEFF_FOR = np.array([.045, .045, .45])
+        self.P_COEFF_FOR = np.array([.065, .065, .65])
         self.I_COEFF_FOR = np.array([.000, .000, .000])
-        self.D_COEFF_FOR = np.array([1.0, 1.0, .5])#np.array([.3, .3, .4])
+        self.D_COEFF_FOR = np.array([5.0, 5.0, 1.5])#np.array([.3, .3, .4])
         
         #PD parameter of attitude controller
-        self.P_COEFF_TOR =  np.array([1.0, 0.8, .05])#np.array([.9, .3, .05])
+        self.P_COEFF_TOR =  np.array([1.0, 0.8, .1])#np.array([.9, .3, .05])
         #self.I_COEFF_TOR = np.array([.0001, .0001, .0001])
         self.D_COEFF_TOR = np.array([.2, .18, .3])
 
@@ -139,7 +139,7 @@ class SimplePIDControl(BaseControl):
                                              computed_target_rpy
                                              )
         cur_rpy = p.getEulerFromQuaternion(cur_quat)
-        return rpm, pos_e, computed_target_rpy - cur_rpy, target_torques
+        return rpm, pos_e,  computed_target_rpy -cur_rpy, target_torques #
 
     ################################################################################
 
@@ -188,7 +188,7 @@ class SimplePIDControl(BaseControl):
         #### Target rotation #######################################
         target_rpy[0] = np.arcsin(-sign_z*target_force[1] / np.linalg.norm(target_force))
         target_rpy[1] = np.arctan2(sign_z*target_force[0], sign_z*target_force[2])
-        target_rpy[2] = 0.
+        target_rpy[2] = math.pi/2
         target_rpy[0] = np.clip(target_rpy[0], -self.MAX_ROLL_PITCH, self.MAX_ROLL_PITCH)
         target_rpy[1] = np.clip(target_rpy[1], -self.MAX_ROLL_PITCH, self.MAX_ROLL_PITCH)
         cur_rotation = np.array(p.getMatrixFromQuaternion(cur_quat)).reshape(3, 3)
