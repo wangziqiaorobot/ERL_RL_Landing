@@ -178,7 +178,7 @@ if __name__ == "__main__":
     
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="roll")
+    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="roll")
     plt.grid()
     plt.legend()
     plt.title('action1_roll')
@@ -186,7 +186,7 @@ if __name__ == "__main__":
 
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="pitch")
+    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="pitch")
     plt.grid()
     plt.legend()
     plt.title('action2_pitch')
@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi*180*0.02),label="yaw")
+    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180*0.02),label="yaw")
     plt.grid()
     plt.legend()
     plt.title('action3_yaw')
@@ -236,7 +236,7 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(observation[3,:]*MAX_PITCH_ROLL/math.pi*180,label="roll")
-    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_roll")
+    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="command(action)_roll")
     plt.grid()
     plt.legend()
     plt.title('obs3_roll')
@@ -245,7 +245,7 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(observation[4,:]*MAX_PITCH_ROLL/math.pi*180,label="pitch")
-    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_pitch")
+    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="command(action)_pitch")
     plt.grid()
     plt.legend()
     plt.title('obs4_pitch')
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(observation[5,:]*MAX_PITCH_ROLL/math.pi*180,label="yaw")
-    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi*180*0.02),label="command(action)_yaw")
+    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180*0.02),label="command(action)_yaw")
     plt.grid()
     plt.legend()
     plt.title('obs5_yaw')
@@ -283,7 +283,9 @@ if __name__ == "__main__":
 ## rewards
 
     plt.figure()
-    plt.plot(rewards[0,:],label="rewards")
+    plt.plot(0.1 * (np.exp(- ((0-observation[0,:])**2+(0-observation[1,:])**2+(0.5-observation[2,:])**2)**2)-1),label="rewards_pos")
+    plt.plot(-0.01 * ((observation[16,:]-actions[0,:])**2+(observation[17,:]-actions[1,:])**2+(observation[18,:]-actions[2,:])**2+(observation[19,:]-actions[3,:])**2),label="rewards_actsmooth")
+
     plt.grid()
     plt.legend()
     plt.title('reward')
