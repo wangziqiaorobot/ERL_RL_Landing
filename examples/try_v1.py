@@ -58,7 +58,7 @@ if __name__ == "__main__":
     #### Initialize the simulation #############################
     H = .7
     H_STEP = .05
-    R = .3
+    R = .5
     INIT_XYZS = np.array([[R*np.cos((i/6)*2*np.pi+np.pi/2), R*np.sin((i/6)*2*np.pi+np.pi/2)-R, H+i*H_STEP] for i in range(ARGS.num_drones)])
     INIT_RPYS = np.array([[0, 0,  i * (np.pi/2)/ARGS.num_drones] for i in range(ARGS.num_drones)])
     AGGR_PHY_STEPS = int(ARGS.simulation_freq_hz/ARGS.control_freq_hz) if ARGS.aggregate else 1
@@ -131,6 +131,8 @@ if __name__ == "__main__":
     test_step=int(int(ARGS.duration_sec*env.SIM_FREQ)/AGGR_PHY_STEPS)
    
     target_rpy_e = np.zeros(shape=(3, test_step))
+    target_rpy = np.zeros(shape=(3, test_step))
+    cur_rpy = np.zeros(shape=(3, test_step))
     pos_e = np.zeros(shape=(3, test_step))
     target_torques=np.zeros(shape=(3, test_step))
     ################################
@@ -151,13 +153,13 @@ if __name__ == "__main__":
            
             #### Compute control for the current way point #############
         for j in range(ARGS.num_drones):
-                action[str(j)], pos_e[:,i], target_rpy_e[:,i],target_torques[:,i] = ctrl[j].computeControlFromState(control_timestep=CTRL_EVERY_N_STEPS*env.TIMESTEP,
+                action[str(j)], pos_e[:,i], target_rpy[:,i],cur_rpy[:,i],target_torques[:,i] = ctrl[j].computeControlFromState(control_timestep=CTRL_EVERY_N_STEPS*env.TIMESTEP,
                                                                        state=obs[str(j)]["state"],
                                                                        target_pos=np.hstack([TARGET_POS[wp_counters[j], 0:2], INIT_XYZS[j, 2]]),
                                                                        #target_pos=INIT_XYZS[j, :] + TARGET_POS[wp_counters[j], :],
                                                                        target_rpy=INIT_RPYS[j, :]
                                                                        )
-
+                target_rpy_e[:,i]= target_rpy[:,i]-cur_rpy[:,i]
             #### Go to the next way point and loop #####################
         for j in range(ARGS.num_drones): 
                 wp_counters[j] = wp_counters[j] + 1 if wp_counters[j] < (NUM_WP-1) else 0
@@ -234,7 +236,29 @@ if __name__ == "__main__":
         plt.legend()
         plt.title('target_torques')
         plt.savefig(save_path+'target_torques.jpg')
+#### target rpy and current rpy  ################
+        plt.figure()
+        plt.plot(target_rpy[0,:]/math.pi*180,label="target_r")
+        plt.plot(cur_rpy[0,:]/math.pi*180,label="cur_r")
+        plt.grid()
+        plt.legend()
+        plt.title('rpy_roll')
+        plt.savefig(save_path+'rpy_r.jpg')
 
+        plt.figure()
+        plt.plot(target_rpy[1,:]/math.pi*180,label="target_p")
+        plt.plot(cur_rpy[1,:]/math.pi*180,label="cur_p")
+        plt.grid()
+        plt.legend()
+        plt.title('rpy_pitch')
+        plt.savefig(save_path+'rpy_pitch.jpg')
 
+        plt.figure()
+        plt.plot(target_rpy[2,:]/math.pi*180,label="target_y")
+        plt.plot(cur_rpy[2,:]/math.pi*180,label="cur_y")
+        plt.grid()
+        plt.legend()
+        plt.title('rpy_yaw')
+        plt.savefig(save_path+'rpy_yaw.jpg')
         
         ################TO DO  PRINT the POS_e and RYP_e ###################
