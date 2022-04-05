@@ -192,7 +192,7 @@ if __name__ == "__main__":
         task_path = os.path.dirname(os.path.realpath(__file__))
         save_path=os.path.join(task_path+"/../files/logs",datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
         plt.figure()
-        plt.plot(target_rpy_e[0,:],label="r")
+        plt.plot(target_rpy_e[0,:]/math.pi*180,label="r")
        
         plt.grid()
         plt.legend()
@@ -201,7 +201,7 @@ if __name__ == "__main__":
 
         plt.figure()
         
-        plt.plot(target_rpy_e[1,:],label="p")
+        plt.plot(target_rpy_e[1,:]/math.pi*180,label="p")
         
         plt.grid()
         plt.legend()
@@ -210,7 +210,7 @@ if __name__ == "__main__":
 
         plt.figure()
       
-        plt.plot(target_rpy_e[2,:],label="y")
+        plt.plot(target_rpy_e[2,:]/math.pi*180,label="y")
         plt.grid()
         plt.legend()
         plt.title('rpy_error')
