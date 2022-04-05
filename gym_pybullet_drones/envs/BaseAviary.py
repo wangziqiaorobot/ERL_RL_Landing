@@ -471,6 +471,7 @@ class BaseAviary(gym.Env):
         #### Initialize/reset counters and zero-valued variables ###
         self.RESET_TIME = time.time()
         self.step_counter = 0
+        self.iterate=1
         self.first_render_call = True
         self.X_AX = -1*np.ones(self.NUM_DRONES)
         self.Y_AX = -1*np.ones(self.NUM_DRONES)
@@ -546,6 +547,12 @@ class BaseAviary(gym.Env):
             print('start recording ....')
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
                                                 fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+".mp4",
+                                                physicsClientId=self.CLIENT
+                                                )
+        if self.iterate % 100 == 0:
+            print('start recording ....')
+            self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
+                                                fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+self.iterate+".mp4",
                                                 physicsClientId=self.CLIENT
                                                 )
         # if self.RECORD and not self.GUI:
