@@ -39,16 +39,19 @@ class SimplePIDControl(BaseControl):
         self.D_COEFF_FOR = np.array([5.0, 5.0, 1.5])#np.array([.3, .3, .4])
         
         #PD parameter of attitude controller
-        self.P_COEFF_TOR =  np.array([1.0, 0.8, .1])#np.array([.9, .3, .05])
+        self.P_COEFF_TOR =  np.array([0.15, 0.15, .08]) #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
         #self.I_COEFF_TOR = np.array([.0001, .0001, .0001])
-        self.D_COEFF_TOR = np.array([.2, .18, .3])
+        self.D_COEFF_TOR =  np.array([.05, .05, .3]) #np.array([.02, .02, .3])
 
 
         self.MAX_ROLL_PITCH = np.pi/6
+        self.M=1.2
         self.L = self._getURDFParameter('arm')
         self.THRUST2WEIGHT_RATIO = self._getURDFParameter('thrust2weight')
-        self.MAX_RPM = np.sqrt((self.THRUST2WEIGHT_RATIO*self.GRAVITY) / (4*self.KF))
-        self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
+        # self.MAX_RPM = np.sqrt((self.THRUST2WEIGHT_RATIO*self.GRAVITY) / (4*self.KF))
+        self.MAX_THRUST = 12*self.M #the max thrust is 12 m/s^2 (collective thrust, which means without mass)
+        self.MAX_RPM = np.sqrt((self.MAX_THRUST) / (4*self.KF))
+        # self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
         self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)
         self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)
         self.A = np.array([ [1, 1, 1, 1], [0, 1, 0, -1], [-1, 0, 1, 0], [-1, 1, -1, 1] ])
@@ -139,7 +142,7 @@ class SimplePIDControl(BaseControl):
                                              computed_target_rpy
                                              )
         cur_rpy = p.getEulerFromQuaternion(cur_quat)
-        return rpm, pos_e,  computed_target_rpy -cur_rpy, target_torques #
+        return rpm, pos_e,  computed_target_rpy ,cur_rpy, target_torques #
 
     ################################################################################
 
