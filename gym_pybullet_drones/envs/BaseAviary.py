@@ -142,8 +142,11 @@ class BaseAviary(gym.Env):
         #### Compute constants #####################################
         self.GRAVITY = self.G*self.M
         self.HOVER_RPM = np.sqrt(self.GRAVITY / (4*self.KF))
-        self.MAX_RPM = np.sqrt((self.THRUST2WEIGHT_RATIO*self.GRAVITY) / (4*self.KF))
-        self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
+        # self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
+        self.MAX_THRUST = 12*self.M #the max thrust is 12 m/s^2 (collective thrust, which means without mass)
+        self.MAX_RPM = np.sqrt((self.MAX_THRUST) / (4*self.KF))
+        # self.MAX_RPM = np.sqrt((self.THRUST2WEIGHT_RATIO*self.GRAVITY) / (4*self.KF))
+        # self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
         if self.DRONE_MODEL == DroneModel.CF2X:
             self.MAX_XY_TORQUE = (2*self.L*self.KF*self.MAX_RPM**2)/np.sqrt(2)
         elif self.DRONE_MODEL in [DroneModel.CF2P, DroneModel.HB]:
@@ -513,8 +516,8 @@ class BaseAviary(gym.Env):
         #     #### Disable collisions between drones' and the ground plane
         #     #### E.g., to start a drone at [0,0,0] #####################
         #     # p.setCollisionFilterPair(bodyUniqueIdA=self.PLANE_ID, bodyUniqueIdB=self.DRONE_IDS[i], linkIndexA=-1, linkIndexB=-1, enableCollision=0, physicsClientId=self.CLIENT)
-        if self.OBSTACLES:
-            self._addObstacles()
+        # if self.OBSTACLES:
+            # self._addObstacles()
     
     ################################################################################
 
