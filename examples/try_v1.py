@@ -56,7 +56,7 @@ if __name__ == "__main__":
     ARGS = parser.parse_args()
 
     #### Initialize the simulation #############################
-    H = .7
+    H = 2.7
     H_STEP = .05
     R = .5
     INIT_XYZS = np.array([[R*np.cos((i/6)*2*np.pi+np.pi/2), R*np.sin((i/6)*2*np.pi+np.pi/2)-R, H+i*H_STEP] for i in range(ARGS.num_drones)])
@@ -242,6 +242,8 @@ if __name__ == "__main__":
         plt.plot(cur_rpy[0,:]/math.pi*180,label="cur_r")
         plt.grid()
         plt.legend()
+        plt.xlabel("time steps")
+        plt.ylabel("degree")
         plt.title('rpy_roll')
         plt.savefig(save_path+'rpy_r.jpg')
 
@@ -250,6 +252,8 @@ if __name__ == "__main__":
         plt.plot(cur_rpy[1,:]/math.pi*180,label="cur_p")
         plt.grid()
         plt.legend()
+        plt.xlabel("time steps")
+        plt.ylabel("degree")
         plt.title('rpy_pitch')
         plt.savefig(save_path+'rpy_pitch.jpg')
 
@@ -258,6 +262,8 @@ if __name__ == "__main__":
         plt.plot(cur_rpy[2,:]/math.pi*180,label="cur_y")
         plt.grid()
         plt.legend()
+        plt.xlabel("time steps")
+        plt.ylabel("degree")
         plt.title('rpy_yaw')
         plt.savefig(save_path+'rpy_yaw.jpg')
         

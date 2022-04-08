@@ -131,7 +131,7 @@ if __name__ == "__main__":
                             aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
                             obs=ARGS.obs,
                             act=ARGS.act,
-                            gui=False,
+                            gui=True,
                             record=False
                             )
     

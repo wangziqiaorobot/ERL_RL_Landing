@@ -39,9 +39,9 @@ class SimplePIDControl(BaseControl):
         self.D_COEFF_FOR = np.array([5.0, 5.0, 1.5])#np.array([.3, .3, .4])
         
         #PD parameter of attitude controller
-        self.P_COEFF_TOR =  np.array([0.15, 0.15, .08]) #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
+        self.P_COEFF_TOR =  np.array([0.15, 0.15, .09]) #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
         #self.I_COEFF_TOR = np.array([.0001, .0001, .0001])
-        self.D_COEFF_TOR =  np.array([.05, .05, .03]) #np.array([.02, .02, .3])
+        self.D_COEFF_TOR =  np.array([.05, .05, .05]) #np.array([.02, .02, .3])
 
 
         self.MAX_ROLL_PITCH = np.pi/6
@@ -191,7 +191,7 @@ class SimplePIDControl(BaseControl):
         #### Target rotation #######################################
         target_rpy[0] = np.arcsin(-sign_z*target_force[1] / np.linalg.norm(target_force))
         target_rpy[1] = np.arctan2(sign_z*target_force[0], sign_z*target_force[2])
-        target_rpy[2] = math.pi/6
+        target_rpy[2] = math.pi/18*target_pos[0]
         target_rpy[0] = np.clip(target_rpy[0], -self.MAX_ROLL_PITCH, self.MAX_ROLL_PITCH)
         target_rpy[1] = np.clip(target_rpy[1], -self.MAX_ROLL_PITCH, self.MAX_ROLL_PITCH)
         cur_rotation = np.array(p.getMatrixFromQuaternion(cur_quat)).reshape(3, 3)
