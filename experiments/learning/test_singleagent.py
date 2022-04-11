@@ -169,7 +169,7 @@ if __name__ == "__main__":
     ############### Plot the states & actions
     save_path = os.path.join(ARGS.exp)
     plt.figure()
-    plt.plot(test_env.MAX_THRUST/2*(actions[0,:]*0.05+1),label="thrust")
+    plt.plot(test_env.MAX_THRUST/2*(actions[0,:]+1),label="thrust")
     #plt.plot((actions[0,:]),label="b")
     plt.grid()
     plt.legend()
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(observation[5,:]*MAX_PITCH_ROLL/math.pi*180,label="yaw")
-    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180*0.02),label="command(action)_yaw")
+    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180),label="command(action)_yaw")
     plt.grid()
     plt.legend()
     plt.title('obs5_yaw')

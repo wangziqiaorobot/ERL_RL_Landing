@@ -191,7 +191,7 @@ class SimplePIDControl(BaseControl):
         #### Target rotation #######################################
         target_rpy[0] = np.arcsin(-sign_z*target_force[1] / np.linalg.norm(target_force))
         target_rpy[1] = np.arctan2(sign_z*target_force[0], sign_z*target_force[2])
-        target_rpy[2] = math.pi/18*target_pos[0]
+        target_rpy[2] = math.pi/6*target_pos[0]
         target_rpy[0] = np.clip(target_rpy[0], -self.MAX_ROLL_PITCH, self.MAX_ROLL_PITCH)
         target_rpy[1] = np.clip(target_rpy[1], -self.MAX_ROLL_PITCH, self.MAX_ROLL_PITCH)
         cur_rotation = np.array(p.getMatrixFromQuaternion(cur_quat)).reshape(3, 3)
