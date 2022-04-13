@@ -145,36 +145,72 @@ class BaseSingleAgentAviary(BaseAviary):
 
     ################################################################################
 
-    def _addObstacles(self):
-        """Add obstacles to the environment.
+    def _addObstacles(self,p4branch):
+    #     """Add obstacles to the environment.
 
-        Only if the observation is of type RGB, 4 landmarks are added.
-        Overrides BaseAviary's method.
+    #     Only if the observation is of type RGB, 4 landmarks are added.
+    #     Overrides BaseAviary's method.
 
-        """
-        if self.OBS_TYPE == ObservationType.RGB:
-            p.loadURDF("block.urdf",
-                       [1, 0, .1],
-                       p.getQuaternionFromEuler([0, 0, 0]),
-                       physicsClientId=self.CLIENT
-                       )
-            p.loadURDF("cube_small.urdf",
-                       [0, 1, .1],
-                       p.getQuaternionFromEuler([0, 0, 0]),
-                       physicsClientId=self.CLIENT
-                       )
-            p.loadURDF("duck_vhacd.urdf",
-                       [-1, 0, .1],
-                       p.getQuaternionFromEuler([0, 0, 0]),
-                       physicsClientId=self.CLIENT
-                       )
-            p.loadURDF("teddy_vhacd.urdf",
-                       [0, -1, .1],
-                       p.getQuaternionFromEuler([0, 0, 0]),
-                       physicsClientId=self.CLIENT
-                       )
-        else:
-            pass
+    #     """
+    #     if self.OBS_TYPE == ObservationType.RGB:
+    #         p.loadURDF("block.urdf",
+    #                    [1, 0, .1],
+    #                    p.getQuaternionFromEuler([0, 0, 0]),
+    #                    physicsClientId=self.CLIENT
+    #                    )
+    #         p.loadURDF("cube_small.urdf",
+    #                    [0, 1, .1],
+    #                    p.getQuaternionFromEuler([0, 0, 0]),
+    #                    physicsClientId=self.CLIENT
+    #                    )
+    #         p.loadURDF("duck_vhacd.urdf",
+    #                    [-1, 0, .1],
+    #                    p.getQuaternionFromEuler([0, 0, 0]),
+    #                    physicsClientId=self.CLIENT
+    #                    )
+    #         p.loadURDF("teddy_vhacd.urdf",
+    #                    [0, -1, .1],
+    #                    p.getQuaternionFromEuler([0, 0, 0]),
+    #                    physicsClientId=self.CLIENT
+    #                    )
+    #     else:
+    #         pass
+        task_path = os.path.dirname(os.path.realpath(__file__))
+        urdf_path=os.path.join("~/RL_UAV_landing/ERL_RL_Landing/gym_pybullet_drones/assets/treebranch.urdf")
+        tree=p.loadURDF(urdf_path,
+        
+                   [0, 0, 0],
+                   p.getQuaternionFromEuler([0, 0, 0]),
+                #    physicsClientId=self.CLIENT,
+                   useFixedBase=True,
+                   )
+        
+        desiredPosPole=p4branch[0]
+        p_joint1=p4branch[1]
+        d_joint1=p4branch[2]
+        desiredPosPole2=p4branch[3]
+        p_joint2=p4branch[4]
+        d_joint2=p4branch[5]
+        maxForce=p4branch[6]
+        link = 0
+        p.setJointMotorControl2(bodyUniqueId=tree,
+                            jointIndex=link,
+                            controlMode=p.POSITION_CONTROL, #PD_CONTROL,
+                            targetPosition=desiredPosPole,
+                            targetVelocity=0,
+                            force=maxForce,
+                            positionGain=p_joint1,
+                            velocityGain=d_joint1)
+        link = 1
+        p.setJointMotorControl2(bodyUniqueId=tree,
+                            jointIndex=link,
+                            controlMode=p.PD_CONTROL,
+                            targetPosition=desiredPosPole2,
+                            targetVelocity=0,
+                            force=maxForce,
+                            positionGain=p_joint2,
+                            velocityGain=d_joint2)
+
 
     ################################################################################
 

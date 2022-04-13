@@ -252,7 +252,8 @@ class BaseAviary(gym.Env):
         self._updateAndStoreKinematicInformation()
         #### Start video recording #################################
         self._startVideoRecording()
-        # self._addObstacles()
+        self.p4branch=[0,0.079,1,0,1,1,10]
+        self._addObstacles(self.p4branch)
     
     ################################################################################
 
@@ -990,7 +991,7 @@ class BaseAviary(gym.Env):
     
     ################################################################################
 
-    def _addObstacles(self):#, p4branch
+    def _addObstacles(self, p4branch):#, p4branch
         """Add obstacles to the environment.
 
         These obstacles are loaded from standard URDF files included in Bullet.
@@ -1021,30 +1022,31 @@ class BaseAviary(gym.Env):
                    useFixedBase=True,
                    )
         
-        # desiredPosPole=p4branch[0]
-        # p_joint1=p4branch[1]
-        # d_joint1=p4branch[2]
-        # desiredPosPole2=p4branch[3]
-        # p_joint2=p4branch[4]
-        # d_joint2=p4branch[5]
-        # link = 0
-        # p.setJointMotorControl2(bodyUniqueId=tree,
-        #                     jointIndex=link,
-        #                     controlMode=p.POSITION_CONTROL, #PD_CONTROL,
-        #                     targetPosition=desiredPosPole,
-        #                     targetVelocity=0,
-        #                     force=maxForceCart,
-        #                     positionGain=p_joint1,
-        #                     velocityGain=d_joint1)
-        # link = 1
-        # p.setJointMotorControl2(bodyUniqueId=tree,
-        #                     jointIndex=link,
-        #                     controlMode=p.PD_CONTROL,
-        #                     targetPosition=desiredPosPole2,
-        #                     targetVelocity=0,
-        #                     force=maxForcePole,
-        #                     positionGain=p_joint2,
-        #                     velocityGain=d_joint2)
+        desiredPosPole=p4branch[0]
+        p_joint1=p4branch[1]
+        d_joint1=p4branch[2]
+        desiredPosPole2=p4branch[3]
+        p_joint2=p4branch[4]
+        d_joint2=p4branch[5]
+        maxForce=p4branch[6]
+        link = 0
+        p.setJointMotorControl2(bodyUniqueId=tree,
+                            jointIndex=link,
+                            controlMode=p.POSITION_CONTROL, #PD_CONTROL,
+                            targetPosition=desiredPosPole,
+                            targetVelocity=0,
+                            force=maxForce,
+                            positionGain=p_joint1,
+                            velocityGain=d_joint1)
+        link = 1
+        p.setJointMotorControl2(bodyUniqueId=tree,
+                            jointIndex=link,
+                            controlMode=p.PD_CONTROL,
+                            targetPosition=desiredPosPole2,
+                            targetVelocity=0,
+                            force=maxForce,
+                            positionGain=p_joint2,
+                            velocityGain=d_joint2)
 
 
 
