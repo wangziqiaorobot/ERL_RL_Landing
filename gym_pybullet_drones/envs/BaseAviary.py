@@ -62,7 +62,7 @@ class BaseAviary(gym.Env):
                  aggregate_phy_steps: int=1,
                  gui=True,
                  record=True,
-                 obstacles=False,
+                 obstacles=True,
                  user_debug_gui=True,
                  vision_attributes=False,
                  dynamics_attributes=False
@@ -519,8 +519,8 @@ class BaseAviary(gym.Env):
         #     #### Disable collisions between drones' and the ground plane
         #     #### E.g., to start a drone at [0,0,0] #####################
         #     # p.setCollisionFilterPair(bodyUniqueIdA=self.PLANE_ID, bodyUniqueIdB=self.DRONE_IDS[i], linkIndexA=-1, linkIndexB=-1, enableCollision=0, physicsClientId=self.CLIENT)
-        # if self.OBSTACLES:
-            # self._addObstacles()
+        if self.OBSTACLES:
+            self._addObstacles(self.p4branch)
     
     ################################################################################
 
@@ -1012,8 +1012,8 @@ class BaseAviary(gym.Env):
         #            )
         
         #fileName= 
-        task_path = os.path.dirname(os.path.realpath(__file__))
-        urdf_path=os.path.join(task_path+"/../assets/treebranch.urdf")
+        # task_path = os.path.dirname(os.path.realpath(__file__))
+        urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
         tree=p.loadURDF(urdf_path,
         
                    [0, 0, 0],

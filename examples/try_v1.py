@@ -104,7 +104,7 @@ if __name__ == "__main__":
                          aggregate_phy_steps=AGGR_PHY_STEPS,
                          gui=ARGS.gui,
                          record=ARGS.record_video,
-                         obstacles=ARGS.obstacles,
+                         obstacles=True, #ARGS.obstacles,
                          user_debug_gui=ARGS.user_debug_gui
                          )
 

@@ -111,7 +111,6 @@ class BaseSingleAgentAviary(BaseAviary):
         #### Create integrated controllers  for the landing task #########################
         if act in [ActionType.LD]:
             os.environ['KMP_DUPLICATE_LIB_OK']='True'
-            
             if drone_model == DroneModel.HB:
                 self.ctrl = SimplePIDControl(drone_model=DroneModel.HB)
                 if act == ActionType.LD:
@@ -175,8 +174,8 @@ class BaseSingleAgentAviary(BaseAviary):
     #                    )
     #     else:
     #         pass
-        task_path = os.path.dirname(os.path.realpath(__file__))
-        urdf_path=os.path.join("~/RL_UAV_landing/ERL_RL_Landing/gym_pybullet_drones/assets/treebranch.urdf")
+        # task_path = os.path.dirname(os.path.realpath(__file__))
+        urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")
         tree=p.loadURDF(urdf_path,
         
                    [0, 0, 0],
