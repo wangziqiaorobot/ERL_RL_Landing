@@ -61,6 +61,7 @@ class LandingAviary(BaseSingleAgentAviary):
                          obs=obs,
                          act=act
                          )
+        
 
     ################################################################################
     
@@ -201,3 +202,60 @@ class LandingAviary(BaseSingleAgentAviary):
             print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped xy velocity [{:.2f} {:.2f}]".format(state[10], state[11]))
         if not(clipped_vel_z == np.array(state[12])).all():
             print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped z velocity [{:.2f}]".format(state[12]))
+    ####################################################################################
+    # def _addObstacles(self, pd4branch):#, pd4branch
+    #     """Add obstacles to the environment.
+
+    #     These obstacles are loaded from standard URDF files included in Bullet.
+
+    #     """
+    #     # p.loadURDF("samurai.urdf",
+    #     #            physicsClientId=self.CLIENT
+    #     #            )
+    #     # p.loadURDF("duck_vhacd.urdf",
+    #     #            [0, 1, 3],
+    #     #            p.getQuaternionFromEuler([0, 0, 0]),
+    #     #            physicsClientId=self.CLIENT
+    #     #            )
+    #     # p.loadURDF("~/RL/gym-pybullet-drones/gym_pybullet_drones/assets/table2.urdf",
+    #     #            [-.5, -.5, 5],
+    #     #         #    p.getQuaternionFromEuler([0, 0, 0]),
+    #     #         #    physicsClientId=self.CLIENT
+    #     #            )
+        
+    #     #fileName= 
+    #     # task_path = os.path.dirname(os.path.realpath(__file__))
+    #     urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
+    #     tree=p.loadURDF(urdf_path,
+        
+    #                [0, 0, 0],
+    #                p.getQuaternionFromEuler([0, 0, 0]),
+    #             #    physicsClientId=self.CLIENT,
+    #                useFixedBase=True,
+    #                )
+        
+    #     desiredPosPole=pd4branch[0]
+    #     p_joint1=pd4branch[1]
+    #     d_joint1=pd4branch[2]
+    #     desiredPosPole2=pd4branch[3]
+    #     p_joint2=pd4branch[4]
+    #     d_joint2=pd4branch[5]
+    #     maxForce=pd4branch[6]
+    #     link = 0
+    #     p.setJointMotorControl2(bodyUniqueId=tree,
+    #                         jointIndex=link,
+    #                         controlMode=p.POSITION_CONTROL, #PD_CONTROL,
+    #                         targetPosition=desiredPosPole,
+    #                         targetVelocity=0,
+    #                         force=maxForce,
+    #                         positionGain=p_joint1,
+    #                         velocityGain=d_joint1)
+    #     link = 1
+    #     p.setJointMotorControl2(bodyUniqueId=tree,
+    #                         jointIndex=link,
+    #                         controlMode=p.PD_CONTROL,
+    #                         targetPosition=desiredPosPole2,
+    #                         targetVelocity=0,
+    #                         force=maxForce,
+    #                         positionGain=p_joint2,
+    #                         velocityGain=d_joint2)

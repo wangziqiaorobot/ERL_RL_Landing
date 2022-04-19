@@ -12,12 +12,12 @@
            <origin rpy="0 0 0" xyz="0 0 0"/>
            <material name="brown"/>
         </visual>
-        <!-- <collision> -->
-         <!-- <geometry> -->
+        <collision>
+         <geometry>
          <!-- for tree to stand on the plane -->
-         <!-- <box size="2.0 2.0 0.5"/>   -->
-         <!-- </geometry> -->
-        <!-- </collision> -->
+         <box size="2.0 2.0 0.5"/>  
+         </geometry>
+        </collision>
         <inertial>
          <mass value="100"/>
           <inertia ixx="800.0" ixy="0.0" ixz="0.0" iyy="800" iyz="0.0" izz="800"/>

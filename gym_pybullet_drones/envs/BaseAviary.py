@@ -6,9 +6,8 @@ from datetime import datetime
 from enum import Enum
 import xml.etree.ElementTree as etxml
 from PIL import Image
-# import pkgutil
-# egl = pkgutil.get_loader('eglRenderer')
 import numpy as np
+from setuptools import PEP420PackageFinder
 import pybullet as p
 import pybullet_data
 import gym
@@ -228,8 +227,8 @@ class BaseAviary(gym.Env):
         if initial_xyzs is None:
             self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
                                         np.array([y*4*self.L for y in range(self.NUM_DRONES)]), \
-                                        np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)]).transpose().reshape(self.NUM_DRONES, 3)
-            # print('INF_INIT_XYZS',self.INIT_XYZS)
+                                        np.ones(self.NUM_DRONES) *4]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+            print('INF_INIT_XYZS',self.INIT_XYZS)
             
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
             self.INIT_XYZS = initial_xyzs
@@ -252,8 +251,8 @@ class BaseAviary(gym.Env):
         self._updateAndStoreKinematicInformation()
         #### Start video recording #################################
         self._startVideoRecording()
-        self.p4branch=[0,0.079,1,0,1,1,10]
-        self._addObstacles(self.p4branch)
+        self.pd4branch=[0,0.079,1,0,1,1,10]
+        #self._addObstacles(self.pd4branch)
     
     ################################################################################
 
@@ -504,9 +503,15 @@ class BaseAviary(gym.Env):
         self.DRONE_IDS = np.array([p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/"+self.URDF,
                                               self.INIT_XYZS[i,:],
                                               p.getQuaternionFromEuler(self.INIT_RPYS[i,:]),
-                                              flags = p.URDF_USE_INERTIA_FROM_FILE,
+                                              flags = p.URDF_USE_INERTIA_FROM_FILE | p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
+        p.loadURDF("sphere2.urdf",
+                   [0, 0, 4],
+                #    p.getQuaternionFromEuler([0,0,0]),
+                   physicsClientId=self.CLIENT,
+                   
+                   )
         
         # add the local axes to the drone, but this will slows down the GUI
         self._showDroneLocalAxes(0)
@@ -519,8 +524,9 @@ class BaseAviary(gym.Env):
         #     #### Disable collisions between drones' and the ground plane
         #     #### E.g., to start a drone at [0,0,0] #####################
         #     # p.setCollisionFilterPair(bodyUniqueIdA=self.PLANE_ID, bodyUniqueIdB=self.DRONE_IDS[i], linkIndexA=-1, linkIndexB=-1, enableCollision=0, physicsClientId=self.CLIENT)
+        #pidpara=self.pd4branch
         if self.OBSTACLES:
-            self._addObstacles(self.p4branch)
+            self._addObstacles()
     
     ################################################################################
 
@@ -991,7 +997,7 @@ class BaseAviary(gym.Env):
     
     ################################################################################
 
-    def _addObstacles(self, p4branch):#, p4branch
+    def _addObstacles(self):#, pd4branch
         """Add obstacles to the environment.
 
         These obstacles are loaded from standard URDF files included in Bullet.
@@ -1013,22 +1019,25 @@ class BaseAviary(gym.Env):
         
         #fileName= 
         # task_path = os.path.dirname(os.path.realpath(__file__))
+        pd4branch=[0,0.079,1,0,1,1,10]
         urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
         tree=p.loadURDF(urdf_path,
         
-                   [0, 0, 0],
+                   [0, 1, 0],
                    p.getQuaternionFromEuler([0, 0, 0]),
-                #    physicsClientId=self.CLIENT,
+                   physicsClientId=self.CLIENT,
                    useFixedBase=True,
+                   flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
                    )
         
-        desiredPosPole=p4branch[0]
-        p_joint1=p4branch[1]
-        d_joint1=p4branch[2]
-        desiredPosPole2=p4branch[3]
-        p_joint2=p4branch[4]
-        d_joint2=p4branch[5]
-        maxForce=p4branch[6]
+        print("#################### Loading the urdf model ###########################")
+        desiredPosPole=pd4branch[0]
+        p_joint1=pd4branch[1]
+        d_joint1=pd4branch[2]
+        desiredPosPole2=pd4branch[3]
+        p_joint2=pd4branch[4]
+        d_joint2=pd4branch[5]
+        maxForce=pd4branch[6]
         link = 0
         p.setJointMotorControl2(bodyUniqueId=tree,
                             jointIndex=link,
@@ -1051,9 +1060,10 @@ class BaseAviary(gym.Env):
 
 
         # p.loadURDF("sphere2.urdf",
-        #            [0, 1, 5],
-        #            p.getQuaternionFromEuler([0,0,0]),
-        #            physicsClientId=self.CLIENT
+        #            [0, 0, 4],
+        #         #    p.getQuaternionFromEuler([0,0,0]),
+        #            physicsClientId=self.CLIENT,
+        #            useFixedBase=False,
         #            )
     
     ################################################################################
