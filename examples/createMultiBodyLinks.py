@@ -70,7 +70,7 @@ tree=p.loadURDF("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/
         
                    [0, 0, 0],
                    p.getQuaternionFromEuler([0, 0, 0]),
-                   #physicsClientId=self.CLIENT,
+                   physicsClientId=p.connect(p.GUI),
                    useFixedBase=True,
                    )
 
@@ -78,13 +78,15 @@ drone=p.loadURDF("/home/ziqiao/Downloads/bullet3-master/data/Quadrotor/quadrotor
         
                    [0, 0, 0],
                    p.getQuaternionFromEuler([0, 0, 0]),
-                   #physicsClientId=self.CLIENT,
+                   physicsClientId=p.connect(p.GUI),
                    #useFixedBase=True,
                    )
 
 p.loadURDF("sphere2.urdf",
                    [0, 1, 5],
+                   
                    p.getQuaternionFromEuler([0,0,0]),
+                   physicsClientId=p.connect(p.GUI),
                   
                    )
 
