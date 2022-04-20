@@ -16,6 +16,7 @@
          <geometry>
          <!-- for tree to stand on the plane -->
          <box size="2.0 2.0 0.5"/>  
+          <!-- <cylinder length="4" radius="0.25"/> -->
          </geometry>
         </collision>
         <inertial>
