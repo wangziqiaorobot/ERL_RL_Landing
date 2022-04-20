@@ -57,7 +57,7 @@ if __name__ == "__main__":
     ARGS = parser.parse_args()
 
     #### Initialize the simulation #############################
-    H = 4
+    H = 3
     H_STEP = .05
     R = .5
     INIT_XYZS = np.array([[R*np.cos((i/6)*2*np.pi+np.pi/2), R*np.sin((i/6)*2*np.pi+np.pi/2)-R, H+i*H_STEP] for i in range(ARGS.num_drones)])
@@ -174,7 +174,17 @@ if __name__ == "__main__":
                        control=np.hstack([TARGET_POS[wp_counters[j], 0:2], INIT_XYZS[j, 2], INIT_RPYS[j, :], np.zeros(6)])
                        # control=np.hstack([INIT_XYZS[j, :]+TARGET_POS[wp_counters[j], :], INIT_RPYS[j, :], np.zeros(6)])
                        )
-        
+        # L=p.getContactPoints(1)
+        # if len(L) !=0:
+            
+            
+        #     p.addUserDebugLine(     lineFromXYZ=L[0][6],
+        #                             lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
+        #                             lineColorRGB=[0, 1, 0],
+        #                             lineWidth=5,
+        #                             lifeTime=1,
+        #                             physicsClientId=env.CLIENT
+        #                                               )
         # #tree branch 
         # for i in range(p.getNumJoints(env.tree)):
         # #print(p.getJointInfo(tree, i)
