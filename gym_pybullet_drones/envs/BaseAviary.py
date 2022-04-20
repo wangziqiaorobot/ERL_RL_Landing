@@ -383,6 +383,42 @@ class BaseAviary(gym.Env):
                 p.stepSimulation(physicsClientId=self.CLIENT)
             #### Save the last applied action (e.g. to compute drag) ###
             self.last_clipped_action = clipped_action
+        #tree branch 
+        for i in range(p.getNumJoints(self.tree)):
+            #disable default constraint-based motors
+            p.setJointMotorControl2(self.tree, i, p.POSITION_CONTROL, targetPosition=0, force=0)
+        
+        # # print the branch joints states
+        # for i in range(p.getNumJoints(self.tree)):    
+        #     print('the joints',i,p.getJointState(self.tree, i))
+        
+        ###### Control the branch joints   ###############
+        pd4branch=[0,0.079,1,0,1,1,10]
+        desiredPosPole=pd4branch[0]
+        p_joint1=pd4branch[1]
+        d_joint1=pd4branch[2]
+        desiredPosPole2=pd4branch[3]
+        p_joint2=pd4branch[4]
+        d_joint2=pd4branch[5]
+        maxForce=pd4branch[6]
+        link = 0
+        p.setJointMotorControl2(bodyUniqueId=self.tree,
+                            jointIndex=link,
+                            controlMode=p.POSITION_CONTROL, #PD_CONTROL,
+                            targetPosition=desiredPosPole,
+                            targetVelocity=0,
+                            force=maxForce,
+                            positionGain=p_joint1,
+                            velocityGain=d_joint1)
+        link = 1
+        p.setJointMotorControl2(bodyUniqueId=self.tree,
+                            jointIndex=link,
+                            controlMode=p.PD_CONTROL,
+                            targetPosition=desiredPosPole2,
+                            targetVelocity=0,
+                            force=maxForce,
+                            positionGain=p_joint2,
+                            velocityGain=d_joint2)
         #### Update and store the drones kinematic information #####
         self._updateAndStoreKinematicInformation()
         #### Prepare the return values #############################
@@ -495,23 +531,20 @@ class BaseAviary(gym.Env):
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
-        p.setRealTimeSimulation(0, physicsClientId=self.CLIENT)
+        
+        p.setRealTimeSimulation(1, physicsClientId=self.CLIENT)  # 1 is enable the real time simulation
         p.setTimeStep(self.TIMESTEP, physicsClientId=self.CLIENT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath(), physicsClientId=self.CLIENT)
         #### Load ground plane, drone and obstacles models #########
         self.PLANE_ID = p.loadURDF("plane.urdf", physicsClientId=self.CLIENT)
+        # p.createCollisionShape(p.GEOM_PLANE)
         self.DRONE_IDS = np.array([p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/"+self.URDF,
                                               self.INIT_XYZS[i,:],
                                               p.getQuaternionFromEuler(self.INIT_RPYS[i,:]),
                                               flags = p.URDF_USE_INERTIA_FROM_FILE | p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
-        p.loadURDF("sphere2.urdf",
-                   [0, 0, 4],
-                #    p.getQuaternionFromEuler([0,0,0]),
-                   physicsClientId=self.CLIENT,
-                   
-                   )
+        
         
         # add the local axes to the drone, but this will slows down the GUI
         self._showDroneLocalAxes(0)
@@ -1017,47 +1050,22 @@ class BaseAviary(gym.Env):
         #         #    physicsClientId=self.CLIENT
         #            )
         
-        #fileName= 
-        # task_path = os.path.dirname(os.path.realpath(__file__))
-        pd4branch=[0,0.079,1,0,1,1,10]
+       
+        ####################    load the tree branches      ########################################
         urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
-        tree=p.loadURDF(urdf_path,
+        self.tree=p.loadURDF(urdf_path,
         
                    [0, 1, 0],
                    p.getQuaternionFromEuler([0, 0, 0]),
                    physicsClientId=self.CLIENT,
                    useFixedBase=True,
-                   flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
+                   flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
                    )
         
-        print("#################### Loading the urdf model ###########################")
-        desiredPosPole=pd4branch[0]
-        p_joint1=pd4branch[1]
-        d_joint1=pd4branch[2]
-        desiredPosPole2=pd4branch[3]
-        p_joint2=pd4branch[4]
-        d_joint2=pd4branch[5]
-        maxForce=pd4branch[6]
-        link = 0
-        p.setJointMotorControl2(bodyUniqueId=tree,
-                            jointIndex=link,
-                            controlMode=p.POSITION_CONTROL, #PD_CONTROL,
-                            targetPosition=desiredPosPole,
-                            targetVelocity=0,
-                            force=maxForce,
-                            positionGain=p_joint1,
-                            velocityGain=d_joint1)
-        link = 1
-        p.setJointMotorControl2(bodyUniqueId=tree,
-                            jointIndex=link,
-                            controlMode=p.PD_CONTROL,
-                            targetPosition=desiredPosPole2,
-                            targetVelocity=0,
-                            force=maxForce,
-                            positionGain=p_joint2,
-                            velocityGain=d_joint2)
+        print("#################### Loading the Tree branch URDF model ###########################")
+        
 
-
+        ################################################################################
 
         # p.loadURDF("sphere2.urdf",
         #            [0, 0, 4],
@@ -1066,7 +1074,7 @@ class BaseAviary(gym.Env):
         #            useFixedBase=False,
         #            )
     
-    ################################################################################
+
     
     def _parseURDFParameters(self):
         """Loads parameters from an URDF file.
