@@ -57,7 +57,7 @@ if __name__ == "__main__":
     ARGS = parser.parse_args()
 
     #### Initialize the simulation #############################
-    H = 0.5
+    H = 4
     H_STEP = .05
     R = .5
     INIT_XYZS = np.array([[R*np.cos((i/6)*2*np.pi+np.pi/2), R*np.sin((i/6)*2*np.pi+np.pi/2)-R, H+i*H_STEP] for i in range(ARGS.num_drones)])
@@ -145,6 +145,7 @@ if __name__ == "__main__":
         
         #### Make it rain rubber ducks #############################
         # if i/env.SIM_FREQ>5 and i%10==0 and i/env.SIM_FREQ<10: p.loadURDF("duck_vhacd.urdf", [0+random.gauss(0, 0.3),-0.5+random.gauss(0, 0.3),3], p.getQuaternionFromEuler([random.randint(0,360),random.randint(0,360),random.randint(0,360)]), physicsClientId=PYB_CLIENT)
+        # p.loadURDF("duck_vhacd.urdf", [0+random.gauss(0, 0.3),-0.5+random.gauss(0, 0.3),3], p.getQuaternionFromEuler([random.randint(0,360),random.randint(0,360),random.randint(0,360)]), physicsClientId=PYB_CLIENT)
 
         #### Step the simulation ###################################
         obs, reward, done, info = env.step(action)
@@ -173,6 +174,37 @@ if __name__ == "__main__":
                        control=np.hstack([TARGET_POS[wp_counters[j], 0:2], INIT_XYZS[j, 2], INIT_RPYS[j, :], np.zeros(6)])
                        # control=np.hstack([INIT_XYZS[j, :]+TARGET_POS[wp_counters[j], :], INIT_RPYS[j, :], np.zeros(6)])
                        )
+        
+        # #tree branch 
+        # for i in range(p.getNumJoints(env.tree)):
+        # #print(p.getJointInfo(tree, i)
+        #     print('the joints',i,p.getJointState(env.tree, i))
+        # pd4branch=[0,0.079,1,0,1,1,10]
+        # desiredPosPole=pd4branch[0]
+        # p_joint1=pd4branch[1]
+        # d_joint1=pd4branch[2]
+        # desiredPosPole2=pd4branch[3]
+        # p_joint2=pd4branch[4]
+        # d_joint2=pd4branch[5]
+        # maxForce=pd4branch[6]
+        # link = 0
+        # p.setJointMotorControl2(bodyUniqueId=env.tree,
+        #                     jointIndex=link,
+        #                     controlMode=p.POSITION_CONTROL, #PD_CONTROL,
+        #                     targetPosition=desiredPosPole,
+        #                     targetVelocity=0,
+        #                     force=maxForce,
+        #                     positionGain=p_joint1,
+        #                     velocityGain=d_joint1)
+        # link = 1
+        # p.setJointMotorControl2(bodyUniqueId=env.tree,
+        #                     jointIndex=link,
+        #                     controlMode=p.PD_CONTROL,
+        #                     targetPosition=desiredPosPole2,
+        #                     targetVelocity=0,
+        #                     force=maxForce,
+        #                     positionGain=p_joint2,
+        #                     velocityGain=d_joint2)
 
     
 
