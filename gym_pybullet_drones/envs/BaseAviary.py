@@ -251,9 +251,8 @@ class BaseAviary(gym.Env):
         self._updateAndStoreKinematicInformation()
         #### Start video recording #################################
         self._startVideoRecording()
-        self.pd4branch=[0,0.079,1,0,1,1,10]
-        #self._addObstacles(self.pd4branch)
-    
+        
+        
     ################################################################################
 
     def reset(self):
@@ -379,6 +378,7 @@ class BaseAviary(gym.Env):
                     self._drag(self.last_clipped_action[i, :], i)
                     self._downwash(i)
             #### PyBullet computes the new state, unless Physics.DYN ###
+            p.stepSimulation(physicsClientId=self.CLIENT)
             if self.PHYSICS != Physics.DYN:
                 p.stepSimulation(physicsClientId=self.CLIENT)
             #### Save the last applied action (e.g. to compute drag) ###
@@ -392,7 +392,7 @@ class BaseAviary(gym.Env):
         # for i in range(p.getNumJoints(self.tree)):    
         #     print('the joints',i,p.getJointState(self.tree, i))
         
-        ###### Control the branch joints   ###############
+        ###########    Control the branch joints   ###############
         pd4branch=[0,0.079,1,0,1,1,10]
         desiredPosPole=pd4branch[0]
         p_joint1=pd4branch[1]
@@ -419,6 +419,20 @@ class BaseAviary(gym.Env):
                             force=maxForce,
                             positionGain=p_joint2,
                             velocityGain=d_joint2)
+        L=p.getContactPoints()
+        if len(L) !=0 & self.GUI:
+            
+            
+            p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                                    lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
+                                    lineColorRGB=[0, 1, 0],
+                                    lineWidth=5,
+                                    lifeTime=1,
+                                    physicsClientId=self.CLIENT
+                                                      )
+
+
+
         #### Update and store the drones kinematic information #####
         self._updateAndStoreKinematicInformation()
         #### Prepare the return values #############################
@@ -531,9 +545,9 @@ class BaseAviary(gym.Env):
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
-        
-        p.setRealTimeSimulation(1, physicsClientId=self.CLIENT)  # 1 is enable the real time simulation
-        p.setTimeStep(self.TIMESTEP, physicsClientId=self.CLIENT)
+        # p.stepSimulation(physicsClientId=self.CLIENT)
+        p.setRealTimeSimulation(0, physicsClientId=self.CLIENT)  # 1 is enable the real time simulation
+        # p.setTimeStep(self.TIMESTEP, physicsClientId=self.CLIENT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath(), physicsClientId=self.CLIENT)
         #### Load ground plane, drone and obstacles models #########
         self.PLANE_ID = p.loadURDF("plane.urdf", physicsClientId=self.CLIENT)
