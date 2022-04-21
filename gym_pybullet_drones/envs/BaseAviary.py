@@ -378,61 +378,62 @@ class BaseAviary(gym.Env):
                     self._drag(self.last_clipped_action[i, :], i)
                     self._downwash(i)
             #### PyBullet computes the new state, unless Physics.DYN ###
-            p.stepSimulation(physicsClientId=self.CLIENT)
+            # p.stepSimulation(physicsClientId=self.CLIENT)
             if self.PHYSICS != Physics.DYN:
                 p.stepSimulation(physicsClientId=self.CLIENT)
             #### Save the last applied action (e.g. to compute drag) ###
             self.last_clipped_action = clipped_action
-        #tree branch 
-        for i in range(p.getNumJoints(self.tree)):
-            #disable default constraint-based motors
-            p.setJointMotorControl2(self.tree, i, p.POSITION_CONTROL, targetPosition=0, force=0)
-        
-        # # print the branch joints states
-        # for i in range(p.getNumJoints(self.tree)):    
-        #     print('the joints',i,p.getJointState(self.tree, i))
-        
-        ###########    Control the branch joints   ###############
-        pd4branch=[0,0.079,1,0,1,1,10]
-        desiredPosPole=pd4branch[0]
-        p_joint1=pd4branch[1]
-        d_joint1=pd4branch[2]
-        desiredPosPole2=pd4branch[3]
-        p_joint2=pd4branch[4]
-        d_joint2=pd4branch[5]
-        maxForce=pd4branch[6]
-        link = 0
-        p.setJointMotorControl2(bodyUniqueId=self.tree,
-                            jointIndex=link,
-                            controlMode=p.POSITION_CONTROL, #PD_CONTROL,
-                            targetPosition=desiredPosPole,
-                            targetVelocity=0,
-                            force=maxForce,
-                            positionGain=p_joint1,
-                            velocityGain=d_joint1)
-        link = 1
-        p.setJointMotorControl2(bodyUniqueId=self.tree,
-                            jointIndex=link,
-                            controlMode=p.PD_CONTROL,
-                            targetPosition=desiredPosPole2,
-                            targetVelocity=0,
-                            force=maxForce,
-                            positionGain=p_joint2,
-                            velocityGain=d_joint2)
-        L=p.getContactPoints()
-        if len(L) !=0 & self.GUI:
+            #tree branch 
+            for i in range(p.getNumJoints(self.tree)):
+                #disable default constraint-based motors
+                p.setJointMotorControl2(self.tree, i, p.POSITION_CONTROL, targetPosition=0, force=0)
             
+            # # print the branch joints states
+            # for i in range(p.getNumJoints(self.tree)):    
+            #     print('the joints',i,p.getJointState(self.tree, i))
             
-            p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                    lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
-                                    lineColorRGB=[0, 1, 0],
-                                    lineWidth=5,
-                                    lifeTime=1,
-                                    physicsClientId=self.CLIENT
-                                                      )
+            ###########    Control the branch joints   ###############
+            pd4branch=[0,0.079,1,0,1,1,10]
+            desiredPosPole=pd4branch[0]
+            p_joint1=pd4branch[1]
+            d_joint1=pd4branch[2]
+            desiredPosPole2=pd4branch[3]
+            p_joint2=pd4branch[4]
+            d_joint2=pd4branch[5]
+            maxForce=pd4branch[6]
+            link = 0
+            p.setJointMotorControl2(bodyUniqueId=self.tree,
+                                jointIndex=link,
+                                controlMode=p.POSITION_CONTROL, #PD_CONTROL,
+                                targetPosition=desiredPosPole,
+                                targetVelocity=0,
+                                force=maxForce,
+                                positionGain=p_joint1,
+                                velocityGain=d_joint1)
+            link = 1
+            p.setJointMotorControl2(bodyUniqueId=self.tree,
+                                jointIndex=link,
+                                controlMode=p.PD_CONTROL,
+                                targetPosition=desiredPosPole2,
+                                targetVelocity=0,
+                                force=maxForce,
+                                positionGain=p_joint2,
+                                velocityGain=d_joint2)
+            ############ Collision Detection and Visualization ###########
+            L=p.getContactPoints(int(self.DRONE_IDS))
+            if len(L) !=0 & self.GUI:
+                
+                
+                p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                                        lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
+                                        lineColorRGB=[0, 1, 0],
+                                        lineWidth=5,
+                                        lifeTime=1,
+                                        physicsClientId=self.CLIENT
+                                                        )
 
 
-
+        p.stepSimulation(physicsClientId=self.CLIENT)
         #### Update and store the drones kinematic information #####
         self._updateAndStoreKinematicInformation()
         #### Prepare the return values #############################
@@ -1066,8 +1067,8 @@ class BaseAviary(gym.Env):
         
        
         ####################    load the tree branches      ########################################
-        urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
-        self.tree=p.loadURDF(urdf_path,
+        # urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
+        self.tree=p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/treebranch.urdf",
         
                    [0, 1, 0],
                    p.getQuaternionFromEuler([0, 0, 0]),
