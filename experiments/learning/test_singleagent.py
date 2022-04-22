@@ -20,6 +20,7 @@ import numpy as np
 import gym
 import torch
 from stable_baselines3.common.env_checker import check_env
+from stable_baselines3.common.cmd_util import make_vec_env 
 from stable_baselines3 import A2C
 from stable_baselines3 import PPO
 from stable_baselines3 import SAC
@@ -98,20 +99,27 @@ if __name__ == "__main__":
                         obs=OBS,
                         act=ACT
                         )
-    # mean_reward, std_reward = evaluate_policy(model,
-    #                                           eval_env,
-    #                                           n_eval_episodes=1
-    #                                           )
-    # print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
+    mean_reward, std_reward = evaluate_policy(model,
+                                              eval_env,
+                                              n_eval_episodes=1
+                                              )
+    print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
     
     #### Show, record a video, and log the model's performance #
-    test_env = gym.make(env_name,
-                        gui=True,
-                        record=True,
-                        aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
-                        obs=OBS,
-                        act=ACT
-                        )
+    # test_env = gym.make(env_name,
+    #                     gui=True,
+    #                     record=True,
+    #                     aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
+    #                     obs=OBS,
+    #                     act=ACT
+    #                     )
+    test_env= LandingAviary(
+                         gui=True,
+                         record=True,
+                         
+                         aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS
+                         
+                         )
     
     logger = Logger(logging_freq_hz=int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS),
                      num_drones=1
