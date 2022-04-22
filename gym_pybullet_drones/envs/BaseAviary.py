@@ -421,14 +421,15 @@ class BaseAviary(gym.Env):
                                 velocityGain=d_joint2)
             ############ Collision Detection and Visualization ###########
             L=p.getContactPoints(int(self.DRONE_IDS))
-            if len(L) !=0 & self.GUI:
+            print(L)
+            if len(L) !=0 :
                 
                 
                 p.addUserDebugLine(     lineFromXYZ=L[0][6],
                                         lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
                                         lineColorRGB=[0, 1, 0],
                                         lineWidth=5,
-                                        lifeTime=1,
+                                        # lifeTime=1,
                                         physicsClientId=self.CLIENT
                                                         )
 
