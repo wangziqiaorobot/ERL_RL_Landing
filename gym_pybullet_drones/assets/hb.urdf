@@ -34,9 +34,11 @@
     </visual>
 
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.075"/>
+      <!-- <origin rpy="0 0 0" xyz="0 0 -0.075"/> -->
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <cylinder radius=".22" length=".15"/>
+        <!-- <cylinder radius=".22" length=".15"/> -->
+        <sphere radius="0.22"/>
       </geometry>
     </collision>  
 
