@@ -421,7 +421,8 @@ class BaseAviary(gym.Env):
                                 velocityGain=d_joint2)
             ############ Collision Detection and Visualization ###########
             p.stepSimulation(physicsClientId=self.CLIENT)
-            L=p.getContactPoints(int(self.DRONE_IDS))
+            L=p.getContactPoints((self.DRONE_IDS[0]))
+            print((self.DRONE_IDS[0]),(self.tree), (self.PLANE_ID),self.DRONE_IDS)
             P=p.getContactPoints(int(self.DRONE_IDS))
             print(L)
             print("for test")
@@ -430,7 +431,7 @@ class BaseAviary(gym.Env):
                 
                 print("drawe a line")
                 p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                        lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
+                                        lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*3,L[0][6][1]+L[0][7][1]*L[0][9]*3,L[0][6][2]+L[0][7][2]*L[0][9]*3),
                                         lineColorRGB=[0, 1, 0],
                                         lineWidth=5,
                                         # lifeTime=1,
@@ -561,9 +562,17 @@ class BaseAviary(gym.Env):
         self.DRONE_IDS = np.array([p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/"+self.URDF,
                                               self.INIT_XYZS[i,:],
                                               p.getQuaternionFromEuler(self.INIT_RPYS[i,:]),
-                                              flags = p.URDF_USE_INERTIA_FROM_FILE | p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
+                                            #   flags = p.URDF_USE_INERTIA_FROM_FILE | p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
+        self.tree=p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/treebranch.urdf",
+        
+                   [0, 1, 0],
+                   p.getQuaternionFromEuler([0, 0, 0]),
+                   physicsClientId=self.CLIENT,
+                   useFixedBase=True,
+                #    flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
+                   )
         
         
         # add the local axes to the drone, but this will slows down the GUI
@@ -1073,14 +1082,14 @@ class BaseAviary(gym.Env):
        
         ####################    load the tree branches      ########################################
         # urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
-        self.tree=p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/treebranch.urdf",
+        # self.tree=p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/treebranch.urdf",
         
-                   [0, 1, 0],
-                   p.getQuaternionFromEuler([0, 0, 0]),
-                   physicsClientId=self.CLIENT,
-                   useFixedBase=True,
-                   flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
-                   )
+        #            [0, 1, 0],
+        #            p.getQuaternionFromEuler([0, 0, 0]),
+        #            physicsClientId=self.CLIENT,
+        #            useFixedBase=True,
+        #         #    flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
+        #            )
         
         print("#################### Loading the Tree branch URDF model ###########################")
         
