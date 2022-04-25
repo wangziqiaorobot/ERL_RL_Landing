@@ -409,32 +409,34 @@ class BaseAviary(gym.Env):
                                 targetVelocity=0,
                                 force=maxForce,
                                 positionGain=p_joint1,
-                                velocityGain=d_joint1)
+                                velocityGain=d_joint1,
+                                physicsClientId=self.CLIENT)
             link = 1
             p.setJointMotorControl2(bodyUniqueId=self.tree,
                                 jointIndex=link,
-                                controlMode=p.PD_CONTROL,
+                                controlMode=p.POSITION_CONTROL,#PD_CONTROL,
                                 targetPosition=desiredPosPole2,
                                 targetVelocity=0,
                                 force=maxForce,
                                 positionGain=p_joint2,
-                                velocityGain=d_joint2)
+                                velocityGain=d_joint2,
+                                physicsClientId=self.CLIENT)
+
             ############ Collision Detection and Visualization ###########
             p.stepSimulation(physicsClientId=self.CLIENT)
-            L=p.getContactPoints((self.DRONE_IDS[0]))
-            print((self.DRONE_IDS[0]),(self.tree), (self.PLANE_ID),self.DRONE_IDS)
-            P=p.getContactPoints(int(self.DRONE_IDS))
-            print(L)
-            print("for test")
-            print(P)
+            L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
+           
+            # P=p.getContactPoints((self.tree))
+            
+         
             if len(L) !=0 :
                 
-                print("drawe a line")
+                
                 p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                        lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*3,L[0][6][1]+L[0][7][1]*L[0][9]*3,L[0][6][2]+L[0][7][2]*L[0][9]*3),
+                                        lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
                                         lineColorRGB=[0, 1, 0],
                                         lineWidth=5,
-                                        # lifeTime=1,
+                                        lifeTime=1,
                                         physicsClientId=self.CLIENT
                                                         )
 
