@@ -1125,7 +1125,7 @@ class BaseAviary(gym.Env):
         J_INV = np.linalg.inv(J)
         KF = float(URDF_TREE[0].attrib['kf'])
         KM = float(URDF_TREE[0].attrib['km'])
-        COLLISION_H = float(URDF_TREE[1][2][1][0].attrib['length'])
+        COLLISION_H = 0.22 #float(URDF_TREE[1][2][1][0].attrib['length'])
         COLLISION_R = float(URDF_TREE[1][2][1][0].attrib['radius'])
         COLLISION_SHAPE_OFFSETS = [float(s) for s in URDF_TREE[1][2][0].attrib['xyz'].split(' ')]
         COLLISION_Z_OFFSET = COLLISION_SHAPE_OFFSETS[2]
