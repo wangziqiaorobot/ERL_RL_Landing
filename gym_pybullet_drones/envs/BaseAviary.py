@@ -350,14 +350,15 @@ class BaseAviary(gym.Env):
         else:
             self._saveLastAction(action)
             clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
-            
+       
         #### Repeat for as many as the aggregate physics steps #####
         for _ in range(self.AGGR_PHY_STEPS):
             #### Update and store the drones kinematic info for certain
             #### Between aggregate steps for certain types of update ###
-            if self.AGGR_PHY_STEPS > 1 and self.PHYSICS in [Physics.DYN, Physics.PYB_GND, Physics.PYB_DRAG, Physics.PYB_DW, Physics.PYB_GND_DRAG_DW]:
+            if self.AGGR_PHY_STEPS > 1 and self.PHYSICS in [Physics.PYB,Physics.DYN, Physics.PYB_GND, Physics.PYB_DRAG, Physics.PYB_DW, Physics.PYB_GND_DRAG_DW]:
                 self._updateAndStoreKinematicInformation()
             #### Step the simulation using the desired physics update ##
+            print(self.PHYSICS)
             for i in range (self.NUM_DRONES):
                 if self.PHYSICS == Physics.PYB:
                     self._physics(clipped_action[i, :], i)
@@ -380,6 +381,7 @@ class BaseAviary(gym.Env):
             #### PyBullet computes the new state, unless Physics.DYN ###
             # p.stepSimulation(physicsClientId=self.CLIENT)
             if self.PHYSICS != Physics.DYN:
+                print("step the simulation")
                 p.stepSimulation(physicsClientId=self.CLIENT)
             #### Save the last applied action (e.g. to compute drag) ###
             self.last_clipped_action = clipped_action
@@ -422,39 +424,47 @@ class BaseAviary(gym.Env):
                                 velocityGain=d_joint2,
                                 physicsClientId=self.CLIENT)
 
-            ############ Collision Detection and Visualization ###########
-            p.stepSimulation(physicsClientId=self.CLIENT)
+            ############ Collision Detection and Visualization #######################
+            # p.stepSimulation(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
             print(L)
             # P=p.getContactPoints((self.tree))
-            
+            print("rotation mat.:", np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
          
             if len(L) !=0 :
                 
-                ### Normal Force ###
-                p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                        lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
-                                        lineColorRGB=[0, 1, 0],
-                                        lineWidth=5,
-                                        # lifeTime=0.5,
-                                        physicsClientId=self.CLIENT)
-                ### Lateral Friction 1 ###                
-                p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                        lineToXYZ=(L[0][6][0]+L[0][11][0]*L[0][10]*0.03,L[0][6][1]+L[0][11][1]*L[0][10]*0.03,L[0][6][2]+L[0][11][2]*L[0][10]*0.03),
-                                        lineColorRGB=[1, 1, 0],
-                                        lineWidth=5,
-                                        # lifeTime=0.5,
-                                        physicsClientId=self.CLIENT
-                                                        )
-                ### Lateral Friction 2 ###  
-                p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                        lineToXYZ=(L[0][6][0]+L[0][13][0]*L[0][12]*0.03,L[0][6][1]+L[0][13][1]*L[0][12]*0.03,L[0][6][2]+L[0][13][2]*L[0][12]*0.03),
-                                        lineColorRGB=[1, 1, 1],
-                                        lineWidth=5,
-                                        # lifeTime=0.5,
-                                        physicsClientId=self.CLIENT
-                                                        )
-                ### External Force
+                # ### Normal Force ###
+                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                #                         lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
+                #                         lineColorRGB=[0, 1, 0],
+                #                         lineWidth=5,
+                #                         # lifeTime=0.5,
+                #                         physicsClientId=self.CLIENT)
+                # ### Lateral Friction 1 ###                
+                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                #                         lineToXYZ=(L[0][6][0]+L[0][11][0]*L[0][10]*0.03,L[0][6][1]+L[0][11][1]*L[0][10]*0.03,L[0][6][2]+L[0][11][2]*L[0][10]*0.03),
+                #                         lineColorRGB=[1, 1, 0],
+                #                         lineWidth=5,
+                #                         # lifeTime=0.5,
+                #                         physicsClientId=self.CLIENT
+                #                                         )
+                # ### Lateral Friction 2 ###  
+                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                #                         lineToXYZ=(L[0][6][0]+L[0][13][0]*L[0][12]*0.03,L[0][6][1]+L[0][13][1]*L[0][12]*0.03,L[0][6][2]+L[0][13][2]*L[0][12]*0.03),
+                #                         lineColorRGB=[1, 1, 1],
+                #                         lineWidth=5,
+                #                         # lifeTime=0.5,
+                #                         physicsClientId=self.CLIENT
+                #                                         )
+                # ### External Force in world coordinates ###
+                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                #                         lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
+                #                         lineColorRGB=[1, 0.64, 0],
+                #                         lineWidth=5,
+                #                         # lifeTime=0.5,
+                #                         physicsClientId=self.CLIENT
+                #                                         )
+                ### External Force in robot coordinates ###
                 p.addUserDebugLine(     lineFromXYZ=L[0][6],
                                         lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
                                         lineColorRGB=[1, 0.64, 0],
@@ -462,6 +472,9 @@ class BaseAviary(gym.Env):
                                         # lifeTime=0.5,
                                         physicsClientId=self.CLIENT
                                                         )
+                
+
+                
 
 
 
