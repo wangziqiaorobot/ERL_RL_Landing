@@ -425,20 +425,45 @@ class BaseAviary(gym.Env):
             ############ Collision Detection and Visualization ###########
             p.stepSimulation(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
-           
+            print(L)
             # P=p.getContactPoints((self.tree))
             
          
             if len(L) !=0 :
                 
-                
+                ### Normal Force ###
                 p.addUserDebugLine(     lineFromXYZ=L[0][6],
                                         lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
                                         lineColorRGB=[0, 1, 0],
                                         lineWidth=5,
-                                        lifeTime=1,
+                                        # lifeTime=0.5,
+                                        physicsClientId=self.CLIENT)
+                ### Lateral Friction 1 ###                
+                p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                                        lineToXYZ=(L[0][6][0]+L[0][11][0]*L[0][10]*0.03,L[0][6][1]+L[0][11][1]*L[0][10]*0.03,L[0][6][2]+L[0][11][2]*L[0][10]*0.03),
+                                        lineColorRGB=[1, 1, 0],
+                                        lineWidth=5,
+                                        # lifeTime=0.5,
                                         physicsClientId=self.CLIENT
                                                         )
+                ### Lateral Friction 2 ###  
+                p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                                        lineToXYZ=(L[0][6][0]+L[0][13][0]*L[0][12]*0.03,L[0][6][1]+L[0][13][1]*L[0][12]*0.03,L[0][6][2]+L[0][13][2]*L[0][12]*0.03),
+                                        lineColorRGB=[1, 1, 1],
+                                        lineWidth=5,
+                                        # lifeTime=0.5,
+                                        physicsClientId=self.CLIENT
+                                                        )
+                ### External Force
+                p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                                        lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
+                                        lineColorRGB=[1, 0.64, 0],
+                                        lineWidth=5,
+                                        # lifeTime=0.5,
+                                        physicsClientId=self.CLIENT
+                                                        )
+
+
 
 
             
