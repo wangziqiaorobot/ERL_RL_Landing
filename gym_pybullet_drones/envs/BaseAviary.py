@@ -378,13 +378,16 @@ class BaseAviary(gym.Env):
                     self._groundEffect(clipped_action[i, :], i)
                     self._drag(self.last_clipped_action[i, :], i)
                     self._downwash(i)
+            
             #### PyBullet computes the new state, unless Physics.DYN ###
             # p.stepSimulation(physicsClientId=self.CLIENT)
             if self.PHYSICS != Physics.DYN:
-                print("step the simulation")
                 p.stepSimulation(physicsClientId=self.CLIENT)
             #### Save the last applied action (e.g. to compute drag) ###
             self.last_clipped_action = clipped_action
+
+
+
             #tree branch 
             for i in range(p.getNumJoints(self.tree)):
                 #disable default constraint-based motors
@@ -424,13 +427,18 @@ class BaseAviary(gym.Env):
                                 velocityGain=d_joint2,
                                 physicsClientId=self.CLIENT)
 
+            
+            
+            
+            
+            
             ############ Collision Detection and Visualization #######################
-            # p.stepSimulation(physicsClientId=self.CLIENT)
+            p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
             print(L)
             # P=p.getContactPoints((self.tree))
             print("rotation mat.:", np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
-         
+            print("drone position:",self.pos[0, :])
             if len(L) !=0 :
                 
                 # ### Normal Force ###
@@ -460,19 +468,52 @@ class BaseAviary(gym.Env):
                 # p.addUserDebugLine(     lineFromXYZ=L[0][6],
                 #                         lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
                 #                         lineColorRGB=[1, 0.64, 0],
-                #                         lineWidth=5,
+                #                         lineWidth=5,addUserDebugLine
                 #                         # lifeTime=0.5,
                 #                         physicsClientId=self.CLIENT
                 #                                         )
                 ### External Force in robot coordinates ###
-                p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                        lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
+                
+                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                #                         lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
+                #                         lineColorRGB=[1, 0.64, 0],
+                #                         lineWidth=5,
+                #                         # lifeTime=0.5,
+                #                         physicsClientId=self.CLIENT
+                #                                         )
+                contact_start=L[0][6]
+                contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03)
+                print(contact_start+self.pos[0, :],contact_end)
+                #move the force from the contact point to the center of mass
+                p.addUserDebugLine(     lineFromXYZ=self.pos[0, :],
+                                        lineToXYZ= np.array(contact_end)-np.array(contact_start)+self.pos[0, :],
                                         lineColorRGB=[1, 0.64, 0],
                                         lineWidth=5,
                                         # lifeTime=0.5,
+                                        
                                         physicsClientId=self.CLIENT
                                                         )
+                ## homogeneous transformation matrix & calculate the transformal##
+
+                rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
+
                 
+                contact_r_frame=  np.dot(rot_mat.T,(np.array(contact_end)-np.array(contact_start)+self.pos[0, :]))-np.dot(rot_mat.T,self.pos[0, :]) 
+                print("in robot frame:",contact_r_frame)
+                
+                ## Visualization of external Force in robot frame ##### 
+                p.addUserDebugLine(                   lineFromXYZ=[0, 0, 0],
+                                                      lineToXYZ=contact_r_frame,
+                                                      lineColorRGB=[1, 1, 1],
+                                                      lineWidth=5,
+                                                      parentObjectUniqueId=self.DRONE_IDS[0],
+                                                      parentLinkIndex=-1,
+                                                      lifeTime=0.1,
+                                                      physicsClientId=self.CLIENT
+                                                      )
+                
+                
+
 
                 
 
