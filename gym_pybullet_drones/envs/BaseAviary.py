@@ -443,6 +443,8 @@ class BaseAviary(gym.Env):
 
             if len(L) !=0 :
                 
+                
+                
                 # ### Normal Force ###
                 # p.addUserDebugLine(     lineFromXYZ=L[0][6],
                 #                         lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
@@ -484,18 +486,18 @@ class BaseAviary(gym.Env):
                 #                         physicsClientId=self.CLIENT
                 #                                         )
                 contact_start=L[0][6]
-                contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03)
+                contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9]),L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9]),L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9]))
                 # print(contact_start+self.pos[0, :],contact_end)
-                #move the force from the contact point to the center of mass
-                p.addUserDebugLine(     lineFromXYZ=self.pos[0, :],
-                                        lineToXYZ= np.array(contact_end)-np.array(contact_start)+self.pos[0, :],
-                                        lineColorRGB=[1, 0.64, 0],
-                                        lineWidth=5,
-                                        # lifeTime=0.5,
+                ###move the force from the contact point to the center of mass
+                # p.addUserDebugLine(     lineFromXYZ=self.pos[0, :],
+                #                         lineToXYZ= np.array(contact_end)-np.array(contact_start)+self.pos[0, :],
+                #                         lineColorRGB=[1, 0.64, 0],
+                #                         lineWidth=5,
+                #                         # lifeTime=0.5,
                                         
-                                        physicsClientId=self.CLIENT
-                                                        )
-                ## homogeneous transformation matrix & calculate the transformal##
+                #                         physicsClientId=self.CLIENT
+                #                                         )
+                ### homogeneous transformation matrix & calculate the transformal##
 
                 rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
 
@@ -503,11 +505,11 @@ class BaseAviary(gym.Env):
                 contact_r_frame=  np.dot(rot_mat.T,(np.array(contact_end)-np.array(contact_start)+self.pos[0, :]))-np.dot(rot_mat.T,self.pos[0, :]) 
                 # print("in robot frame:",contact_r_frame,type(self.Fcontact),type(contact_r_frame))
                 self.Fcontact=contact_r_frame
-                print('contact_r_frame',contact_r_frame)
+                
                
                 ## Visualization of external Force in robot frame ##### 
                 p.addUserDebugLine(                   lineFromXYZ=[0, 0, 0],
-                                                      lineToXYZ=contact_r_frame,
+                                                      lineToXYZ=contact_r_frame*0.03,
                                                       lineColorRGB=[1, 1, 1],
                                                       lineWidth=5,
                                                       parentObjectUniqueId=self.DRONE_IDS[0],
@@ -517,14 +519,14 @@ class BaseAviary(gym.Env):
                                                       )
             else:
                 self.Fcontact= np.zeros(3) ### set the contact force to zero if there if no contact##
-            print("contact force:", self.Fcontact)
+            print("contact force:", self.Fcontact,self.Fcontact[1])
             print("wall clock",time.time()-self.RESET_TIME,"sim time:",self.step_counter*self.TIMESTEP)
 
                 
                 
 
 
-            
+
 
 
 
@@ -645,7 +647,7 @@ class BaseAviary(gym.Env):
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
-        # p.stepSimulation(physicsClientId=self.CLIENT)
+        
         p.setRealTimeSimulation(0, physicsClientId=self.CLIENT)  # 1 is enable the real time simulation
         # p.setTimeStep(self.TIMESTEP, physicsClientId=self.CLIENT)
         p.setAdditionalSearchPath(pybullet_data.getDataPath(), physicsClientId=self.CLIENT)
@@ -750,7 +752,7 @@ class BaseAviary(gym.Env):
             (20,)-shaped array of floats containing the state vector of the n-th drone.
             Check the only line in this method and `_updateAndStoreKinematicInformation()`
             to understand its format.
-
+        
         """
         state = np.hstack([self.pos[nth_drone, :], self.quat[nth_drone, :], self.rpy[nth_drone, :],
                            self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_action[nth_drone, :],self.Fcontact])
