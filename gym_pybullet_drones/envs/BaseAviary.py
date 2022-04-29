@@ -358,7 +358,6 @@ class BaseAviary(gym.Env):
             if self.AGGR_PHY_STEPS > 1 and self.PHYSICS in [Physics.PYB,Physics.DYN, Physics.PYB_GND, Physics.PYB_DRAG, Physics.PYB_DW, Physics.PYB_GND_DRAG_DW]:
                 self._updateAndStoreKinematicInformation()
             #### Step the simulation using the desired physics update ##
-            print(self.PHYSICS)
             for i in range (self.NUM_DRONES):
                 if self.PHYSICS == Physics.PYB:
                     self._physics(clipped_action[i, :], i)
@@ -439,6 +438,9 @@ class BaseAviary(gym.Env):
             # P=p.getContactPoints((self.tree))
             print("rotation mat.:", np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
             print("drone position:",self.pos[0, :])
+
+            
+
             if len(L) !=0 :
                 
                 # ### Normal Force ###
@@ -483,7 +485,7 @@ class BaseAviary(gym.Env):
                 #                                         )
                 contact_start=L[0][6]
                 contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03)
-                print(contact_start+self.pos[0, :],contact_end)
+                # print(contact_start+self.pos[0, :],contact_end)
                 #move the force from the contact point to the center of mass
                 p.addUserDebugLine(     lineFromXYZ=self.pos[0, :],
                                         lineToXYZ= np.array(contact_end)-np.array(contact_start)+self.pos[0, :],
@@ -499,8 +501,10 @@ class BaseAviary(gym.Env):
 
                 
                 contact_r_frame=  np.dot(rot_mat.T,(np.array(contact_end)-np.array(contact_start)+self.pos[0, :]))-np.dot(rot_mat.T,self.pos[0, :]) 
-                print("in robot frame:",contact_r_frame)
-                
+                # print("in robot frame:",contact_r_frame,type(self.Fcontact),type(contact_r_frame))
+                self.Fcontact=contact_r_frame
+                print('contact_r_frame',contact_r_frame)
+               
                 ## Visualization of external Force in robot frame ##### 
                 p.addUserDebugLine(                   lineFromXYZ=[0, 0, 0],
                                                       lineToXYZ=contact_r_frame,
@@ -511,11 +515,16 @@ class BaseAviary(gym.Env):
                                                       lifeTime=0.1,
                                                       physicsClientId=self.CLIENT
                                                       )
+            else:
+                self.Fcontact= np.zeros(3) ### set the contact force to zero if there if no contact##
+            print("contact force:", self.Fcontact)
+            print("wall clock",time.time()-self.RESET_TIME,"sim time:",self.step_counter*self.TIMESTEP)
+
                 
                 
 
 
-                
+            
 
 
 
@@ -629,6 +638,9 @@ class BaseAviary(gym.Env):
         self.rpy = np.zeros((self.NUM_DRONES, 3))
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
+        #### Initialize the drones contact force information ##########
+        self.Fcontact= np.zeros(3)
+
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### Set PyBullet's parameters #############################
@@ -686,7 +698,16 @@ class BaseAviary(gym.Env):
             self.vel[i], self.ang_v[i] = p.getBaseVelocity(self.DRONE_IDS[i], physicsClientId=self.CLIENT)
     
     ################################################################################
+    
+    
+    
+    def _contactdetection(self):
+        print("test")
 
+
+
+
+    ###############################################################################
     def _startVideoRecording(self):
         """Starts the recording of a video output.
 
@@ -732,8 +753,9 @@ class BaseAviary(gym.Env):
 
         """
         state = np.hstack([self.pos[nth_drone, :], self.quat[nth_drone, :], self.rpy[nth_drone, :],
-                           self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_action[nth_drone, :]])
-        return state.reshape(20,)
+                           self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_action[nth_drone, :],self.Fcontact])
+        print("state",state.reshape(23,))
+        return state.reshape(23,)
 
     ################################################################################
 

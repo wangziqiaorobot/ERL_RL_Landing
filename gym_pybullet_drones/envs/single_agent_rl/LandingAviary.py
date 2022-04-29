@@ -1,4 +1,5 @@
 # from cv2 import exp
+from calendar import c
 import numpy as np
 from gym import spaces
 
@@ -76,7 +77,23 @@ class LandingAviary(BaseSingleAgentAviary):
         """
         state = self._getDroneStateVector(0)
         diff_act= self.current_action-state[16:20]
+        
+
+        ############## for the hovering task  #############
+        # return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
+
+        
+        
+        
+        ########### for the landing task ############# 
+
         return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
+        
+        
+
+
+
+
 
         # return  0.05*(np.exp(- np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.005
         # return -1 *(np.exp(-(0-state[0])**2)-3+np.exp(-(0-state[1])**2)+np.exp(-(0.5-state[2])**2))
@@ -140,13 +157,18 @@ class LandingAviary(BaseSingleAgentAviary):
         MAX_Z = MAX_LIN_VEL_Z*self.EPISODE_LEN_SEC
 
         MAX_PITCH_ROLL = np.pi # Full range
+        
+        MAX_F_XY=5  #max external froce in xy axis in robot frame
+        MAX_F_Z=11.76 ##max external froce in z axis in robot frame
+
 
         clipped_pos_xy = np.clip(state[0:2], -MAX_XY, MAX_XY)
         clipped_pos_z = np.clip(state[2], 0, MAX_Z)
         clipped_rp = np.clip(state[7:9], -MAX_PITCH_ROLL, MAX_PITCH_ROLL)
         clipped_vel_xy = np.clip(state[10:12], -MAX_LIN_VEL_XY, MAX_LIN_VEL_XY)
         clipped_vel_z = np.clip(state[12], -MAX_LIN_VEL_Z, MAX_LIN_VEL_Z)
-
+        clipped_F_xy_External=np.np.clip(state[21:23],-MAX_F_XY, MAX_F_XY)
+        clipped_F_z_External=np.np.clip(state[23],-MAX_F_Z, MAX_F_Z)
         if self.GUI:
             self._clipAndNormalizeStateWarning(state,
                                                clipped_pos_xy,
@@ -163,7 +185,8 @@ class LandingAviary(BaseSingleAgentAviary):
         normalized_vel_xy = clipped_vel_xy / MAX_LIN_VEL_XY
         normalized_vel_z = clipped_vel_z / MAX_LIN_VEL_XY
         normalized_ang_vel = state[13:16]/np.linalg.norm(state[13:16]) if np.linalg.norm(state[13:16]) != 0 else state[13:16]
-
+        normalized_fxy_external= clipped_F_xy_External/MAX_F_XY
+        normalized_fz_external= clipped_F_z_External/MAX_F_Z
         norm_and_clipped = np.hstack([normalized_pos_xy,
                                       normalized_pos_z,
                                       state[3:7],
@@ -172,8 +195,10 @@ class LandingAviary(BaseSingleAgentAviary):
                                       normalized_vel_xy,
                                       normalized_vel_z,
                                       normalized_ang_vel,
-                                      state[16:20]
-                                      ]).reshape(20,)
+                                      state[16:20],
+                                      normalized_fxy_external,
+                                      normalized_fz_external
+                                      ]).reshape(23,)
 
         return norm_and_clipped
     
@@ -202,60 +227,3 @@ class LandingAviary(BaseSingleAgentAviary):
             print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped xy velocity [{:.2f} {:.2f}]".format(state[10], state[11]))
         if not(clipped_vel_z == np.array(state[12])).all():
             print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped z velocity [{:.2f}]".format(state[12]))
-    ####################################################################################
-    # def _addObstacles(self, pd4branch):#, pd4branch
-    #     """Add obstacles to the environment.
-
-    #     These obstacles are loaded from standard URDF files included in Bullet.
-
-    #     """
-    #     # p.loadURDF("samurai.urdf",
-    #     #            physicsClientId=self.CLIENT
-    #     #            )
-    #     # p.loadURDF("duck_vhacd.urdf",
-    #     #            [0, 1, 3],
-    #     #            p.getQuaternionFromEuler([0, 0, 0]),
-    #     #            physicsClientId=self.CLIENT
-    #     #            )
-    #     # p.loadURDF("~/RL/gym-pybullet-drones/gym_pybullet_drones/assets/table2.urdf",
-    #     #            [-.5, -.5, 5],
-    #     #         #    p.getQuaternionFromEuler([0, 0, 0]),
-    #     #         #    physicsClientId=self.CLIENT
-    #     #            )
-        
-    #     #fileName= 
-    #     # task_path = os.path.dirname(os.path.realpath(__file__))
-    #     urdf_path=os.path.join("/home/ziqiao/RL/gym-pybullet-drones/gym_pybullet_drones/assets/treebranch.urdf")        
-    #     tree=p.loadURDF(urdf_path,
-        
-    #                [0, 0, 0],
-    #                p.getQuaternionFromEuler([0, 0, 0]),
-    #             #    physicsClientId=self.CLIENT,
-    #                useFixedBase=True,
-    #                )
-        
-    #     desiredPosPole=pd4branch[0]
-    #     p_joint1=pd4branch[1]
-    #     d_joint1=pd4branch[2]
-    #     desiredPosPole2=pd4branch[3]
-    #     p_joint2=pd4branch[4]
-    #     d_joint2=pd4branch[5]
-    #     maxForce=pd4branch[6]
-    #     link = 0
-    #     p.setJointMotorControl2(bodyUniqueId=tree,
-    #                         jointIndex=link,
-    #                         controlMode=p.POSITION_CONTROL, #PD_CONTROL,
-    #                         targetPosition=desiredPosPole,
-    #                         targetVelocity=0,
-    #                         force=maxForce,
-    #                         positionGain=p_joint1,
-    #                         velocityGain=d_joint1)
-    #     link = 1
-    #     p.setJointMotorControl2(bodyUniqueId=tree,
-    #                         jointIndex=link,
-    #                         controlMode=p.PD_CONTROL,
-    #                         targetPosition=desiredPosPole2,
-    #                         targetVelocity=0,
-    #                         force=maxForce,
-    #                         positionGain=p_joint2,
-    #                         velocityGain=d_joint2)
