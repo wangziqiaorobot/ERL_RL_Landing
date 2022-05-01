@@ -92,7 +92,7 @@ class LandingAviary(BaseSingleAgentAviary):
        
         balancingRewardCoeff=0.01*time
         slippageRewardCoeff=0.01*time
-        contactRewardCoeff=0.01*time
+        contactRewardCoeff=0.03*time
         linearvelocityRewardCoeff=0.01*time
         angulervelocityRewardCoeff=0.01*time
         actionsmoothRewardCoeff=-0.02
@@ -110,7 +110,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
         #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         
-        contactReward=contactRewardCoeff*(np.exp(- np.linalg.norm(1-state[23])**4)-1)
+        contactReward=contactRewardCoeff*(np.exp(- np.linalg.norm(1-state[22])**4)-1)
         linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
@@ -197,8 +197,8 @@ class LandingAviary(BaseSingleAgentAviary):
         clipped_rp = np.clip(state[7:9], -MAX_PITCH_ROLL, MAX_PITCH_ROLL)
         clipped_vel_xy = np.clip(state[10:12], -MAX_LIN_VEL_XY, MAX_LIN_VEL_XY)
         clipped_vel_z = np.clip(state[12], -MAX_LIN_VEL_Z, MAX_LIN_VEL_Z)
-        clipped_F_xy_External=np.np.clip(state[21:23],-MAX_F_XY, MAX_F_XY)
-        clipped_F_z_External=np.np.clip(state[23],-MAX_F_Z, MAX_F_Z)
+        clipped_F_xy_External=np.clip(state[20:22],-MAX_F_XY, MAX_F_XY)
+        clipped_F_z_External=np.clip(state[22],-MAX_F_Z, MAX_F_Z)
         if self.GUI:
             self._clipAndNormalizeStateWarning(state,
                                                clipped_pos_xy,
