@@ -227,7 +227,7 @@ class BaseAviary(gym.Env):
         if initial_xyzs is None:
             self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
                                         np.array([y*4*self.L for y in range(self.NUM_DRONES)]), \
-                                        np.ones(self.NUM_DRONES) *3]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+                                        np.ones(self.NUM_DRONES) *2.5]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             print('INF_INIT_XYZS',self.INIT_XYZS)
             
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
@@ -434,10 +434,10 @@ class BaseAviary(gym.Env):
             ############ Collision Detection and Visualization #######################
             p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
-            print(L)
+            # print(L)
             # P=p.getContactPoints((self.tree))
-            print("rotation mat.:", np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
-            print("drone position:",self.pos[0, :])
+            # print("rotation mat.:", np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
+            # print("drone position:",self.pos[0, :])
 
             
 
@@ -519,8 +519,8 @@ class BaseAviary(gym.Env):
                                                       )
             else:
                 self.Fcontact= np.zeros(3) ### set the contact force to zero if there if no contact##
-            print("contact force:", self.Fcontact,self.Fcontact[1])
-            print("wall clock",time.time()-self.RESET_TIME,"sim time:",self.step_counter*self.TIMESTEP)
+            # print("contact force:", self.Fcontact,self.Fcontact[1])
+            # print("wall clock",time.time()-self.RESET_TIME,"sim time:",self.step_counter*self.TIMESTEP)
 
                 
                 
