@@ -100,11 +100,11 @@ if __name__ == "__main__":
                         obs=OBS,
                         act=ACT
                         )
-    mean_reward, std_reward = evaluate_policy(model,
-                                              eval_env,
-                                              n_eval_episodes=1
-                                              )
-    print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
+    # mean_reward, std_reward = evaluate_policy(model,
+    #                                           eval_env,
+    #                                           n_eval_episodes=1
+    #                                           )
+    # print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
     
     #### Show, record a video, and log the model's performance #
     # test_env = gym.make(env_name,
@@ -155,6 +155,8 @@ if __name__ == "__main__":
         shape=(test_env.observation_space.shape[0], test_steps), dtype=np.float32)
     rewards = np.zeros(
         shape=(1, test_steps), dtype=np.float32)
+    infos = np.zeros(
+        shape=(6, test_steps), dtype=np.float32)
     for i in range(test_steps):
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
@@ -164,6 +166,7 @@ if __name__ == "__main__":
         actions[:,i]=action
         observation[:,i]=obs
         rewards[:,i]=reward
+        infos[:,i]=info
         sync(np.floor(i*test_env.AGGR_PHY_STEPS), start, test_env.TIMESTEP)
     test_env.close()
 
@@ -292,9 +295,14 @@ if __name__ == "__main__":
 ## rewards
 
     plt.figure()
-    plt.plot(0.1 * (np.exp(- ((0-observation[0,:])**2+(0-observation[1,:])**2+(0.5-observation[2,:])**2)**2)-1),label="rewards_pos")
-    plt.plot(-0.01 * ((observation[16,:]-actions[0,:])**2+(observation[17,:]-actions[1,:])**2+(observation[18,:]-actions[2,:])**2+(observation[19,:]-actions[3,:])**2),label="rewards_actsmooth")
-
+    # plt.plot(0.1 * (np.exp(- ((0-observation[0,:])**2+(0-observation[1,:])**2+(0.5-observation[2,:])**2)**2)-1),label="rewards_pos")
+    # plt.plot(-0.01 * ((observation[16,:]-actions[0,:])**2+(observation[17,:]-actions[1,:])**2+(observation[18,:]-actions[2,:])**2+(observation[19,:]-actions[3,:])**2),label="rewards_actsmooth")
+    plt.plot(infos[0,:],label="balancingReward")
+    plt.plot(infos[1,:],label="contactReward")
+    plt.plot(infos[2,:],label="linearvelocityReward")
+    plt.plot(infos[3,:],label="angulervelocityReward")
+    plt.plot(infos[4,:],label="actionsmoothReward")
+    plt.plot(infos[5,:],label="actionlimitReward")
     plt.grid()
     plt.legend()
     plt.title('reward')
