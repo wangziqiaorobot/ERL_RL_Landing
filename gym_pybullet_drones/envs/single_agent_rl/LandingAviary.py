@@ -163,48 +163,48 @@ class LandingAviary(BaseSingleAgentAviary):
     #     """
 
 
-    #     state = self._getDroneStateVector(0)  ###  self._computeObs() need or not???
-    #     diff_act= self.current_action-state[16:20]
-    #     time=self.step_counter*self.TIMESTEP
+        state = self._getDroneStateVector(0)  ###  self._computeObs() need or not???
+        diff_act= self.current_action-state[16:20]
+        time=self.step_counter*self.TIMESTEP
         
-    #     ############## for the hovering task  #############
-    #     # return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
+        ############## for the hovering task  #############
+        # return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
 
         
         
         
-    #     ########### for the landing task ############# 
-    #     # L_vel + W_vel + Contact_force + energy_consanpution
+        ########### for the landing task ############# 
+        # L_vel + W_vel + Contact_force + energy_consanpution
         
         
        
-    #     balancingRewardCoeff=0.01*time
-    #     slippageRewardCoeff=0.01*time
-    #     contactRewardCoeff=0.03*time
-    #     linearvelocityRewardCoeff=0.01*time
-    #     angulervelocityRewardCoeff=0.01*time
-    #     actionsmoothRewardCoeff=-0.01
-    #     actionlimitRewardCoeff=-0.02*time
+        balancingRewardCoeff=0.01*time
+        slippageRewardCoeff=0.01*time
+        contactRewardCoeff=0.03*time
+        linearvelocityRewardCoeff=0.01*time
+        angulervelocityRewardCoeff=0.01*time
+        actionsmoothRewardCoeff=-0.01
+        actionlimitRewardCoeff=-0.02*time
         
 
 
-    #     balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[7:10])**4)-1)
+        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[7:10])**4)-1)
         
-    #     slippageReward=0
-    #     # if state[23]==0:
+        slippageReward=0
+        # if state[23]==0:
 
-    #     #     slippageReward=slippageRewardCoeff*(-10)
-    #     # else:
+        #     slippageReward=slippageRewardCoeff*(-10)
+        # else:
 
-    #     #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
+        #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         
-    #     contactReward=contactRewardCoeff*(np.exp(- np.linalg.norm(1-state[22])**4)-1)
-    #     linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)
-    #     angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
-    #     actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
-    #     actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action)**2
-    #     info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward])
-        return  {"answer": 42} 
+        contactReward=contactRewardCoeff*(np.exp(- np.linalg.norm(1-state[22])**4)-1)
+        linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)
+        angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
+        actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
+        actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action)**2
+        info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward])
+        return info #{"answer": 42} 
     ################################################################################
     
     def _clipAndNormalizeState(self,
