@@ -398,7 +398,7 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.079,1,0,1,1,10]
+            pd4branch=[0,0.08,1,0,1000,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
             desiredPosPole=pd4branch[0]
             p_joint1=pd4branch[1]
             d_joint1=pd4branch[2]
@@ -409,7 +409,7 @@ class BaseAviary(gym.Env):
             link = 0
             p.setJointMotorControl2(bodyUniqueId=self.tree,
                                 jointIndex=link,
-                                controlMode=p.POSITION_CONTROL, #PD_CONTROL,
+                                controlMode=p.POSITION_CONTROL, #PD_CONTROL,POSITION_CONTROL
                                 targetPosition=desiredPosPole,
                                 targetVelocity=0,
                                 force=maxForce,
@@ -419,7 +419,7 @@ class BaseAviary(gym.Env):
             link = 1
             p.setJointMotorControl2(bodyUniqueId=self.tree,
                                 jointIndex=link,
-                                controlMode=p.POSITION_CONTROL,#PD_CONTROL,
+                                controlMode=p.PD_CONTROL,#PD_CONTROL,
                                 targetPosition=desiredPosPole2,
                                 targetVelocity=0,
                                 force=maxForce,

@@ -1,7 +1,7 @@
 import pybullet as p
 import time
 import pybullet_data
-from pdControllerExplicit import PDControllerExplicit
+# from pdControllerExplicit import PDControllerExplicit
 
 
 p.connect(p.GUI)
