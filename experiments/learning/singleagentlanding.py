@@ -50,7 +50,7 @@ from gym_pybullet_drones.envs.single_agent_rl.BaseSingleAgentAviary import Actio
 
 import shared_constants
 
-EPISODE_REWARD_THRESHOLD = 1000 # Upperbound: rewards are always negative, but non-zero
+EPISODE_REWARD_THRESHOLD = 1000 # when reach this reward value tranning will stop
 """float: Reward threshold to halt the script."""
 
 if __name__ == "__main__":
