@@ -228,7 +228,7 @@ class BaseAviary(gym.Env):
             self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
                                         np.array([y*4*self.L for y in range(self.NUM_DRONES)]), \
                                         np.ones(self.NUM_DRONES) *2.5]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
-            print('INF_INIT_XYZS',self.INIT_XYZS)
+            
             
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
             self.INIT_XYZS = initial_xyzs
@@ -304,6 +304,7 @@ class BaseAviary(gym.Env):
             in each subclass for its format.
 
         """
+        
         #### Save PNG video frames if RECORD=True and GUI=False ####
         # if self.RECORD and not self.GUI and self.step_counter%self.CAPTURE_FREQ == 0:
         #     [w, h, rgb, dep, seg] = p.getCameraImage(width=self.VID_WIDTH,
