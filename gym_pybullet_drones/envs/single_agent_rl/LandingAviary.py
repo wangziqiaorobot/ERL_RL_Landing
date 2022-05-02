@@ -2,6 +2,7 @@
 from calendar import c
 import numpy as np
 from gym import spaces
+import pybullet as p
 
 from gym_pybullet_drones.envs.BaseAviary import DroneModel, Physics, BaseAviary
 from gym_pybullet_drones.envs.single_agent_rl.BaseSingleAgentAviary import ActionType, ObservationType, BaseSingleAgentAviary
@@ -78,7 +79,8 @@ class LandingAviary(BaseSingleAgentAviary):
         state = self._getDroneStateVector(0)  ###  self._computeObs() need or not???
         diff_act= self.current_action-state[16:20]
         time=self.step_counter*self.TIMESTEP
-        
+        p.performCollisionDetection(physicsClientId=self.CLIENT)
+        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
         ############## for the hovering task  #############
         # return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
 
@@ -97,7 +99,7 @@ class LandingAviary(BaseSingleAgentAviary):
         angulervelocityRewardCoeff=0.0001*time
         actionsmoothRewardCoeff=-0.0001
         actionlimitRewardCoeff=-0.0002*time
-        
+        contactgroundRewardCoeff=-0.0001
         
 
         balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[7:10])**4)-1)
@@ -115,8 +117,11 @@ class LandingAviary(BaseSingleAgentAviary):
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
         actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action)**2
-
-        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+0.0005
+        if L !=0:
+            contactgroundReward=contactgroundRewardCoeff*(10)
+        else:
+            contactgroundReward=0
+        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.0005
         
         #   self.step_counter*self.TIMESTEP
         
@@ -142,8 +147,10 @@ class LandingAviary(BaseSingleAgentAviary):
         """
         ### TO DO : stop the current episode, when the dorne on ground
         
-       
-        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC :# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
+        p.performCollisionDetection(physicsClientId=self.CLIENT)
+        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
+        
+        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or L !=0:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
             self.iterate= self.iterate+1
         # Alternative done condition, see PR #32
         # if (self.step_counter/self.SIM_FREQ > (self.EPISODE_LEN_SEC)) or ((self._getDroneStateVector(0))[2] < 0.05):
