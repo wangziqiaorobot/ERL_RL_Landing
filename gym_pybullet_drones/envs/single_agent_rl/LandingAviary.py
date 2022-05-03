@@ -117,8 +117,9 @@ class LandingAviary(BaseSingleAgentAviary):
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
         actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action)**2
-        if L !=0:
-            contactgroundReward=contactgroundRewardCoeff*(10)
+        if len(L) !=0:
+            contactgroundReward=-(10)
+            print("fall down to the gorund",L)
         else:
             contactgroundReward=0
         return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.0005
@@ -150,7 +151,7 @@ class LandingAviary(BaseSingleAgentAviary):
         p.performCollisionDetection(physicsClientId=self.CLIENT)
         L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
         
-        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or L !=0:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
+        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
             self.iterate= self.iterate+1
         # Alternative done condition, see PR #32
         # if (self.step_counter/self.SIM_FREQ > (self.EPISODE_LEN_SEC)) or ((self._getDroneStateVector(0))[2] < 0.05):
