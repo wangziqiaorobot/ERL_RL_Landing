@@ -683,8 +683,8 @@ class BaseAviary(gym.Env):
         #     #### E.g., to start a drone at [0,0,0] #####################
         #     # p.setCollisionFilterPair(bodyUniqueIdA=self.PLANE_ID, bodyUniqueIdB=self.DRONE_IDS[i], linkIndexA=-1, linkIndexB=-1, enableCollision=0, physicsClientId=self.CLIENT)
         #pidpara=self.pd4branch
-        if self.OBSTACLES:
-            self._addObstacles()
+        # if self.OBSTACLES:
+        #     self._addObstacles()
     
     ################################################################################
 
@@ -757,7 +757,7 @@ class BaseAviary(gym.Env):
         """
         state = np.hstack([self.pos[nth_drone, :], self.quat[nth_drone, :], self.rpy[nth_drone, :],
                            self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_action[nth_drone, :],self.Fcontact])
-        print("state",state.reshape(23,))
+        # print("state",state.reshape(23,))
         return state.reshape(23,)
 
     ################################################################################
@@ -1197,7 +1197,7 @@ class BaseAviary(gym.Env):
         #         #    flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
         #            )
         
-        print("#################### Loading the Tree branch URDF model ###########################")
+        
         
 
         ################################################################################
