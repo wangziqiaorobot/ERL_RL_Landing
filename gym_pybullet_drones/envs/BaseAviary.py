@@ -7,7 +7,6 @@ from enum import Enum
 import xml.etree.ElementTree as etxml
 from PIL import Image
 import numpy as np
-from setuptools import PEP420PackageFinder
 import pybullet as p
 import pybullet_data
 import gym
@@ -391,14 +390,14 @@ class BaseAviary(gym.Env):
             #tree branch 
             for i in range(p.getNumJoints(self.tree)):
                 #disable default constraint-based motors
-                p.setJointMotorControl2(self.tree, i, p.POSITION_CONTROL, targetPosition=0, force=0)
+                p.setJointMotorControl2(self.tree, i, p.VELOCITY_CONTROL,  force=0,physicsClientId=self.CLIENT)
             
             # # print the branch joints states
             # for i in range(p.getNumJoints(self.tree)):    
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,1000,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=[0,0.08,1,0,1000,1,20]    #pd4branch=[0,0.079,1,0,1,1,13]
             desiredPosPole=pd4branch[0]
             p_joint1=pd4branch[1]
             d_joint1=pd4branch[2]
@@ -417,6 +416,7 @@ class BaseAviary(gym.Env):
                                 velocityGain=d_joint1,
                                 physicsClientId=self.CLIENT)
             link = 1
+            
             p.setJointMotorControl2(bodyUniqueId=self.tree,
                                 jointIndex=link,
                                 controlMode=p.PD_CONTROL,#PD_CONTROL,
