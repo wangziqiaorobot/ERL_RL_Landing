@@ -128,14 +128,14 @@
     <link name="treebranch_link">
         <visual> 
             <geometry> 
-                <cylinder length="1.5" radius="0.1"/>
+                <cylinder length="1.5" radius="0.02"/>
             </geometry>
            <origin rpy="1.57 0 0" xyz="0 -0.75 0"/>
            <material name="brown"/>
         </visual>
         <collision>
          <geometry>
-          <cylinder length="1.5" radius="0.1"/>
+          <cylinder length="1.5" radius="0.02"/>  
          </geometry>
          <origin rpy="1.57 0 0" xyz="0 -0.75 0"/>
         </collision>
