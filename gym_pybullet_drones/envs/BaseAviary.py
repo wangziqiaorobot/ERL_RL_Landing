@@ -378,7 +378,7 @@ class BaseAviary(gym.Env):
                     self._drag(self.last_clipped_action[i, :], i)
                     self._downwash(i)
             
-            #### PyBullet computes the new state, unless Physics.DYN ###
+            #### PyBullet computes the new state, unless Physics.DYN， Dyn will computes the state by a hand write lib ###
             # p.stepSimulation(physicsClientId=self.CLIENT)
             if self.PHYSICS != Physics.DYN:
                 p.stepSimulation(physicsClientId=self.CLIENT)
