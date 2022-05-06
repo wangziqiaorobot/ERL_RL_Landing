@@ -148,7 +148,7 @@ if __name__ == "__main__":
     # logger.plot()
 
     # new log try ####
-    test_steps=2000
+    test_steps=500
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
@@ -156,7 +156,7 @@ if __name__ == "__main__":
     rewards = np.zeros(
         shape=(1, test_steps), dtype=np.float32)
     infos = np.zeros(
-        shape=(6, test_steps), dtype=np.float32)
+        shape=(8, test_steps), dtype=np.float32)
     for i in range(test_steps):
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
@@ -295,14 +295,14 @@ if __name__ == "__main__":
 ## rewards
 
     plt.figure()
-    # plt.plot(0.1 * (np.exp(- ((0-observation[0,:])**2+(0-observation[1,:])**2+(0.5-observation[2,:])**2)**2)-1),label="rewards_pos")
-    # plt.plot(-0.01 * ((observation[16,:]-actions[0,:])**2+(observation[17,:]-actions[1,:])**2+(observation[18,:]-actions[2,:])**2+(observation[19,:]-actions[3,:])**2),label="rewards_actsmooth")
     plt.plot(infos[0,:],label="balancingReward")
     plt.plot(infos[1,:],label="contactReward")
     plt.plot(infos[2,:],label="linearvelocityReward")
     plt.plot(infos[3,:],label="angulervelocityReward")
     plt.plot(infos[4,:],label="actionsmoothReward")
     plt.plot(infos[5,:],label="actionlimitReward")
+    plt.plot(infos[6,:],label="slippageReward")
+    plt.plot(infos[7,:],label="contactgroundReward")
     plt.grid()
     plt.legend()
     plt.title('reward')
