@@ -176,11 +176,11 @@ class LandingAviary(BaseSingleAgentAviary):
 
     #     """
 
-
         # state = self._getDroneStateVector(0)  ###  self._computeObs() need or not???
         # diff_act= self.current_action-state[16:20]
         # time=self.step_counter*self.TIMESTEP
-        
+        # p.performCollisionDetection(physicsClientId=self.CLIENT)
+        # L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
         # ############## for the hovering task  #############
         # # return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
 
@@ -192,33 +192,43 @@ class LandingAviary(BaseSingleAgentAviary):
         
         
        
-        # balancingRewardCoeff=0.01*time
-        # slippageRewardCoeff=0.01*time
-        # contactRewardCoeff=0.03*time
-        # linearvelocityRewardCoeff=0.01*time
-        # angulervelocityRewardCoeff=0.01*time
-        # actionsmoothRewardCoeff=-0.01
-        # actionlimitRewardCoeff=-0.02*time
+        # balancingRewardCoeff=0.4*time
+        # slippageRewardCoeff=0.006*time
+        # contactRewardCoeff=0.003*time
+        # linearvelocityRewardCoeff=0.0001*time
+        # angulervelocityRewardCoeff=0.001*time
+        # actionsmoothRewardCoeff=-0.0001
+        # actionlimitRewardCoeff=-0.0001*time
+        # contactgroundRewardCoeff=-0.0001
         
 
-
-        # balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[7:10])**4)-1)
+        # balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[7:9])**4)-1)
         
-        # slippageReward=0
+        # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
         # # if state[23]==0:
-
+        
         # #     slippageReward=slippageRewardCoeff*(-10)
         # # else:
 
         # #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
-        
-        # contactReward=contactRewardCoeff*(np.exp(- np.linalg.norm(1-state[22])**4)-1)
-        # linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)
+        # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0:
+        #     contactReward=0 #contactRewardCoeff*(np.exp(- np.linalg.norm(1-state[22])**4)-1)
+        # else:
+        #     contactReward=time*-0.5
+
+        # linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[10:13])**4)-1)
         # angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
         # actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
         # actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action)**2
-        # info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward])
-        return  {"answer": 42}#{"answer": 42} #info
+        # if len(L) !=0:
+        #     contactgroundReward=-(3)
+        #     print("fall down to the gorund",L)
+        # else:
+        #     contactgroundReward=0
+       
+
+        # info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward])
+        return  {"answer": 42} #{"answer": 42} #info
     ################################################################################
     
     def _clipAndNormalizeState(self,
@@ -247,7 +257,7 @@ class LandingAviary(BaseSingleAgentAviary):
         
         MAX_F_XY=5  #max external froce in xy axis in robot frame
         MAX_F_Z=11.76 ##max external froce in z axis in robot frame
-
+        #这些值正确吗？？
 
         clipped_pos_xy = np.clip(state[0:2], -MAX_XY, MAX_XY)
         clipped_pos_z = np.clip(state[2], 0, MAX_Z)
@@ -267,7 +277,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
         normalized_pos_xy = clipped_pos_xy / MAX_XY
         normalized_pos_z = clipped_pos_z / MAX_Z
-        normalized_rp = clipped_rp / MAX_PITCH_ROLL
+        normalized_rp = clipped_rp / MAX_PITCH_ROLL      
         normalized_y = state[9] / np.pi # No reason to clip
         normalized_vel_xy = clipped_vel_xy / MAX_LIN_VEL_XY
         normalized_vel_z = clipped_vel_z / MAX_LIN_VEL_XY
