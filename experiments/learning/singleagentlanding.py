@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument('--algo',       default='ppo',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
     parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
-    parser.add_argument('--cpu',        default='16',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
+    parser.add_argument('--cpu',        default='4',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
     ARGS = parser.parse_args()
 
     #### Save directory ########################################
@@ -147,7 +147,7 @@ if __name__ == "__main__":
                                  verbose=1,
                                  best_model_save_path=filename+'/'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"),
                                  log_path=filename+'/',
-                                 eval_freq=int(32000/ARGS.cpu),
+                                 eval_freq=int(8000/ARGS.cpu),
                                  deterministic=True,
                                  render=False
                                  )
