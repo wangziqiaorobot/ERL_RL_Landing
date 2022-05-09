@@ -327,7 +327,7 @@ class BaseSingleAgentAviary(BaseAviary):
             # print('target_rpy',action[1:4])
             
             targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-                                                 thrust=(self.MAX_THRUST/2*(action[0]+1)), #gravity:4.9; thrust :9.8
+                                                 thrust=(self.GRAVITY*(1+0.1*action[0])), #gravity:4.9; thrust :9.8,   self.MAX_THRUST/2*(action[0]+1)
                                                  cur_quat=state[3:7],
                                                  target_rpy=np.array([action[1]*self.MAX_ROLL_PITCH,action[2]*self.MAX_ROLL_PITCH,action[3]*self.MAX_ROLL_PITCH/5]) #MAX_ROLL_PITCH=30 deg
                                                  )
