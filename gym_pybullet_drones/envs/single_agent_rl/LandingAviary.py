@@ -119,10 +119,10 @@ class LandingAviary(BaseSingleAgentAviary):
         linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[10:13])**4)-1)
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
-        actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action)**2
+        actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3])**2
         if len(L) !=0:
             contactgroundReward=-(3)
-            print("fall down to the gorund",L)
+            print("fall down to the gorund")
         else:
             contactgroundReward=0
         return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.0005

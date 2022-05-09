@@ -438,7 +438,7 @@ class BaseAviary(gym.Env):
             # print(L)
             # P=p.getContactPoints((self.tree))
             # print("rotation mat.:", np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
-            # print("drone position:",self.pos[0, :])
+            # print("drone position:",self.pos[0, :],self.pos[0, 0],self.pos[0, 1])
 
             
 
