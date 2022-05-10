@@ -444,8 +444,13 @@ class BaseAviary(gym.Env):
 
             if len(L) !=0 :
                 
-                
-                
+                #contact point
+                p.addUserDebugLine(     lineFromXYZ=L[0][6],
+                                        lineToXYZ=(L[0][6][0]+0.01,L[0][6][1],L[0][6][2]),
+                                        lineColorRGB=[1, 0, 0],
+                                        lineWidth=100,
+                                        lifeTime=0.05,
+                                        physicsClientId=self.CLIENT)
                 # ### Normal Force ###
                 # p.addUserDebugLine(     lineFromXYZ=L[0][6],
                 #                         lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
@@ -510,8 +515,8 @@ class BaseAviary(gym.Env):
                
                 ## Visualization of external Force in robot frame ##### 
                 p.addUserDebugLine(                   lineFromXYZ=[0, 0, 0],
-                                                      lineToXYZ=contact_r_frame*0.03,
-                                                      lineColorRGB=[1, 1, 1],
+                                                      lineToXYZ=contact_r_frame*0.07,
+                                                      lineColorRGB=[1, 0, 0],
                                                       lineWidth=5,
                                                       parentObjectUniqueId=self.DRONE_IDS[0],
                                                       parentLinkIndex=-1,
