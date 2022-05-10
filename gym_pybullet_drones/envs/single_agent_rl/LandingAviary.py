@@ -92,10 +92,10 @@ class LandingAviary(BaseSingleAgentAviary):
         
         
        
-        balancingRewardCoeff=0.04*time
-        slippageRewardCoeff=0.009*time
+        balancingRewardCoeff=0.01*time
+        slippageRewardCoeff=0.04*time
         contactRewardCoeff=0.003*time
-        linearvelocityRewardCoeff=0.0001*time
+        linearvelocityRewardCoeff=0.001*time
         angulervelocityRewardCoeff=0.03*time
         actionsmoothRewardCoeff=-0.0001
         actionlimitRewardCoeff=-0.0001*time
@@ -104,7 +104,11 @@ class LandingAviary(BaseSingleAgentAviary):
 
         balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[7:9])**4)-1)
         
-        slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
+        if np.linalg.norm(self.pos[0,0])>2 or np.linalg.norm(self.pos[0,1])>2:
+            slippageReward=-3
+        else:
+            slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
+        # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
         # if state[23]==0:
         
         #     slippageReward=slippageRewardCoeff*(-10)
@@ -114,7 +118,7 @@ class LandingAviary(BaseSingleAgentAviary):
         if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0:
             contactReward=0 #contactRewardCoeff*(np.exp(- np.linalg.norm(1-state[22])**4)-1)
         else:
-            contactReward=time*-0.1
+            contactReward=time*-0.2
 
         linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
@@ -154,7 +158,7 @@ class LandingAviary(BaseSingleAgentAviary):
         p.performCollisionDetection(physicsClientId=self.CLIENT)
         L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
         
-        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
+        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0])>2 or np.linalg.norm(self.pos[0,1])>2:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
             self.iterate= self.iterate+1
         # Alternative done condition, see PR #32
         # if (self.step_counter/self.SIM_FREQ > (self.EPISODE_LEN_SEC)) or ((self._getDroneStateVector(0))[2] < 0.05):
