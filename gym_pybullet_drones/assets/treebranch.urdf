@@ -12,13 +12,11 @@
            <origin rpy="0 0 0" xyz="0 0 0"/>
            <material name="brown"/>
         </visual>
-        <collision>
-         <geometry>
-         <!-- for tree to stand on the plane -->
-         <!-- <box size="2.0 2.0 0.5"/>   -->
-          <cylinder length="4" radius="0.25"/>
-         </geometry>
-        </collision>
+        <!-- <collision> -->
+         <!-- <geometry> -->
+          <!-- <cylinder length="4" radius="0.25"/> -->
+         <!-- </geometry> -->
+        <!-- </collision> -->
         <inertial>
          <mass value="100"/>
           <inertia ixx="800.0" ixy="0.0" ixz="0.0" iyy="800" iyz="0.0" izz="800"/>
@@ -67,7 +65,7 @@
         <child link="virtual_link"/>
         <dynamics damping="0.01" friction="0.01"/>
         <!-- <limit effort="1000" velocity="0.5" lower="-0.3" upper="0.3" /> -->
-        <limit effort="1000" velocity="0.5" lower="-0.0" upper="0.0" />
+        <limit effort="1000" velocity="0.5" lower="-0.3" upper="0.3" />
     </joint>
 
 
