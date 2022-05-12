@@ -181,7 +181,7 @@ if __name__ == "__main__":
     ############### Plot the states & actions
     save_path = os.path.join(ARGS.exp)
     plt.figure()
-    plt.plot(test_env.MAX_THRUST/2*(actions[0,:]+1),label="thrust")
+    plt.plot(test_env.GRAVITY*(0.1*actions[0,:]+1),label="thrust")
     #plt.plot((actions[0,:]),label="b")
     plt.grid()
     plt.legend()
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="roll")
+    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="roll")
     plt.grid()
     plt.legend()
     plt.title('action1_roll')
@@ -198,7 +198,7 @@ if __name__ == "__main__":
 
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="pitch")
+    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="pitch")
     plt.grid()
     plt.legend()
     plt.title('action2_pitch')
@@ -247,7 +247,7 @@ if __name__ == "__main__":
 ##### r\p\y
 
     plt.figure()
-    plt.plot(observation[3,:]*MAX_PITCH_ROLL/math.pi*180,label="roll")
+    plt.plot(observation[7,:]*MAX_PITCH_ROLL/math.pi*180,label="roll")
     plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="command(action)_roll")
     plt.grid()
     plt.legend()
@@ -256,7 +256,7 @@ if __name__ == "__main__":
 
 
     plt.figure()
-    plt.plot(observation[4,:]*MAX_PITCH_ROLL/math.pi*180,label="pitch")
+    plt.plot(observation[8,:]*MAX_PITCH_ROLL/math.pi*180,label="pitch")
     plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="command(action)_pitch")
     plt.grid()
     plt.legend()
@@ -264,7 +264,7 @@ if __name__ == "__main__":
     plt.savefig(save_path + '/obs4_pitch.jpg')
 
     plt.figure()
-    plt.plot(observation[5,:]*MAX_PITCH_ROLL/math.pi*180,label="yaw")
+    plt.plot(observation[9,:]*MAX_PITCH_ROLL/math.pi*180,label="yaw")
     plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180),label="command(action)_yaw")
     plt.grid()
     plt.legend()
@@ -274,9 +274,9 @@ if __name__ == "__main__":
 ### line_v
 
     plt.figure()
-    plt.plot(observation[6,:]*MAX_PITCH_ROLL,label="x_vel")
-    plt.plot(observation[7,:]*MAX_PITCH_ROLL,label="y_vel")
-    plt.plot(observation[8,:]*MAX_LIN_VEL_Z,label="z_vel")
+    plt.plot(observation[10,:]*MAX_LIN_VEL_XY,label="x_vel")
+    plt.plot(observation[11,:]*MAX_LIN_VEL_XY,label="y_vel")
+    plt.plot(observation[12,:]*MAX_LIN_VEL_Z,label="z_vel")
     plt.grid()
     plt.legend()
     plt.title('lin_vel')
@@ -284,12 +284,12 @@ if __name__ == "__main__":
 
 ## ang_vel
     plt.figure()
-    plt.plot(observation[9,:]*MAX_PITCH_ROLL,label="x_ang_vel")
-    plt.plot(observation[10,:]*MAX_PITCH_ROLL,label="y_ang_vel")
-    plt.plot(observation[11,:]*MAX_LIN_VEL_Z,label="z_ang_vel")
+    plt.plot(observation[13,:],label="x_ang_vel")
+    plt.plot(observation[14,:],label="y_ang_vel")
+    plt.plot(observation[15,:],label="z_ang_vel")
     plt.grid()
     plt.legend()
-    plt.title('lin_vel')
+    plt.title('ang_vel')
     plt.savefig(save_path + '/ang_vel.jpg')
 
 ## rewards
@@ -301,10 +301,90 @@ if __name__ == "__main__":
     plt.plot(infos[3,:],label="angulervelocityReward")
     plt.plot(infos[4,:],label="actionsmoothReward")
     plt.plot(infos[5,:],label="actionlimitReward")
-    plt.plot(infos[6,:],label="contactgroundReward")
-    plt.plot(infos[7,:],label="slippageReward")
+    plt.plot(infos[6,:],label="slippageReward")
+    plt.plot(infos[7,:],label="contactgroundReward")
     plt.grid()
     plt.legend()
     plt.title('reward')
     plt.savefig(save_path + '/reward.jpg')
+
+## polt the observation
+######## xyz
+    plt.figure()
+    plt.plot(observation[0,:],label="obs0_x")
+    plt.plot(observation[1,:],label="obs1_y")
+    plt.plot(observation[2,:],label="obs2_z")
+    plt.grid()
+    plt.legend()
+    plt.title('obs_xyz')
+    plt.savefig(save_path + '/obs_xyz.jpg')
+
+########   Q4
+    plt.figure()
+    plt.plot(observation[3,:],label="obs3_q1")
+    plt.plot(observation[4,:],label="obs4_q2")
+    plt.plot(observation[5,:],label="obs5_q3")
+    plt.plot(observation[6,:],label="obs6_q4")
+    plt.grid()
+    plt.legend()
+    plt.title('obs_q4')
+    plt.savefig(save_path + '/obs_q4.jpg')
+
+######## RPY
+    plt.figure()
+    plt.plot(observation[7,:],label="roll")
+    plt.plot(observation[8,:],label="pitch")
+    plt.plot(observation[9,:],label="yaw")
+    plt.grid()
+    plt.legend()
+    plt.title('obs_rpy')
+    plt.savefig(save_path + '/obs_rpy.jpg')
+
+######## linear v
+    plt.figure()
+    plt.plot(observation[10,:],label="x")
+    plt.plot(observation[11,:],label="y")
+    plt.plot(observation[12,:],label="z")
+    plt.grid()
+    plt.legend()
+    plt.title('obs_lin_v')
+    plt.savefig(save_path + '/obs_lin_v.jpg')
+
+######## anguler v
+    plt.figure()
+    plt.plot(observation[13,:],label="wx")
+    plt.plot(observation[14,:],label="wy")
+    plt.plot(observation[15,:],label="wz")
+    plt.grid()
+    plt.legend()
+    plt.title('obs_ang_v')
+    plt.savefig(save_path + '/obs_ang_v.jpg')
+
+########   action
+    plt.figure()
+    plt.plot(observation[16,:],label="a1")
+    plt.plot(observation[17,:],label="a2")
+    plt.plot(observation[18,:],label="a3")
+    plt.plot(observation[19,:],label="a4")
+    plt.grid()
+    plt.legend()
+    plt.title('obs_action')
+    plt.savefig(save_path + '/obs_action.jpg')
+
+######## force
+    plt.figure()
+    plt.plot(observation[20,:],label="fx")
+    plt.plot(observation[21,:],label="fy")
+    plt.plot(observation[22,:],label="fz")
+    plt.grid()
+    plt.legend()
+    plt.title('obs_force')
+    plt.savefig(save_path + '/obs_force.jpg')
+
+
+
+
+
+
+
  
