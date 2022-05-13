@@ -106,7 +106,7 @@ if __name__ == "__main__":
     # check_env(train_env, warn=True, skip_render_check=True)
     
     #### On-policy algorithms ##################################
-    onpolicy_kwargs = dict(activation_fn=torch.nn.ReLU,
+    onpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
                            net_arch=[dict(vf=[256, 128], pi=[256, 128])] #c
                            ) # or None
    
