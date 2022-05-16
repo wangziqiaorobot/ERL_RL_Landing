@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument('--algo',       default='ppo',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
     parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
-    parser.add_argument('--cpu',        default='4',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
+    parser.add_argument('--cpu',        default='10',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
     ARGS = parser.parse_args()
 
     #### Save directory ########################################
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     train_env = make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
                                  n_envs=ARGS.cpu,# The number of Parallel environments
-                                 seed=1
+                                 seed=6
                                  )
    
     print("[INFO] Action space:", train_env.action_space)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     
     #### On-policy algorithms ##################################
     onpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
-                           net_arch=[dict(vf=[256, 128], pi=[256, 128])] #c
+                           net_arch=[dict(vf=[512,256], pi=[512,256])] #c
                            ) # or None
    
     if ARGS.algo == 'ppo':
@@ -147,7 +147,7 @@ if __name__ == "__main__":
                                  verbose=1,
                                  best_model_save_path=filename+'/'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"),
                                  log_path=filename+'/',
-                                 eval_freq=int(8000/ARGS.cpu),
+                                 eval_freq=int(2000*10/ARGS.cpu),
                                  deterministic=True,
                                  render=False
                                  )
