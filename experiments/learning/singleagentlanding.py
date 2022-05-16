@@ -107,7 +107,7 @@ if __name__ == "__main__":
     
     #### On-policy algorithms ##################################
     onpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
-                           net_arch=[dict(vf=[512,256], pi=[512,256])] #c
+                           net_arch=[256, 256, dict(vf=[256,128], pi=[256,128])] #c
                            ) # or None
    
     if ARGS.algo == 'ppo':
