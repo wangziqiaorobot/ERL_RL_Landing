@@ -101,7 +101,7 @@ class LandingAviary(BaseSingleAgentAviary):
         actionlimitRewardCoeff=-0.00001*time
         contactgroundRewardCoeff=-0.00001
         
-        print("state22",state[22])
+        
         balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[7:9])**4)-1)
         
         if np.linalg.norm(self.pos[0,0])>1 or np.linalg.norm(self.pos[0,1])>1:
