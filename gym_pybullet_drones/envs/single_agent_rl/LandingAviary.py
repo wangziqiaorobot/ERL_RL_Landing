@@ -117,7 +117,7 @@ class LandingAviary(BaseSingleAgentAviary):
         #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
         if np.linalg.norm(state[22]) >0: #if have contact
-            contactReward=contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) #contactReward=0 
+            contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
         else:
             contactReward=time*-0.01
 
