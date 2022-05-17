@@ -397,7 +397,7 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,-0.3,10,1,10]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=[0,0.08,1,0,500,2,10]    #pd4branch=[0,0.079,1,0,1,1,13]
             desiredPosPole=pd4branch[0]
             p_joint1=pd4branch[1]
             d_joint1=pd4branch[2]
@@ -436,8 +436,10 @@ class BaseAviary(gym.Env):
             p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
             # print(L)
+            # p.changeDynamics(self.tree,linkIndex=1,physicsClientId=self.CLIENT,lateralFriction=1)
+            print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
             # P=p.getContactPoints((self.tree))
-            # print("rotation mat.:", np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
+            # print("rotation mat.:", np.array(p.getMatrtrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
             # print("drone position:",self.pos[0, :],self.pos[0, 0],self.pos[0, 1])
 
             
