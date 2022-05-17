@@ -206,19 +206,19 @@ if __name__ == "__main__":
 
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180*0.02),label="yaw")
+    plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180),label="yaw")
     plt.grid()
     plt.legend()
     plt.title('action3_yaw')
     plt.savefig(save_path + '/action3_yaw.jpg')
 
     ## observation
-    MAX_LIN_VEL_XY = 3 
+    MAX_LIN_VEL_XY = 2 
     MAX_LIN_VEL_Z = 1
 
-    MAX_XY = MAX_LIN_VEL_XY*test_env.EPISODE_LEN_SEC
-    MAX_Z = MAX_LIN_VEL_Z*test_env.EPISODE_LEN_SEC
-    MAX_PITCH_ROLL = np.pi # Full range
+    MAX_XY = 1
+    MAX_Z = 3
+    MAX_PITCH_ROLL = np.pi/2 # Full range
     
 
 ##### x\y\z
@@ -248,7 +248,7 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(observation[7,:]*MAX_PITCH_ROLL/math.pi*180,label="roll")
-    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="command(action)_roll")
+    plt.plot((actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_roll")
     plt.grid()
     plt.legend()
     plt.title('obs3_roll')
@@ -257,14 +257,14 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(observation[8,:]*MAX_PITCH_ROLL/math.pi*180,label="pitch")
-    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/3/math.pi*180),label="command(action)_pitch")
+    plt.plot((actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_pitch")
     plt.grid()
     plt.legend()
     plt.title('obs4_pitch')
     plt.savefig(save_path + '/obs4_pitch.jpg')
 
     plt.figure()
-    plt.plot(observation[9,:]*MAX_PITCH_ROLL/math.pi*180,label="yaw")
+    plt.plot(observation[9,:]/math.pi*180,label="yaw")
     plt.plot((actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180),label="command(action)_yaw")
     plt.grid()
     plt.legend()
@@ -307,6 +307,19 @@ if __name__ == "__main__":
     plt.legend()
     plt.title('reward')
     plt.savefig(save_path + '/reward.jpg')
+    
+    
+    MAX_F_XY=5  #max external froce in xy axis in robot frame
+    MAX_F_Z=11.76 ##max external froce in z axis in robot frame
+## force 
+    plt.figure()
+    plt.plot(observation[20,:]*MAX_F_XY,label="fx")
+    plt.plot(observation[21,:]*MAX_F_XY,label="fy")
+    plt.plot(observation[22,:]*MAX_F_Z,label="fz")
+    plt.grid()
+    plt.legend()
+    plt.title('Force')
+    plt.savefig(save_path + '/Force.jpg')
 
 ## polt the observation
 ######## xyz
