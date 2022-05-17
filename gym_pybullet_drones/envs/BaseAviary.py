@@ -224,8 +224,8 @@ class BaseAviary(gym.Env):
                                                             )
         #### Set initial poses #####################################
         if initial_xyzs is None:
-            self.INIT_XYZS = np.vstack([np.array([x*4*self.L for x in range(self.NUM_DRONES)]), \
-                                        np.array([y*4*self.L for y in range(self.NUM_DRONES)]), \
+            self.INIT_XYZS = np.vstack([np.array([0]), \
+                                        np.array([0]), \
                                         np.ones(self.NUM_DRONES) *2.1]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             
             
@@ -397,7 +397,7 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,10,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=[0,0.08,1,-0.3,10,1,10]    #pd4branch=[0,0.079,1,0,1,1,13]
             desiredPosPole=pd4branch[0]
             p_joint1=pd4branch[1]
             d_joint1=pd4branch[2]
