@@ -143,5 +143,8 @@
          <mass value="0.05"/>
           <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
         </inertial>
+        <!-- <contact>
+	      <lateral_friction value="2"/>
+	    </contact> -->
     </link>
 </robot>
