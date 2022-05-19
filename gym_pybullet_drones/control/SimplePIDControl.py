@@ -39,9 +39,9 @@ class SimplePIDControl(BaseControl):
         self.D_COEFF_FOR = np.array([5.0, 5.0, 1.5])#np.array([.3, .3, .4])
         
         #PD parameter of attitude controller
-        self.P_COEFF_TOR =  np.array([0.15, 0.15, .09]) #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
-        #self.I_COEFF_TOR = np.array([.0001, .0001, .0001])
-        self.D_COEFF_TOR =  np.array([.05, .05, .05]) #np.array([.02, .02, .3])
+        self.P_COEFF_TOR =  np.array([0.15, 0.15, .09])#([0.11, 0.15, .1]) #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
+        # self.I_COEFF_TOR = np.array([.0001, .0001, .0001])
+        self.D_COEFF_TOR =  np.array([.05, .05, .05])#([.07, .08, .8]) #np.array([.02, .02, .3])
 
 
         self.MAX_ROLL_PITCH = np.pi/6
@@ -240,6 +240,7 @@ class SimplePIDControl(BaseControl):
         #### PID target torques ####################################
         target_torques = np.multiply(self.P_COEFF_TOR, rpy_e) \
                          + np.multiply(self.D_COEFF_TOR, d_rpy_e)
+                         #+ np.multiply(self.I_COEFF_TOR, self.integral_rpy_e)\
                         #   + np.multiply(self.I_COEFF_TOR, self.integral_rpy_e) \
         #### add the torque Constraints #######
         # print('MAX_XY_TORQUE:',self.MAX_XY_TORQUE)
