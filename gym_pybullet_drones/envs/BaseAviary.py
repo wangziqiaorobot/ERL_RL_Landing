@@ -304,24 +304,7 @@ class BaseAviary(gym.Env):
 
         """
         
-        #### Save PNG video frames if RECORD=True and GUI=False ####
-        # if self.RECORD and not self.GUI and self.step_counter%self.CAPTURE_FREQ == 0:
-        #     [w, h, rgb, dep, seg] = p.getCameraImage(width=self.VID_WIDTH,
-        #                                              height=self.VID_HEIGHT,
-        #                                              shadow=1,
-        #                                              viewMatrix=self.CAM_VIEW,
-        #                                              projectionMatrix=self.CAM_PRO,
-        #                                              renderer=p.ER_TINY_RENDERER,
-        #                                              flags=p.ER_SEGMENTATION_MASK_OBJECT_AND_LINKINDEX,
-        #                                              physicsClientId=self.CLIENT
-        #                                              )
-        #     (Image.fromarray(np.reshape(rgb, (h, w, 4)), 'RGBA')).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
-        #     #### Save the depth or segmentation view instead #######
-        #     # dep = ((dep-np.min(dep)) * 255 / (np.max(dep)-np.min(dep))).astype('uint8')
-        #     # (Image.fromarray(np.reshape(dep, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
-        #     # seg = ((seg-np.min(seg)) * 255 / (np.max(seg)-np.min(seg))).astype('uint8')
-        #     # (Image.fromarray(np.reshape(seg, (h, w)))).save(self.IMG_PATH+"frame_"+str(self.FRAME_NUM)+".png")
-        #     self.FRAME_NUM += 1
+        
 
         self.current_action = action
 
@@ -397,14 +380,16 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,500,2,10]    #pd4branch=[0,0.079,1,0,1,1,13]
-            desiredPosPole=pd4branch[0]
-            p_joint1=pd4branch[1]
-            d_joint1=pd4branch[2]
-            desiredPosPole2=pd4branch[3]
-            p_joint2=pd4branch[4]
-            d_joint2=pd4branch[5]
-            maxForce=pd4branch[6]
+            # pd4branch=[0,0.01,1,0,50,.5,5]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=self.pd4branch
+            print("pd4branch",pd4branch)
+            desiredPosPole=float(pd4branch[0])
+            p_joint1=float(pd4branch[1])
+            d_joint1=float(pd4branch[2])
+            desiredPosPole2=float(pd4branch[3])
+            p_joint2=float(pd4branch[4])
+            d_joint2=float(pd4branch[5])
+            maxForce=float(pd4branch[6])
             link = 0
             p.setJointMotorControl2(bodyUniqueId=self.tree,
                                 jointIndex=link,
@@ -436,8 +421,8 @@ class BaseAviary(gym.Env):
             p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
             # print(L)
-            # p.changeDynamics(self.tree,linkIndex=1,physicsClientId=self.CLIENT,lateralFriction=1)
-            print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
+            
+            # print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
             # P=p.getContactPoints((self.tree))
             # print("rotation mat.:", np.array(p.getMatrtrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
             # print("drone position:",self.pos[0, :],self.pos[0, 0],self.pos[0, 1])
@@ -653,8 +638,19 @@ class BaseAviary(gym.Env):
 
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
+        #### reset the branch parameter
+        self.pd4branch=[ 
+        np.random.uniform(-0.01,0.01),##random pos value in x-axis,
+        np.random.uniform(0.02,0.1),##random p value in x-axis,
+        np.random.uniform(0.8,1.2),##random d value in x-axis,
+        np.random.uniform(-0.05,0.05), ##random pos in z-axis
+        np.random.randint(10,100), ##random p value in z-axis
+        np.random.uniform(0.5,1),##random d value in z-axis
+        np.random.uniform(5,10)]##random max_force
+        
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
+
         
         p.setRealTimeSimulation(0, physicsClientId=self.CLIENT)  # 1 is enable the real time simulation
         # p.setTimeStep(self.TIMESTEP, physicsClientId=self.CLIENT)
@@ -676,7 +672,8 @@ class BaseAviary(gym.Env):
                    useFixedBase=True,
                 #    flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
                    )
-        
+        #change the branch friction coefficient
+        # p.changeDynamics(self.tree,linkIndex=1,physicsClientId=self.CLIENT,lateralFriction=0.8)
         
         # add the local axes to the drone, but this will slows down the GUI
         self._showDroneLocalAxes(0)
