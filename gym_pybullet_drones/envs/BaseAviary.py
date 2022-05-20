@@ -332,14 +332,15 @@ class BaseAviary(gym.Env):
         #### Save, preprocess, and clip the action to the max. RPM #
         else:
             self._saveLastAction(action)
-            clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
+            # clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
        
         #### Repeat for as many as the aggregate physics steps #####
-        for _ in range(self.AGGR_PHY_STEPS*4):
+        for _ in range(self.AGGR_PHY_STEPS*2):
             #### Update and store the drones kinematic info for certain
             #### Between aggregate steps for certain types of update ###
             if self.AGGR_PHY_STEPS > 1 and self.PHYSICS in [Physics.PYB,Physics.DYN, Physics.PYB_GND, Physics.PYB_DRAG, Physics.PYB_DW, Physics.PYB_GND_DRAG_DW]:
                 self._updateAndStoreKinematicInformation()
+                clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
             #### Step the simulation using the desired physics update ##
             for i in range (self.NUM_DRONES):
                 if self.PHYSICS == Physics.PYB:
@@ -884,6 +885,7 @@ class BaseAviary(gym.Env):
         forces = np.array(rpm**2)*self.KF
         torques = np.array(rpm**2)*self.KM
         z_torque = (-torques[0] + torques[1] - torques[2] + torques[3])
+        print("test",rpm)
         for i in range(4):
             p.applyExternalForce(self.DRONE_IDS[nth_drone],
                                  i,
