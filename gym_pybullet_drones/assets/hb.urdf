@@ -42,7 +42,6 @@
         <sphere radius="0.22"/>
       </geometry>
     </collision>  
-
   </link>
 
   <link name="prop0_link">

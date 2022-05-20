@@ -66,7 +66,7 @@ if __name__ == "__main__":
     AGGR_PHY_STEPS = int(ARGS.simulation_freq_hz/ARGS.control_freq_hz) if ARGS.aggregate else 1
 
     #### Initialize a circular trajectory ######################
-    PERIOD = 10
+    PERIOD = 5
     NUM_WP = ARGS.control_freq_hz*PERIOD
     TARGET_POS = np.zeros((NUM_WP,3))
     for i in range(NUM_WP):
