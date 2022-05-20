@@ -18,7 +18,7 @@ class LandingAviary(BaseSingleAgentAviary):
                  initial_rpys=None,
                  physics: Physics=Physics.PYB, #change the physics to the DYN inorder to the dynamics information
                  freq: int=240,
-                 aggregate_phy_steps: int=1,
+                 aggregate_phy_steps: int=5,
                  gui=False,
                  record=False, 
                  obs: ObservationType=ObservationType.KIN,
