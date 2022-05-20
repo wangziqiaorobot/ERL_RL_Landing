@@ -39,9 +39,9 @@ class SimplePIDControl(BaseControl):
         self.D_COEFF_FOR = np.array([5.0, 5.0, 1.5])#np.array([.3, .3, .4])
         
         #PD parameter of attitude controller
-        self.P_COEFF_TOR =  np.array([0.15, 0.15, .09])#([0.11, 0.15, .1]) #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
+        self.P_COEFF_TOR =  np.array([0.11, 0.13, .1])#([0.15, 0.15, .09])# #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
         # self.I_COEFF_TOR = np.array([.0001, .0001, .0001])
-        self.D_COEFF_TOR =  np.array([.05, .05, .05])#([.07, .08, .8]) #np.array([.02, .02, .3])
+        self.D_COEFF_TOR =  np.array([.19, .19, .4])#([.05, .05, .05])# #np.array([.02, .02, .3])
 
 
         self.MAX_ROLL_PITCH = np.pi/6
