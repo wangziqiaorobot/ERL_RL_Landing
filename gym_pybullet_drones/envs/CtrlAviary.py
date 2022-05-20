@@ -16,7 +16,7 @@ class CtrlAviary(BaseAviary):
                  initial_rpys=None,
                  physics: Physics=Physics.PYB,
                  freq: int=240,
-                 aggregate_phy_steps: int=1,
+                 aggregate_phy_steps: int=5,
                  gui=False,
                  record=False,
                  obstacles=False,
