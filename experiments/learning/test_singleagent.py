@@ -148,7 +148,7 @@ if __name__ == "__main__":
     # logger.plot()
 
     # new log try ####
-    test_steps=10000
+    test_steps=100
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     plt.plot(observation[2,:]*MAX_Z,label="z")
     plt.grid()
     plt.legend()
-    plt.title('obs2_y')
+    plt.title('obs2_z')
     plt.savefig(save_path + '/obs2_z.jpg')
 
 ##### r\p\y
