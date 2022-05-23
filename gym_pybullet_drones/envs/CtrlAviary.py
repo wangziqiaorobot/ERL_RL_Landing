@@ -9,14 +9,14 @@ class CtrlAviary(BaseAviary):
     ################################################################################
 
     def __init__(self,
-                 drone_model: DroneModel=DroneModel.CF2X,
+                 drone_model: DroneModel=DroneModel.HB,
                  num_drones: int=1,
                  neighbourhood_radius: float=np.inf,
                  initial_xyzs=None,
                  initial_rpys=None,
                  physics: Physics=Physics.PYB,
                  freq: int=240,
-                 aggregate_phy_steps: int=5,
+                 aggregate_phy_steps: int=1,
                  gui=False,
                  record=False,
                  obstacles=False,
