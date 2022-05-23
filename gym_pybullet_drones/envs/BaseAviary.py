@@ -50,14 +50,14 @@ class BaseAviary(gym.Env):
     ################################################################################
 
     def __init__(self,
-                 drone_model: DroneModel=DroneModel.CF2X,
+                 drone_model: DroneModel=DroneModel.HB,
                  num_drones: int=1,
                  neighbourhood_radius: float=np.inf,
                  initial_xyzs=None,
                  initial_rpys=None,
                  physics: Physics=Physics.PYB,
                  freq: int=240,
-                 aggregate_phy_steps: int=5,
+                 aggregate_phy_steps: int=1,
                  gui=True,
                  record=True,
                  obstacles=True,
@@ -182,6 +182,7 @@ class BaseAviary(gym.Env):
             self.CLIENT = p.connect(p.GUI) # p.connect(p.GUI, options="--opengl2")
             for i in [p.COV_ENABLE_RGB_BUFFER_PREVIEW, p.COV_ENABLE_DEPTH_BUFFER_PREVIEW, p.COV_ENABLE_SEGMENTATION_MARK_PREVIEW]:
                 p.configureDebugVisualizer(i, 0, physicsClientId=self.CLIENT)
+                p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
             p.resetDebugVisualizerCamera(cameraDistance=3,
                                          cameraYaw=-30,
                                          cameraPitch=-30,
@@ -332,12 +333,13 @@ class BaseAviary(gym.Env):
         #### Save, preprocess, and clip the action to the max. RPM #
         else:
             self._saveLastAction(action)
-            # clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
+            clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
        
         #### Repeat for as many as the aggregate physics steps #####
-        for _ in range(self.AGGR_PHY_STEPS*2):
+        for _ in range(self.AGGR_PHY_STEPS):
             #### Update and store the drones kinematic info for certain
             #### Between aggregate steps for certain types of update ###
+            print("AGGR_PHY_STEPS",self.AGGR_PHY_STEPS)
             if self.AGGR_PHY_STEPS > 1 and self.PHYSICS in [Physics.PYB,Physics.DYN, Physics.PYB_GND, Physics.PYB_DRAG, Physics.PYB_DW, Physics.PYB_GND_DRAG_DW]:
                 self._updateAndStoreKinematicInformation()
                 clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
