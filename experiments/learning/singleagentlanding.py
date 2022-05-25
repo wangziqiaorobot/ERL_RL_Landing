@@ -131,7 +131,7 @@ if __name__ == "__main__":
                             obs=ARGS.obs,
                             act=ARGS.act,
                             gui=True,
-                            record=False
+                            record=True
                             )
     
     
