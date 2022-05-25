@@ -109,6 +109,7 @@ class BaseAviary(gym.Env):
         #### Parameters ############################################
         self.NUM_DRONES = num_drones
         self.NEIGHBOURHOOD_RADIUS = neighbourhood_radius
+        self.iterate=1
         #### Options ###############################################
         self.DRONE_MODEL = drone_model
         self.GUI = gui
@@ -151,7 +152,7 @@ class BaseAviary(gym.Env):
             self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)
         self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)
         self.GND_EFF_H_CLIP = 0.25 * self.PROP_RADIUS * np.sqrt((15 * self.MAX_RPM**2 * self.KF * self.GND_EFF_COEFF) / self.MAX_THRUST)
-        self.MAX_ROLL_PITCH = np.pi/6
+        self.MAX_ROLL_PITCH = np.pi/18
         #### Create attributes for vision tasks ####################
         self.VISION_ATTR = vision_attributes
         if self.VISION_ATTR:
@@ -341,25 +342,28 @@ class BaseAviary(gym.Env):
             #### Between aggregate steps for certain types of update ###
             print("AGGR_PHY_STEPS",self.AGGR_PHY_STEPS)
             self._updateAndStoreKinematicInformation()
-            t0=time.time()
+            
             clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
-            t1=time.time()
-            print("time:",str(t1-t0))
+            self._physics(clipped_action[0, :], 0)
+            p.stepSimulation(physicsClientId=self.CLIENT)
+            
             # if self.AGGR_PHY_STEPS > 1 and self.PHYSICS in [Physics.PYB,Physics.DYN, Physics.PYB_GND, Physics.PYB_DRAG, Physics.PYB_DW, Physics.PYB_GND_DRAG_DW]:
             #     self._updateAndStoreKinematicInformation()
             #     clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
             #### Step the simulation using the desired physics update ##
-            for i in range (self.NUM_DRONES):
-                if self.PHYSICS == Physics.PYB:
-                    self._physics(clipped_action[i, :], i)
-                elif self.PHYSICS == Physics.DYN:
-                    self._dynamics(clipped_action[i, :], i)
+            # for i in range (self.NUM_DRONES):
+            #     if self.PHYSICS == Physics.PYB:
+            #         self._physics(clipped_action[i, :], i)
+            #     elif self.PHYSICS == Physics.DYN:
+            #         self._dynamics(clipped_action[i, :], i)
                 
             
             #### PyBullet computes the new state, unless Physics.DYN， Dyn will computes the state by a hand write lib ###
             # p.stepSimulation(physicsClientId=self.CLIENT)
-            if self.PHYSICS != Physics.DYN:
-                p.stepSimulation(physicsClientId=self.CLIENT)
+            # if self.PHYSICS != Physics.DYN:
+            #     p.stepSimulation(physicsClientId=self.CLIENT)
+
+
             #### Save the last applied action (e.g. to compute drag) ###
             self.last_clipped_action = clipped_action
 
@@ -375,8 +379,8 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,10,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
-            # pd4branch=self.pd4branch
+            # pd4branch=[0,0.08,1,0,10,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=self.pd4branch
             print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
             p_joint1=float(pd4branch[1])
@@ -610,7 +614,7 @@ class BaseAviary(gym.Env):
         #### Initialize/reset counters and zero-valued variables ###
         self.RESET_TIME = time.time()
         self.step_counter = 0
-        self.iterate=1
+        
         self.first_render_call = True
         self.X_AX = -1*np.ones(self.NUM_DRONES)
         self.Y_AX = -1*np.ones(self.NUM_DRONES)
@@ -718,18 +722,18 @@ class BaseAviary(gym.Env):
         The video is saved under folder `files/videos`.
 
         """
-        if self.RECORD : #and self.GUI
+        if self.RECORD and self.iterate % 100: #and self.GUI
             print('start recording ....')
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
-                                                fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+".mp4",
+                                                fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+str(self.iterate)+".mp4",
                                                 physicsClientId=self.CLIENT
                                                 )
-        if self.iterate % 100 == 0:
-            print('start recording ....')
-            self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
-                                                fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+self.iterate+".mp4",
-                                                physicsClientId=self.CLIENT
-                                                )
+        # if self.iterate % 100 == 0:
+        #     print('start recording ....')
+        #     self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
+        #                                         fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+str(self.iterate)+".mp4",
+        #                                         physicsClientId=self.CLIENT
+        #                                         )
         # if self.RECORD and not self.GUI:
         #     self.FRAME_NUM = 0
         #     self.IMG_PATH = os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+"/"
