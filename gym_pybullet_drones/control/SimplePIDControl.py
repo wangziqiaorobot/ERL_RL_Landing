@@ -44,7 +44,7 @@ class SimplePIDControl(BaseControl):
         self.D_COEFF_TOR =  np.array([0.8, .8, .8]) #([.19, .19, .4])#([.05, .05, .05])# #np.array([.02, .02, .3])
 
 
-        self.MAX_ROLL_PITCH = np.pi/6
+        self.MAX_ROLL_PITCH = np.pi/18
         self.M=1.2
         self.L = self._getURDFParameter('arm')
         self.THRUST2WEIGHT_RATIO = self._getURDFParameter('thrust2weight')
@@ -52,8 +52,8 @@ class SimplePIDControl(BaseControl):
         self.MAX_THRUST = 12*self.M #the max thrust is 12 m/s^2 (collective thrust, which means without mass)
         self.MAX_RPM = np.sqrt((self.MAX_THRUST) / (4*self.KF))
         # self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
-        self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)*14
-        self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)*14
+        self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)#*14
+        self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)#*14
         self.A = np.array([ [1, 1, 1, 1], [0, 1, 0, -1], [-1, 0, 1, 0], [-1, 1, -1, 1] ])
         self.INV_A = np.linalg.inv(self.A)
         self.B_COEFF = np.array([1/self.KF, 1/(self.KF*self.L), 1/(self.KF*self.L), 1/self.KM])
@@ -235,12 +235,12 @@ class SimplePIDControl(BaseControl):
             rpy_e[2] = rpy_e[2] + 2*np.pi
         d_rpy_e = (rpy_e - self.last_rpy_e) / control_timestep
         self.last_rpy_e = rpy_e
-        # self.integral_rpy_e = self.integral_rpy_e + rpy_e*control_timestep
+        self.integral_rpy_e = self.integral_rpy_e + rpy_e*control_timestep
         
         #### PID target torques ####################################
         target_torques = np.multiply(self.P_COEFF_TOR, rpy_e) \
                          + np.multiply(self.D_COEFF_TOR, d_rpy_e)\
-                        #   + np.multiply(self.I_COEFF_TOR, self.integral_rpy_e) \
+                          + np.multiply(self.I_COEFF_TOR, self.integral_rpy_e) \
         #### add the torque Constraints #######
         # print('MAX_XY_TORQUE:',self.MAX_XY_TORQUE)
         # print('MAX_Z_TORQUE:',self.MAX_Z_TORQUE)
