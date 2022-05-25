@@ -235,12 +235,11 @@ class SimplePIDControl(BaseControl):
             rpy_e[2] = rpy_e[2] + 2*np.pi
         d_rpy_e = (rpy_e - self.last_rpy_e) / control_timestep
         self.last_rpy_e = rpy_e
-        self.integral_rpy_e = self.integral_rpy_e + rpy_e*control_timestep
+        # self.integral_rpy_e = self.integral_rpy_e + rpy_e*control_timestep
         
         #### PID target torques ####################################
         target_torques = np.multiply(self.P_COEFF_TOR, rpy_e) \
                          + np.multiply(self.D_COEFF_TOR, d_rpy_e)\
-                         + np.multiply(self.I_COEFF_TOR, self.integral_rpy_e)\
                         #   + np.multiply(self.I_COEFF_TOR, self.integral_rpy_e) \
         #### add the torque Constraints #######
         # print('MAX_XY_TORQUE:',self.MAX_XY_TORQUE)

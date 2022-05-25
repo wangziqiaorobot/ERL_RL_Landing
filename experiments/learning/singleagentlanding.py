@@ -147,7 +147,7 @@ if __name__ == "__main__":
                                  verbose=1,
                                  best_model_save_path=filename+'/'+datetime.now().strftime("%m.%d.%Y_%H.%M.%S"),
                                  log_path=filename+'/',
-                                 eval_freq=int(2000*10/ARGS.cpu),
+                                 eval_freq=int(2000),
                                  deterministic=True,
                                  render=False
                                  )
