@@ -226,9 +226,9 @@ class BaseAviary(gym.Env):
                                                             )
         #### Set initial poses #####################################
         if initial_xyzs is None:
-            self.INIT_XYZS = np.vstack([np.array([0]), \
-                                        np.array([0]), \
-                                        np.ones(self.NUM_DRONES) *2.1]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+            self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(0.15,0.15))]), \
+                                        np.array([float(np.random.uniform(0.15,0.15))]), \
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.1,2.4))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             
             
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
@@ -673,7 +673,7 @@ class BaseAviary(gym.Env):
                 #    flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
                    )
         #change the branch friction coefficient
-        # p.changeDynamics(self.tree,linkIndex=1,physicsClientId=self.CLIENT,lateralFriction=0.8)
+        p.changeDynamics(self.tree,linkIndex=1,physicsClientId=self.CLIENT,lateralFriction=0.8)
         
         # add the local axes to the drone, but this will slows down the GUI
         self._showDroneLocalAxes(0)
