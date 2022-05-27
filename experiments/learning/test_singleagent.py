@@ -162,7 +162,7 @@ if __name__ == "__main__":
                                         deterministic=True # OPTIONAL 'deterministic=False'
                                         )
         obs, reward, done, info = test_env.step(action)
-        # test_env.render()
+        test_env.render()
         actions[:,i]=action
         observation[:,i]=obs
         rewards[:,i]=reward

@@ -383,7 +383,7 @@ class BaseAviary(gym.Env):
             ###########    Control the branch joints   ###############
             # pd4branch=[0,0.08,1,0,20,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
             pd4branch=self.pd4branch
-            print("pd4branch",pd4branch)
+            # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
             p_joint1=float(pd4branch[1])
             d_joint1=float(pd4branch[2])
@@ -640,7 +640,7 @@ class BaseAviary(gym.Env):
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.ones(self.NUM_DRONES) *float(np.random.uniform(2.1,2.4))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
         #### Initialize the branch friction friction coefficient ##########
-        self.lateralFriction=float(np.random.uniform(0.4,0.8))
+        self.lateralFriction=float(np.random.uniform(0.6,0.8))
         #### Initialize the drones contact force information ##########
         self.Fcontact= np.zeros(3)
 
@@ -652,7 +652,7 @@ class BaseAviary(gym.Env):
         np.random.uniform(0.02,0.1),##random p value in x-axis,
         np.random.uniform(0.8,1.2),##random d value in x-axis,
         np.random.uniform(-0.05,0.05), ##random pos in z-axis
-        np.random.randint(10,100), ##random p value in z-axis
+        np.random.randint(10,500), ##random p value in z-axis
         np.random.uniform(0.5,1),##random d value in z-axis
         np.random.uniform(5,10)]##random max_force
         
@@ -730,7 +730,7 @@ class BaseAviary(gym.Env):
         The video is saved under folder `files/videos`.
 
         """
-        if self.RECORD and self.iterate % 100: #and self.GUI
+        if self.RECORD and self.iterate % 500: #and self.GUI
             print('start recording ....')
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
                                                 fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+str(self.iterate)+".mp4",
