@@ -307,7 +307,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.title('reward')
     plt.savefig(save_path + '/reward.jpg')
-    
+    print('actionsmoothReward',infos[4,:])
     
     MAX_F_XY=5  #max external froce in xy axis in robot frame
     MAX_F_Z=11.76 ##max external froce in z axis in robot frame
