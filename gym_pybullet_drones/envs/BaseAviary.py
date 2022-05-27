@@ -334,15 +334,15 @@ class BaseAviary(gym.Env):
                                                           physicsClientId=self.CLIENT
                                                           ) for i in range(self.NUM_DRONES)]
         #### Save, preprocess, and clip the action to the max. RPM #
-        else:
-            self._saveLastAction(action)
+        # else:
+            # self._saveLastAction(action)
             # clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
        
         #### Repeat for as many as the aggregate physics steps #####
         for _ in range(self.AGGR_PHY_STEPS):
             #### Update and store the drones kinematic info for certain
             #### Between aggregate steps for certain types of update ###
-            print("AGGR_PHY_STEPS",self.AGGR_PHY_STEPS)
+            
             self._updateAndStoreKinematicInformation()
             
             clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
@@ -381,8 +381,8 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            # pd4branch=[0,0.08,1,0,20,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
-            pd4branch=self.pd4branch
+            pd4branch=[0,0.08,1,0,500,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
+            # pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
             p_joint1=float(pd4branch[1])
@@ -530,9 +530,12 @@ class BaseAviary(gym.Env):
         self._updateAndStoreKinematicInformation()
         #### Prepare the return values #############################
         obs = self._computeObs()
+        print("current_action",self.current_action,"last_action",self.last_action,"diff",self.current_action-self.last_action)
         reward = self._computeReward()
+        
         done = self._computeDone()
         info = self._computeInfo()
+        self._saveLastAction(action)
         #### Advance the step counter ##############################
         self.step_counter = self.step_counter + (1 * self.AGGR_PHY_STEPS)
         print("step:",self.step_counter)
@@ -905,7 +908,6 @@ class BaseAviary(gym.Env):
         forces = np.array(rpm**2)*self.KF
         torques = np.array(rpm**2)*self.KM
         z_torque = (-torques[0] + torques[1] - torques[2] + torques[3])
-        print("test",rpm)
         for i in range(4):
             p.applyExternalForce(self.DRONE_IDS[nth_drone],
                                  i,
