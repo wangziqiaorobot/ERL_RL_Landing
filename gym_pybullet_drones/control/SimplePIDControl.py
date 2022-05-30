@@ -34,14 +34,14 @@ class SimplePIDControl(BaseControl):
             print("[ERROR] in SimplePIDControl.__init__(), SimplePIDControl requires DroneModel.HB")
             exit()
         #PID parameter of position controller
-        self.P_COEFF_FOR = np.array([.065, .065, .65])
+        self.P_COEFF_FOR = np.array([.065, .065, .95])
         self.I_COEFF_FOR = np.array([.000, .000, .000])
         self.D_COEFF_FOR = np.array([5.0, 5.0, 1.5])#np.array([.3, .3, .4])
         
         #PD parameter of attitude controller
-        self.P_COEFF_TOR =  np.array([36.15, 20.15, 28.9]) #([0.11, 0.13, .1])#([0.15, 0.15, .09])# #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
+        self.P_COEFF_TOR =  np.array([66.15, 20.15, 28.9]) #([0.11, 0.13, .1])#([0.15, 0.15, .09])# #np.array([0.3, 0.3, .08])#np.array([.9, .3, .05])
         self.I_COEFF_TOR = np.array([.0001, .0001, .0001])
-        self.D_COEFF_TOR =  np.array([0.8, .8, .8]) #([.19, .19, .4])#([.05, .05, .05])# #np.array([.02, .02, .3])
+        self.D_COEFF_TOR =  np.array([0.9, .8, .8]) #([.19, .19, .4])#([.05, .05, .05])# #np.array([.02, .02, .3])
 
 
         self.MAX_ROLL_PITCH = np.pi/18
@@ -52,7 +52,7 @@ class SimplePIDControl(BaseControl):
         self.MAX_THRUST = 12*self.M #the max thrust is 12 m/s^2 (collective thrust, which means without mass)
         self.MAX_RPM = np.sqrt((self.MAX_THRUST) / (4*self.KF))
         # self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
-        self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)#*14
+        self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)*3#*14
         self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)#*14
         self.A = np.array([ [1, 1, 1, 1], [0, 1, 0, -1], [-1, 0, 1, 0], [-1, 1, -1, 1] ])
         self.INV_A = np.linalg.inv(self.A)
