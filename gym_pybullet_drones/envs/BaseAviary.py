@@ -228,7 +228,7 @@ class BaseAviary(gym.Env):
         if initial_xyzs is None:
             self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.4))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.1,2.4))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             
             # self.INIT_XYZS = np.vstack([np.array([0.15]), \
             #                             np.array([0]), \
@@ -641,9 +641,9 @@ class BaseAviary(gym.Env):
         #### Random Initialize the drones position information ##########
         self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.1,2.4))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.1,2.3))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
         #### Initialize the branch friction friction coefficient ##########
-        self.lateralFriction=float(np.random.uniform(0.6,0.8))
+        self.lateralFriction=float(np.random.uniform(0.8,0.1))
         #### Initialize the drones contact force information ##########
         self.Fcontact= np.zeros(3)
 
@@ -655,7 +655,6 @@ class BaseAviary(gym.Env):
         np.random.uniform(0.02,0.1),##random p value in x-axis,
         np.random.uniform(0.8,1.2),##random d value in x-axis,
         np.random.uniform(-0.05,0.05), ##random pos in z-axis
-        np.random.randint(10,500), ##random p value in z-axis
         np.random.uniform(0.5,1),##random d value in z-axis
         np.random.uniform(5,10)]##random max_force
         
