@@ -94,9 +94,9 @@ class LandingAviary(BaseSingleAgentAviary):
         
        
         balancingRewardCoeff=0.001*(time)#0.002/(time+0.5)
-        slippageRewardCoeff=0.08*time
+        slippageRewardCoeff=0.1*time
         contactRewardCoeff=0.01*time
-        linearvelocityRewardCoeff=0.015/(time+0.5)
+        linearvelocityRewardCoeff=0.03/(time+0.5)
         angulervelocityRewardCoeff=0.003*time
         actionsmoothRewardCoeff=-0.01
         actionlimitRewardCoeff=-0.00001*time
@@ -120,7 +120,7 @@ class LandingAviary(BaseSingleAgentAviary):
         if np.linalg.norm(state[22]) >0: #if have contact
             contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
         else:
-            contactReward=time*-0.05
+            contactReward=time*-0.02
 
         linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[10:13])**4)-1)
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
@@ -215,7 +215,7 @@ class LandingAviary(BaseSingleAgentAviary):
         # if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
         #     slippageReward=-15
         # else:
-        #     slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**8)-1)
+        #     slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**10)-1)
         # # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
         # # if state[23]==0:
         
@@ -240,7 +240,7 @@ class LandingAviary(BaseSingleAgentAviary):
         #     contactgroundReward=0
         
         # info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward])
-        return {"answer": 42}  #{"answer": 42} #info
+        return {"answer": 42} #{"answer": 42} #info
     ################################################################################
     
     def _clipAndNormalizeState(self,
