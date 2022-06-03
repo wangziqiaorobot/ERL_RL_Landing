@@ -381,7 +381,7 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            # pd4branch=[0,0.08,1,0,1,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
+            # pd4branch=[0,0.08,1,0,1000,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
             pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
