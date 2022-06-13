@@ -91,20 +91,16 @@ class LandingAviary(BaseSingleAgentAviary):
         ########### for the landing task ############# 
         # L_vel + W_vel + Contact_force + energy_consanpution
         
-        
-       
-        balancingRewardCoeff=0.01/(time+0.5)#0.001*(time)
+        balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
         slippageRewardCoeff=0.2*time
         contactRewardCoeff=0.01*time
-        linearvelocityRewardCoeff=0.03/(time+0.5)
+        linearvelocityRewardCoeff=0.05#0.03/(time+0.5)
         angulervelocityRewardCoeff=0.003*time
         actionsmoothRewardCoeff=-0.01
         actionlimitRewardCoeff=-0.00001*time
         contactgroundRewardCoeff=-0.00001
-        
-        
-        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[7:9])**6)-1)
-        
+        contactReward=time*-0.02
+          
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
         else:
@@ -119,9 +115,13 @@ class LandingAviary(BaseSingleAgentAviary):
         # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
         if np.linalg.norm(state[22]) >0: #if have contact
             contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
-        else:
-            contactReward=time*-0.02
+            #bool_contact_history=ture
+            balancingRewardCoeff = balancingRewardCoeff/time
+        # else:
+        #     contactReward=time*-0.02
+        #     balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
 
+        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0])-state[7:9])**6)-1)
         linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[10:13])**4)-1)
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
@@ -201,7 +201,7 @@ class LandingAviary(BaseSingleAgentAviary):
         
        
         # balancingRewardCoeff=0.01/(time+0.5)#0.001*(time)
-        # slippageRewardCoeff=0.1*time
+        # slippageRewardCoeff=0.2*time
         # contactRewardCoeff=0.01*time
         # linearvelocityRewardCoeff=0.03/(time+0.5)
         # angulervelocityRewardCoeff=0.003*time
@@ -239,7 +239,7 @@ class LandingAviary(BaseSingleAgentAviary):
         # else:
         #     contactgroundReward=0
         # info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward])
-        return {"answer": 42}  #{"answer": 42} #info
+        return {"answer": 42} #{"answer": 42} #info
     ################################################################################
     
     def _clipAndNormalizeState(self,
