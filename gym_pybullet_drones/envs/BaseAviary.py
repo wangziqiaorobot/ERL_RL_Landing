@@ -228,7 +228,7 @@ class BaseAviary(gym.Env):
         if initial_xyzs is None:
             self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.1,2.4))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.3,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             
             # self.INIT_XYZS = np.vstack([np.array([0]), \
             #                             np.array([0]), \
