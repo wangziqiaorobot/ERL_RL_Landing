@@ -209,7 +209,7 @@ if __name__ == "__main__":
 
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-    plt.plot(time_plt[0,:],(actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180),label="yaw")
+    plt.plot(time_plt[0,:],(actions[3,:]*np.pi/math.pi*180),label="yaw")
     plt.grid()
     plt.legend()
     plt.title('action3_yaw')
@@ -268,7 +268,7 @@ if __name__ == "__main__":
 
     plt.figure()
     plt.plot(time_plt[0,:],observation[9,:]/math.pi*180,label="yaw")
-    plt.plot(time_plt[0,:],(actions[3,:]*test_env.MAX_ROLL_PITCH/5/math.pi*180),label="command(action)_yaw")
+    plt.plot(time_plt[0,:],(actions[3,:]*np.pi/math.pi*180),label="command(action)_yaw")
     plt.grid()
     plt.legend()
     plt.title('obs5_yaw')

@@ -176,48 +176,7 @@ if __name__ == "__main__":
                        control=np.hstack([TARGET_POS[wp_counters[j], 0:2], INIT_XYZS[j, 2], INIT_RPYS[j, :], np.zeros(6)])
                        # control=np.hstack([INIT_XYZS[j, :]+TARGET_POS[wp_counters[j], :], INIT_RPYS[j, :], np.zeros(6)])
                        )
-        # L=p.getContactPoints(1)
-        # if len(L) !=0:
-            
-            
-        #     p.addUserDebugLine(     lineFromXYZ=L[0][6],
-        #                             lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
-        #                             lineColorRGB=[0, 1, 0],
-        #                             lineWidth=5,
-        #                             lifeTime=1,
-        #                             physicsClientId=env.CLIENT
-        #                                               )
-        # #tree branch 
-        # for i in range(p.getNumJoints(env.tree)):
-        # #print(p.getJointInfo(tree, i)
-        #     print('the joints',i,p.getJointState(env.tree, i))
-        # pd4branch=[0,0.079,1,0,1,1,10]
-        # desiredPosPole=pd4branch[0]
-        # p_joint1=pd4branch[1]
-        # d_joint1=pd4branch[2]
-        # desiredPosPole2=pd4branch[3]
-        # p_joint2=pd4branch[4]
-        # d_joint2=pd4branch[5]
-        # maxForce=pd4branch[6]
-        # link = 0
-        # p.setJointMotorControl2(bodyUniqueId=env.tree,
-        #                     jointIndex=link,
-        #                     controlMode=p.POSITION_CONTROL, #PD_CONTROL,
-        #                     targetPosition=desiredPosPole,
-        #                     targetVelocity=0,
-        #                     force=maxForce,
-        #                     positionGain=p_joint1,
-        #                     velocityGain=d_joint1)
-        # link = 1
-        # p.setJointMotorControl2(bodyUniqueId=env.tree,
-        #                     jointIndex=link,
-        #                     controlMode=p.PD_CONTROL,
-        #                     targetPosition=desiredPosPole2,
-        #                     targetVelocity=0,
-        #                     force=maxForce,
-        #                     positionGain=p_joint2,
-        #                     velocityGain=d_joint2)
-
+        
     
 
         #### Sync the simulation ###################################

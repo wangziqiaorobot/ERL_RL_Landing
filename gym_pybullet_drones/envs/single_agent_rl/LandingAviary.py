@@ -199,7 +199,7 @@ class LandingAviary(BaseSingleAgentAviary):
         # # L_vel + W_vel + Contact_force + energy_consanpution
         
         # balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-        # slippageRewardCoeff=0.5*time
+        # slippageRewardCoeff=0.8*time#0.5;0.3
         # contactRewardCoeff=0.01*time
         # linearvelocityRewardCoeff=0.05#0.03/(time+0.5)
         # angulervelocityRewardCoeff=0.003*time
@@ -220,9 +220,11 @@ class LandingAviary(BaseSingleAgentAviary):
 
         # #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         # # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
-        # if np.linalg.norm(state[22]) >0: #if have contact
+        # if (state[22]) >0: #if have contact#np.linalg.norm(state[22]) >0:
         #     contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
-        #     #bool_contact_history=ture
+        #     self.bool_contact_history=True
+        
+        # if self.bool_contact_history==True:
         #     balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
         # # else:
         # #     contactReward=time*-0.02

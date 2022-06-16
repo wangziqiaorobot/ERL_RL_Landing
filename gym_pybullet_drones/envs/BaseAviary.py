@@ -110,6 +110,7 @@ class BaseAviary(gym.Env):
         self.NUM_DRONES = num_drones
         self.NEIGHBOURHOOD_RADIUS = neighbourhood_radius
         self.iterate=1
+        self.bool_contact_history=False
         #### Options ###############################################
         self.DRONE_MODEL = drone_model
         self.GUI = gui
@@ -152,7 +153,7 @@ class BaseAviary(gym.Env):
             self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)
         self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)
         self.GND_EFF_H_CLIP = 0.25 * self.PROP_RADIUS * np.sqrt((15 * self.MAX_RPM**2 * self.KF * self.GND_EFF_COEFF) / self.MAX_THRUST)
-        self.MAX_ROLL_PITCH = np.pi/12
+        self.MAX_ROLL_PITCH = np.pi/18
         #### Create attributes for vision tasks ####################
         self.VISION_ATTR = vision_attributes
         if self.VISION_ATTR:
@@ -238,9 +239,10 @@ class BaseAviary(gym.Env):
         else:
             print("[ERROR] invalid initial_xyzs in BaseAviary.__init__(), try initial_xyzs.reshape(NUM_DRONES,3)")
         if initial_rpys is None:
-            self.INIT_RPYS = np.vstack([np.array([0]), \
-                                        np.array([0]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(-3.14,3.14))]).transpose().reshape(self.NUM_DRONES, 3)
+            self.INIT_RPYS = np.zeros((self.NUM_DRONES, 3))
+            # self.INIT_RPYS = np.vstack([np.array([0]), \
+            #                             np.array([0]), \
+            #                             np.ones(self.NUM_DRONES) *float(np.random.uniform(-3.14,3.14))]).transpose().reshape(self.NUM_DRONES, 3)
             # print('INF_INIT_RPYS',self.INIT_RPYS)
         elif np.array(initial_rpys).shape == (self.NUM_DRONES, 3):
             self.INIT_RPYS = initial_rpys
