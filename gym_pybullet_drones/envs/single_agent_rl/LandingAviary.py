@@ -93,7 +93,7 @@ class LandingAviary(BaseSingleAgentAviary):
         
         balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
         slippageRewardCoeff=1.2*time#0.8;0.5;0.3
-        contactRewardCoeff=0.01*time
+        # contactRewardCoeff=0.01*time
         linearvelocityRewardCoeff=0.05#0.03/(time+0.5)
         angulervelocityRewardCoeff=0.003*time
         actionsmoothRewardCoeff=-0.01
