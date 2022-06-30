@@ -66,6 +66,7 @@ if __name__ == "__main__":
         model = A2C.load(path)
     if algo == 'ppo':
         model = PPO.load(path)
+        print("################## model ########################",model)
     if algo == 'sac':
         model = SAC.load(path)
     if algo == 'td3':
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     # logger.plot()
 
     # new log try ####
-    test_steps=400
+    test_steps=4
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
@@ -160,6 +161,7 @@ if __name__ == "__main__":
     infos = np.zeros(
         shape=(8, test_steps), dtype=np.float32)
     for i in range(test_steps):
+        print("################## model ########################",model)
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
                                         )
