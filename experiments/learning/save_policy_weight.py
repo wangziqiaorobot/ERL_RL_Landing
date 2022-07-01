@@ -14,7 +14,8 @@ saves weights of actuator model mlp
 """
 
 if __name__ == '__main__':
-    importPath = "/home/ziqiao/RL/ERL_RL_Landing/experiments/learning/results/save-landing-ppo-kin-ld-06.03.2022_12.15.09/06.03.2022_12.15.16/best_model/"
+    # importPath = "/home/ziqiao/RL/ERL_RL_Landing/experiments/learning/results/save-landing-ppo-kin-ld-06.03.2022_12.15.09/06.03.2022_12.15.16/best_model/"
+    importPath = "/home/snuc/RL_UAV_landing/ERL_RL_Landing/experiments/learning/results/save-landing-ppo-kin-ld-06.21.2022_21.12.27/06.21.2022_21.12.31/best_model/"
 
     if torch.cuda.is_available():
         dev = "cuda:0"
@@ -24,25 +25,28 @@ if __name__ == '__main__':
 
     snapshot = torch.load(importPath + 'policy.pth', map_location=torch.device(dev))
     # print(snapshot)
-    snapshot1=snapshot['mlp_extractor.shared_net.0.weight']
-    print("#####################################")
-    # print(snapshot1)
+    action_net_weight=snapshot['action_net.weight']
+    action_net_bias=snapshot['action_net.bias']
+    
+    print(action_net_weight)
     # actor_net = snapshot['actor_state_dict']['architecture']
 
 
-    weights = [i for k, i in snapshot1 if (k.endswith('.weight'))]
-    print(weights)
+    # weights = [i for k, i in snapshot1 if (k.endswith('.weight'))]
+    # print(weights)
     # biases = [i for k, i in actor_net.items() if (k.endswith('.bias'))]
 
-
-    # paramsConcat = np.array([])
-    # for w, b in zip(weights, biases):
-    #     w = w.cpu().numpy().transpose()
-    #     b = b.cpu().numpy().transpose()
-
-    #     paramsConcat = np.concatenate((paramsConcat, w.flatten(order='C')))
-    #     paramsConcat = np.concatenate((paramsConcat, b.flatten(order='C')))
-
+    print("#####################################")
+    paramsConcat = np.array([])
+    for w, b in zip(action_net_weight, action_net_bias):
+        w = w.cpu().numpy().transpose()
+        
+        b = b.cpu().numpy().transpose()
+        
+        paramsConcat = np.concatenate((paramsConcat, w.flatten(order='C')))
+        paramsConcat = np.concatenate((paramsConcat, b.flatten(order='C')))
+    print(w)
+    print('b',b)
     # dims = array('L', [paramsConcat.shape[0], 1])
     # params = array('f', paramsConcat)
 
