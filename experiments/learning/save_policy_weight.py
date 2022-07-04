@@ -5,9 +5,7 @@ import torch.nn.functional as F
 import numpy as np
 from array import array
 import os
-# from IPython import embed
-# import rslgym.algorithm.modules as rslgym_module
-
+from stable_baselines3 import PPO
 
 """
 saves weights of actuator model mlp
@@ -39,6 +37,7 @@ if __name__ == '__main__':
     weights = [i for k, i in policy.items() if (k.endswith('.weight') and (k.startswith('mlp_extractor.shared_net') or k.startswith('mlp_extractor.policy_net')))]
     # print(weights)
     biases = [i for k, i in policy.items() if (k.endswith('.bias') and (k.startswith('mlp_extractor.shared_net') or k.startswith('mlp_extractor.policy_net')))]
+    print(biases)
 
     print("#####################################")
     paramsConcat = np.array([])
@@ -64,13 +63,18 @@ if __name__ == '__main__':
     out.close()
     print("saved to folder %s " % importPath)
 
-    # action_size = 4
-    # observation_size = 23
+    action_size = 4
+    observation_size = 23
 
     # """
     # load policy the way we do it in the test scripts and double check result
     # """
-
+    path="/home/ziqiao/RL/ERL_RL_Landing/experiments/learning/results/save-landing-ppo-kin-ld-06.03.2022_12.15.09/06.03.2022_12.15.16/best_model.zip/"
+    model = PPO.load(path)
+    obs=np.zeros(shape=(1, observation_size), dtype=np.float32)
+    action, _states = model.predict(obs,
+                                        deterministic=True # OPTIONAL 'deterministic=False'
+                                        )
     # actor_net = rslgym_module.MLP([256,256,256,128],
     #                               nn.Tanh,
     #                               observation_size,
@@ -92,4 +96,4 @@ if __name__ == '__main__':
 
     # act = actor.noiseless_action(ob).cpu().detach().numpy()
 
-    # print(act)
+    print('action is :',action)
