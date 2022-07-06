@@ -161,7 +161,7 @@ if __name__ == "__main__":
     infos = np.zeros(
         shape=(8, test_steps), dtype=np.float32)
     for i in range(test_steps):
-        print("################## model ########################",model)
+        
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
                                         )
@@ -312,7 +312,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.title('reward')
     plt.savefig(save_path + '/reward.jpg')
-    print('actionsmoothReward',infos[4,:])
+    
     
     MAX_F_XY=5  #max external froce in xy axis in robot frame
     MAX_F_Z=11.76 ##max external froce in z axis in robot frame
