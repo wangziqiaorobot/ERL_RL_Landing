@@ -107,7 +107,7 @@ if __name__ == "__main__":
     
     #### On-policy algorithms ##################################
     onpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
-                           net_arch=[256, 256, dict(vf=[256,128], pi=[256,128])] #c
+                           net_arch=[256, 256, dict(vf=[256,128], pi=[256,128])] #c 256/512/1024
                            ) # or None
    
     if ARGS.algo == 'ppo':
@@ -158,6 +158,14 @@ if __name__ == "__main__":
 
     #### Save the model ########################################
     model.save(filename+'/success_model.zip')
+    model.policy.save(filename + "/policy.pth")
+
+    # ====
+    # load policy
+    # weights = torch.load(weight_path, map_location=device)
+    # policy = ControlPolicy()
+    # policy.load_weighs(weights["state_dict"])
+
     
 
     #### Print training progression ############################
