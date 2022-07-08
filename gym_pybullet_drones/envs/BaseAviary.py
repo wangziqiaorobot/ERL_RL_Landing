@@ -10,6 +10,7 @@ import numpy as np
 import pybullet as p
 import pybullet_data
 import gym
+from stable_baselines3.common.running_mean_std import RunningMeanStd
 
 class DroneModel(Enum):
     """Drone models enumeration class."""
@@ -250,8 +251,10 @@ class BaseAviary(gym.Env):
             print("[ERROR] invalid initial_rpys in BaseAviary.__init__(), try initial_rpys.reshape(NUM_DRONES,3)")
         #### Create action and observation spaces ##################
         self.action_space = self._actionSpace()
-       
         self.observation_space = self._observationSpace()
+        #### State normalization ###################################
+        self.obs_rms = RunningMeanStd(shape=[23, 1])
+        self.obs_rms_new = RunningMeanStd(shape=[23, 1])
         #### Housekeeping ##########################################
         self._housekeeping()
         #### Update and store the drones kinematic information #####
@@ -721,13 +724,37 @@ class BaseAviary(gym.Env):
     
     ################################################################################
     
-    
-    
-    def _contactdetection(self):
-        print("test")
+    def _normalize_obs(self, obs: np.ndarray, obs_rms: RunningMeanStd) -> np.ndarray:
+        """
+        Helper to normalize observation.
+        :param obs:
+        :param obs_rms: associated statistics
+        :return: normalized observation
+        """
+        return (obs - obs_rms.mean) / np.sqrt(obs_rms.var + 1e-8)
 
 
 
+    ################################################################################
+    def _unnormalize_obs(self, obs: np.ndarray, obs_rms: RunningMeanStd) -> np.ndarray:
+        """
+        Helper to unnormalize observation.
+        :param obs:
+        :param obs_rms: associated statistics
+        :return: unnormalized observation
+        """
+        return (obs * np.sqrt(obs_rms.var + 1e-8)) + obs_rms.mean
+
+    ################################################################################
+    def normalize_obs(self, obs: np.ndarray) -> np.ndarray:
+        """
+        Normalize observations using this VecNormalize's observations statistics.
+        Calling this method does not update statistics.
+        """
+        # Avoid modifying by reference the original object
+        # obs_ = deepcopy(obs)
+        obs_ = self._normalize_obs(obs, self.obs_rms).astype(np.float64)
+        return obs_
 
     ###############################################################################
     def _startVideoRecording(self):
