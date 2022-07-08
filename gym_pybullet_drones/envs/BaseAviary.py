@@ -227,13 +227,13 @@ class BaseAviary(gym.Env):
                                                             )
         #### Set initial poses #####################################
         if initial_xyzs is None:
-            self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+            # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+            #                             np.array([float(np.random.uniform(-0.1,0.1))]), \
+            #                             np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             
-            # self.INIT_XYZS = np.vstack([np.array([0]), \
-            #                             np.array([0]), \
-            #                             np.ones(self.NUM_DRONES) *2.6]).transpose().reshape(self.NUM_DRONES, 3)
+            self.INIT_XYZS = np.vstack([np.array([0]), \
+                                        np.array([0]), \
+                                        np.ones(self.NUM_DRONES) *2.6]).transpose().reshape(self.NUM_DRONES, 3)
         elif np.array(initial_xyzs).shape == (self.NUM_DRONES,3):
             self.INIT_XYZS = initial_xyzs
         else:
@@ -385,8 +385,8 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            # pd4branch=[0,0.08,1,0,1200,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
-            pd4branch=self.pd4branch
+            pd4branch=[0,0.08,1,0,500,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
+            # pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
             p_joint1=float(pd4branch[1])
@@ -643,9 +643,9 @@ class BaseAviary(gym.Env):
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
         #### Random Initialize the drones position information ##########
-        self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+        # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+        #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
+        #                                 np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
         #### Initialize the branch friction friction coefficient ##########
         self.lateralFriction=float(np.random.uniform(0.8,0.1))
         #### Initialize the drones contact force information ##########
