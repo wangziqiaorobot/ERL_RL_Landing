@@ -400,13 +400,17 @@ class BaseSingleAgentAviary(BaseAviary):
         
         
         # obs_ = self._clipAndNormalizeState(self._getDroneStateVector(0))
-        self.obs_rms.update(self._getDroneStateVector(0))
-        obs_ = self.normalize_obs(self._getDroneStateVector(0))
+        
+        obs=np.reshape(self._getDroneStateVector(0), (1, 23))
+        self.obs_rms_new.update(obs)
+        print('obs ',self.obs_rms.mean )
+        obs_ = self.normalize_obs(obs)
+        obs_=np.reshape(obs_, ( 23))
         print("#############################################")
-        print("state:",(self._getDroneStateVector(0)))
+        print("drone real state:",(self._getDroneStateVector(0)))
         # print("hand shipping mean",self._clipAndNormalizeState(self._getDroneStateVector(0)))
         print('self.obs_rms ',self.obs_rms.mean )
-        print("running mean",obs_)
+        print("running mean, the return obs_",obs_)
         print("#############################################")
         return obs_
            
