@@ -12,6 +12,8 @@ import pybullet_data
 import gym
 from stable_baselines3.common.running_mean_std import RunningMeanStd
 
+
+
 class DroneModel(Enum):
     """Drone models enumeration class."""
 
@@ -253,8 +255,9 @@ class BaseAviary(gym.Env):
         self.action_space = self._actionSpace()
         self.observation_space = self._observationSpace()
         #### State normalization ###################################
-        self.obs_rms = RunningMeanStd(shape=[23,])
-        self.obs_rms_new = RunningMeanStd(shape=[23,])
+        self.obs_rms = RunningMeanStd(shape=[1,23])
+        self.obs_rms_new = RunningMeanStd(shape=[1,23])
+        
         #### Housekeeping ##########################################
         self._housekeeping()
         #### Update and store the drones kinematic information #####
@@ -546,7 +549,7 @@ class BaseAviary(gym.Env):
         self._saveLastAction(action)
         #### Advance the step counter ##############################
         self.step_counter = self.step_counter + (1 * self.AGGR_PHY_STEPS)
-        print("step:",self.step_counter)
+        
         return obs, reward, done, info
     
     ################################################################################
@@ -757,6 +760,33 @@ class BaseAviary(gym.Env):
         obs_ = self._normalize_obs(obs, self.obs_rms).astype(np.float64)
 
         return obs_
+
+    ###############################################################################  
+    def update_rms(self):
+        self.obs_rms = self.obs_rms_new
+        print("update_rms",self.obs_rms)
+    
+    ############################################################################### 
+    def save_rms(self, save_dir, n_iter) -> None:
+        if not os.path.exists(save_dir):
+            os.mkdir(save_dir)
+        data_path = save_dir + "/iter_{0:05d}".format(n_iter)
+        np.savez(
+            data_path,
+            mean=np.asarray(self.obs_rms.mean),
+            var=np.asarray(self.obs_rms.var),
+        )
+    
+    ############################################################################### 
+    def load_rms(self, data_dir) -> None:
+        self.mean, self.var = None, None
+        np_file = np.load(data_dir)
+        #
+        self.mean = np_file["mean"]
+        self.var = np_file["var"]
+        #
+        self.obs_rms.mean = np.mean(self.mean, axis=0)
+        self.obs_rms.var = np.mean(self.var, axis=0)
 
     ###############################################################################
     def _startVideoRecording(self):

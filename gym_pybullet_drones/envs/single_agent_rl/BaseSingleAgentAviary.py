@@ -10,6 +10,7 @@ from gym_pybullet_drones.envs.BaseAviary import DroneModel, Physics, ImageType, 
 from gym_pybullet_drones.utils.utils import nnlsRPM
 from gym_pybullet_drones.control.DSLPIDControl import DSLPIDControl
 from gym_pybullet_drones.control.SimplePIDControl import SimplePIDControl
+from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
 
 class ActionType(Enum):
     """Action type enumeration class."""
@@ -399,19 +400,18 @@ class BaseSingleAgentAviary(BaseAviary):
         """
         
         
-        # obs_ = self._clipAndNormalizeState(self._getDroneStateVector(0))
+        obs_ = self._clipAndNormalizeState(self._getDroneStateVector(0))
         
-        obs=np.reshape(self._getDroneStateVector(0), (1, 23))
-        self.obs_rms_new.update(obs)
-        print('obs ',self.obs_rms.mean )
-        obs_ = self.normalize_obs(obs)
-        obs_=np.reshape(obs_, ( 23))
-        print("#############################################")
-        print("drone real state:",(self._getDroneStateVector(0)))
-        # print("hand shipping mean",self._clipAndNormalizeState(self._getDroneStateVector(0)))
-        print('self.obs_rms ',self.obs_rms.mean )
-        print("running mean, the return obs_",obs_)
-        print("#############################################")
+        # obs=np.reshape(self._getDroneStateVector(0), (1, 23))
+        # self.obs_rms_new.update(obs)
+        # obs_ = self.normalize_obs(obs)
+        # obs_=np.reshape(obs_, ( 23))
+        # print("#############################################")
+        # print("drone real state:",(self._getDroneStateVector(0)))
+        # # print("hand shipping mean",self._clipAndNormalizeState(self._getDroneStateVector(0)))
+        # print('self.obs_rms ',self.obs_rms.mean )
+        # print("running mean, the return obs_",obs_)
+        # print("#############################################")
         return obs_
            
         

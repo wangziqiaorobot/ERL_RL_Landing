@@ -39,6 +39,7 @@ from stable_baselines3 import TD3
 from stable_baselines3 import DDPG
 from stable_baselines3.common.policies import ActorCriticPolicy as a2cppoMlpPolicy
 from stable_baselines3.common.policies import ActorCriticCnnPolicy as a2cppoCnnPolicy
+from stable_baselines3.common.on_policy_algorithm import OnPolicyAlgorithm
 from stable_baselines3.sac.policies import SACPolicy as sacMlpPolicy
 from stable_baselines3.sac import CnnPolicy as sacCnnPolicy
 from stable_baselines3.td3 import MlpPolicy as td3ddpgMlpPolicy
@@ -47,7 +48,7 @@ from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback,
 from gym_pybullet_drones.envs.single_agent_rl.LandingAviary import LandingAviary
 from gym_pybullet_drones.envs.single_agent_rl.TakeoffAviary import TakeoffAviary
 from gym_pybullet_drones.envs.single_agent_rl.BaseSingleAgentAviary import ActionType, ObservationType
-
+from stable_baselines3.common.vec_env import dummy_vec_env
 import shared_constants
 
 EPISODE_REWARD_THRESHOLD = 1000 # when reach this reward value tranning will stop
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning experiments script')
     parser.add_argument('--env',        default='landing',      type=str,             choices=['takeoff', 'hover', 'flythrugate', 'tune'], help='Task (default: hover)', metavar='')
-    parser.add_argument('--algo',       default='ppo',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
+    parser.add_argument('--algo',       default='sac',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
     parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
     parser.add_argument('--cpu',        default='10',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
@@ -70,36 +71,19 @@ if __name__ == "__main__":
         os.makedirs(filename+'/')
 
 
-
-    #### Warning ###############################################
-
-    # if ARGS.env == 'tune' and ARGS.act != ActionType.TUN:
-    #     print("\n\n\n[WARNING] TuneAviary is intended for use with ActionType.TUN\n\n\n")
-    # if ARGS.act == ActionType.ONE_D_RPM or ARGS.act == ActionType.ONE_D_DYN or ARGS.act == ActionType.ONE_D_PID:
-    #     print("\n\n\n[WARNING] Simplified 1D problem for debugging purposes\n\n\n")
-    # #### Errors ################################################
-    #     if not ARGS.env in ['takeoff', 'hover']: 
-    #         print("[ERROR] 1D action space is only compatible with Takeoff and HoverAviary")
-    #         exit()
-    # if ARGS.act == ActionType.TUN and ARGS.env != 'tune' :
-    #     print("[ERROR] ActionType.TUN is only compatible with TuneAviary")
-    #     exit()
-    # if ARGS.algo in ['sac', 'td3', 'ddpg'] and ARGS.cpu!=1: 
-    #     print("[ERROR] The selected algorithm does not support multiple environments")
-    #     exit()
-
-    #### Uncomment to debug slurm scripts ######################
-    # exit()
-
     
     sa_env_kwargs = dict(aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act)
-    # train_env = gym.make(env_name, aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act) # single environment instead of a vectorized one    
+    # train_env = gym.make(LandingAviary, aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act) # single environment instead of a vectorized one    
     
+    if ARGS.algo == 'sac':
+        ARGS.cpu=1
+
     train_env = make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
                                  n_envs=ARGS.cpu,# The number of Parallel environments
                                  seed=6
                                  )
+    
    
     print("[INFO] Action space:", train_env.action_space)
     print("[INFO] Observation space:", train_env.observation_space)
@@ -109,6 +93,10 @@ if __name__ == "__main__":
     onpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
                            net_arch=[256, 256, dict(vf=[256,128], pi=[256,128])] #c 256/512/1024
                            ) # or None
+    #### Off-policy algorithms #################################
+    offpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
+                            net_arch=dict(qf=[512, 512], pi=[512, 512])
+                            ) 
    
     if ARGS.algo == 'ppo':
         model = PPO(a2cppoMlpPolicy,
@@ -116,13 +104,15 @@ if __name__ == "__main__":
                     policy_kwargs=onpolicy_kwargs,
                     tensorboard_log=filename+'/tb/',
                     verbose=1
-                    ) if ARGS.obs == ObservationType.KIN else PPO(a2cppoCnnPolicy,
-                                                                  train_env,
-                                                                  policy_kwargs=onpolicy_kwargs,
-                                                                  tensorboard_log=filename+'/tb/',
-                                                                  verbose=1
-                                                                  )
+                    ) 
 
+    if ARGS.algo == 'sac':
+        model = SAC(sacMlpPolicy,
+                    train_env,
+                    policy_kwargs=offpolicy_kwargs,
+                    tensorboard_log=filename+'/tb/',
+                    verbose=1
+                    ) 
     
 
     #### Create eveluation environment #########################
@@ -153,7 +143,7 @@ if __name__ == "__main__":
                                  )
     model.learn(total_timesteps=1000*8000, #int(1e12),
                 callback=eval_callback,
-                log_interval=100,
+                log_interval=1,
                 )
 
     #### Save the model ########################################
