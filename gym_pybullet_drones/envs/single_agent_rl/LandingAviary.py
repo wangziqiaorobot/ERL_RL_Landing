@@ -92,14 +92,14 @@ class LandingAviary(BaseSingleAgentAviary):
         # L_vel + W_vel + Contact_force + energy_consanpution
         
         balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-        slippageRewardCoeff=1.2*time#0.8;0.5;0.3
+        slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
         # contactRewardCoeff=0.01*time
         linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
-        angulervelocityRewardCoeff=0.003*time
+        angulervelocityRewardCoeff=0.003#*time
         actionsmoothRewardCoeff=-0.01
-        actionlimitRewardCoeff=-0.00001*time
+        actionlimitRewardCoeff=-0.00001#*time
         contactgroundRewardCoeff=-0.00001
-        contactReward=time*-0.018
+        contactReward=-0.006#-0.018#*time
           
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
@@ -133,7 +133,7 @@ class LandingAviary(BaseSingleAgentAviary):
             print("fall down to the ground")
         else:
             contactgroundReward=0
-        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.5
+        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.008
         
         #   self.step_counter*self.TIMESTEP
         
@@ -201,14 +201,14 @@ class LandingAviary(BaseSingleAgentAviary):
         # # L_vel + W_vel + Contact_force + energy_consanpution
         
         # balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-        # slippageRewardCoeff=1.2*time#0.8;0.5;0.3
+        # slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
         # # contactRewardCoeff=0.01*time
-        # linearvelocityRewardCoeff=0.1 #0.05#0.03/(time+0.5)
-        # angulervelocityRewardCoeff=0.003*time
+        # linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
+        # angulervelocityRewardCoeff=0.003#*time
         # actionsmoothRewardCoeff=-0.01
-        # actionlimitRewardCoeff=-0.00001*time
+        # actionlimitRewardCoeff=-0.00001#*time
         # contactgroundRewardCoeff=-0.00001
-        # contactReward=time*-0.018
+        # contactReward=-0.009#-0.018#*time
           
         # if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
         #     slippageReward=-15
