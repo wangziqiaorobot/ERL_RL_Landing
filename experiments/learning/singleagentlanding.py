@@ -72,18 +72,26 @@ if __name__ == "__main__":
 
 
     
-    sa_env_kwargs = dict(aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act)
+    sa_env_kwargs = dict(aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act,filepath=filename)
     # train_env = gym.make(LandingAviary, aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act) # single environment instead of a vectorized one    
     
     if ARGS.algo == 'sac':
         ARGS.cpu=1
 
-    train_env = make_vec_env(LandingAviary,
+    train_env =make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
                                  n_envs=ARGS.cpu,# The number of Parallel environments
                                  seed=6
                                  )
-    
+    # 
+    # gym.make("landing-aviary-v0",
+    #                         aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
+    #                         obs=ARGS.obs,
+    #                         act=ARGS.act,
+    #                         gui=False,
+    #                         record=False
+    #                         )
+                
    
     print("[INFO] Action space:", train_env.action_space)
     print("[INFO] Observation space:", train_env.observation_space)
@@ -120,8 +128,8 @@ if __name__ == "__main__":
                             aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
                             obs=ARGS.obs,
                             act=ARGS.act,
-                            gui=True,
-                            record=True
+                            gui=False,
+                            record=False
                             )
     
     
@@ -143,7 +151,7 @@ if __name__ == "__main__":
                                  )
     model.learn(total_timesteps=1000*8000, #int(1e12),
                 callback=eval_callback,
-                log_interval=1,
+                log_interval=100,
                 )
 
     #### Save the model ########################################

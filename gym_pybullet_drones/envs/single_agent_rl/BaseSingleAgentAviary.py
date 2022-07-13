@@ -48,7 +48,8 @@ class BaseSingleAgentAviary(BaseAviary):
                  gui=True,
                  record=True, 
                  obs: ObservationType=ObservationType.KIN,
-                 act: ActionType=ActionType.RPM
+                 act: ActionType=ActionType.RPM,
+                 filepath=None
                  ):
         """Initialization of a generic single agent RL environment.
 
@@ -86,6 +87,8 @@ class BaseSingleAgentAviary(BaseAviary):
         self.OBS_TYPE = obs
         self.ACT_TYPE = act
         self.EPISODE_LEN_SEC = 5 # the longth of each epsoid
+        
+
         #### Create integrated controllers #########################
         # if act in [ActionType.PID, ActionType.VEL, ActionType.TUN, ActionType.ONE_D_PID]:
         #     os.environ['KMP_DUPLICATE_LIB_OK']='True'
@@ -133,7 +136,8 @@ class BaseSingleAgentAviary(BaseAviary):
                          obstacles=True, # Add obstacles for RGB observations and/or FlyThruGate
                          user_debug_gui=False, # Remove of RPM sliders from all single agent learning aviaries
                          vision_attributes=vision_attributes,
-                         dynamics_attributes=dynamics_attributes
+                         dynamics_attributes=dynamics_attributes,
+                         filepath=filepath
                          )
         #### Set a limit on the maximum target speed ###############
         if act == ActionType.VEL:
@@ -400,18 +404,31 @@ class BaseSingleAgentAviary(BaseAviary):
         """
         
         
-        obs_ = self._clipAndNormalizeState(self._getDroneStateVector(0))
+        # obs_ = self._clipAndNormalizeState(self._getDroneStateVector(0))
         
-        # obs=np.reshape(self._getDroneStateVector(0), (1, 23))
-        # self.obs_rms_new.update(obs)
-        # obs_ = self.normalize_obs(obs)
-        # obs_=np.reshape(obs_, ( 23))
-        # print("#############################################")
-        # print("drone real state:",(self._getDroneStateVector(0)))
-        # # print("hand shipping mean",self._clipAndNormalizeState(self._getDroneStateVector(0)))
-        # print('self.obs_rms ',self.obs_rms.mean )
-        # print("running mean, the return obs_",obs_)
-        # print("#############################################")
+        obs=np.reshape(self._getDroneStateVector(0), (1, 23))
+        self.obs_rms_new.update(obs)
+
+        # update running mean and standard deivation for state normalization
+        if self.iterate % 10 == 0 and self.iterate <= 1500:
+                self.update_rms()
+
+        if self.iterate % 100 == 0:
+            os.makedirs(self.filepath, exist_ok=True)
+            self.save_rms(
+                save_dir=self.filepath + "/RMS", n_iter=self.iterate
+                )
+
+        obs_ = self.normalize_obs(obs)
+        
+
+        obs_=np.reshape(obs_, ( 23))
+        print("#############################################")
+        print("drone real state:",(self._getDroneStateVector(0)))
+        # print("hand shipping mean",self._clipAndNormalizeState(self._getDroneStateVector(0)))
+        print('self.obs_rms ',self.obs_rms.mean )
+        print("running mean, the return obs_",obs_)
+        print("#############################################")
         return obs_
            
         

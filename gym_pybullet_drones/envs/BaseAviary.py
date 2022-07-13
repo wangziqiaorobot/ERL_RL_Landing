@@ -66,7 +66,8 @@ class BaseAviary(gym.Env):
                  obstacles=True,
                  user_debug_gui=True,
                  vision_attributes=False,
-                 dynamics_attributes=False
+                 dynamics_attributes=False,
+                 filepath=None
                  ):
         """Initialization of a generic aviary environment.
 
@@ -112,7 +113,6 @@ class BaseAviary(gym.Env):
         #### Parameters ############################################
         self.NUM_DRONES = num_drones
         self.NEIGHBOURHOOD_RADIUS = neighbourhood_radius
-        self.iterate=1
         self.bool_contact_history=False
         #### Options ###############################################
         self.DRONE_MODEL = drone_model
@@ -257,7 +257,16 @@ class BaseAviary(gym.Env):
         #### State normalization ###################################
         self.obs_rms = RunningMeanStd(shape=[1,23])
         self.obs_rms_new = RunningMeanStd(shape=[1,23])
-        
+        self.iterate=1
+        ### Create the path for saved rms file######################
+        if filepath is None:
+            self.filepath= os.path.dirname(os.path.abspath(__file__))+"/../../files/logs/save-RMS-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")
+        else:
+            self.filepath=filepath
+
+
+
+
         #### Housekeeping ##########################################
         self._housekeeping()
         #### Update and store the drones kinematic information #####

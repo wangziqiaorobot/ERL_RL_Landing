@@ -24,7 +24,8 @@ class LandingAviary(BaseSingleAgentAviary):
                  gui=False,
                  record=False, 
                  obs: ObservationType=ObservationType.KIN,
-                 act: ActionType=ActionType.LD
+                 act: ActionType=ActionType.LD,
+                 filepath=None
                  ):
         """Initialization of a single agent RL environment.
 
@@ -63,7 +64,8 @@ class LandingAviary(BaseSingleAgentAviary):
                          gui=gui,
                          record=record,
                          obs=obs,
-                         act=act
+                         act=act,
+                         filepath=filepath
                          )
         
 
@@ -163,7 +165,7 @@ class LandingAviary(BaseSingleAgentAviary):
         
         p.performCollisionDetection(physicsClientId=self.CLIENT)
         L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
-        
+        print("the current itearetion from the env is :",self.iterate,"###################")
         if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
             self.iterate= self.iterate+1
            
