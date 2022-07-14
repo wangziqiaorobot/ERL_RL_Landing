@@ -149,7 +149,7 @@ if __name__ == "__main__":
     # logger.plot()
 
     # new log try ####
-    test_steps=200
+    test_steps=800
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
