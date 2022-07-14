@@ -255,8 +255,8 @@ class BaseAviary(gym.Env):
         self.action_space = self._actionSpace()
         self.observation_space = self._observationSpace()
         #### State normalization ###################################
-        self.obs_rms = RunningMeanStd(shape=[1,23])
-        self.obs_rms_new = RunningMeanStd(shape=[1,23])
+        self.obs_rms = RunningMeanStd(shape=[1,25])
+        self.obs_rms_new = RunningMeanStd(shape=[1,25])
         self.iterate=1
         ### Create the path for saved rms file######################
         if filepath is None:
@@ -656,6 +656,7 @@ class BaseAviary(gym.Env):
         self.pos = np.zeros((self.NUM_DRONES, 3))
         self.quat = np.zeros((self.NUM_DRONES, 4))
         self.rpy = np.zeros((self.NUM_DRONES, 3))
+        self.rotaion_matrix=np.zeros((self.NUM_DRONES, 9))
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
         #### Random Initialize the drones position information ##########
@@ -734,6 +735,7 @@ class BaseAviary(gym.Env):
             self.pos[i], self.quat[i] = p.getBasePositionAndOrientation(self.DRONE_IDS[i], physicsClientId=self.CLIENT)
             self.rpy[i] = p.getEulerFromQuaternion(self.quat[i])
             self.vel[i], self.ang_v[i] = p.getBaseVelocity(self.DRONE_IDS[i], physicsClientId=self.CLIENT)
+            self.rotaion_matrix[i]=p.getMatrixFromQuaternion(self.quat[i])
     
     ################################################################################
     
@@ -842,10 +844,15 @@ class BaseAviary(gym.Env):
             to understand its format.
         
         """
-        state = np.hstack([self.pos[nth_drone, :], self.quat[nth_drone, :], self.rpy[nth_drone, :],
+        # #state with quat and rpy
+        # state = np.hstack([self.pos[nth_drone, :], self.quat[nth_drone, :], self.rpy[nth_drone, :],
+        #                    self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_action[nth_drone, :],self.Fcontact])
+        # return state.reshape(23,)
+
+        #state with quat and rpy
+        state = np.hstack([self.pos[nth_drone, :], self.rotaion_matrix[nth_drone, :],
                            self.vel[nth_drone, :], self.ang_v[nth_drone, :], self.last_action[nth_drone, :],self.Fcontact])
-        # print("state",state.reshape(23,))
-        return state.reshape(23,)
+        return state.reshape(25,)
 
     ################################################################################
 

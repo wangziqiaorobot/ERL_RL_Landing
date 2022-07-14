@@ -151,7 +151,7 @@ if __name__ == "__main__":
                                  )
     model.learn(total_timesteps=1000*8000, #int(1e12),
                 callback=eval_callback,
-                log_interval=100,
+                log_interval=10,
                 )
 
     #### Save the model ########################################

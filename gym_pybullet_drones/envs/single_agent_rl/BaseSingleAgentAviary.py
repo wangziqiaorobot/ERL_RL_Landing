@@ -247,114 +247,14 @@ class BaseSingleAgentAviary(BaseAviary):
             commanded to the 4 motors of each drone.
 
         """
-        # if self.ACT_TYPE == ActionType.TUN:
-        #     self.ctrl.setPIDCoefficients(p_coeff_pos=(action[0]+1)*self.TUNED_P_POS,
-        #                                  i_coeff_pos=(action[1]+1)*self.TUNED_I_POS,
-        #                                  d_coeff_pos=(action[2]+1)*self.TUNED_D_POS,
-        #                                  p_coeff_att=(action[3]+1)*self.TUNED_P_ATT,
-        #                                  i_coeff_att=(action[4]+1)*self.TUNED_I_ATT,
-        #                                  d_coeff_att=(action[5]+1)*self.TUNED_D_ATT
-        #                                  )
-        #     return self._trajectoryTrackingRPMs() 
-        # elif self.ACT_TYPE == ActionType.RPM:
-        #     return np.array(self.HOVER_RPM * (1+0.05*action))
-        # elif self.ACT_TYPE == ActionType.DYN: #
-            
-        #     return nnlsRPM(thrust=(self.GRAVITY*(action[0]+1)),
-        #                    x_torque=(0.05*self.MAX_XY_TORQUE*action[1]),
-        #                    y_torque=(0.05*self.MAX_XY_TORQUE*action[2]),
-        #                    z_torque=(0.05*self.MAX_Z_TORQUE*action[3]),
-        #                    counter=self.step_counter,
-        #                    max_thrust=self.MAX_THRUST,
-        #                    max_xy_torque=self.MAX_XY_TORQUE,
-        #                    max_z_torque=self.MAX_Z_TORQUE,
-        #                    a=self.A,
-        #                    inv_a=self.INV_A,
-        #                    b_coeff=self.B_COEFF,
-        #                    gui=self.GUI
-        #                    )
-        # elif self.ACT_TYPE == ActionType.PID: 
-        #     state = self._getDroneStateVector(0)
-        #     rpm, _, _ = self.ctrl.computeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-        #                                          cur_pos=state[0:3],
-        #                                          cur_quat=state[3:7],
-        #                                          cur_vel=state[10:13],
-        #                                          cur_ang_vel=state[13:16],
-        #                                          target_pos=state[0:3]+0.1*action
-        #                                          )
-        #     return rpm
-        # elif self.ACT_TYPE == ActionType.VEL:
-        #     state = self._getDroneStateVector(0)
-        #     if np.linalg.norm(action[0:3]) != 0:
-        #         v_unit_vector = action[0:3] / np.linalg.norm(action[0:3])
-        #     else:
-        #         v_unit_vector = np.zeros(3)
-        #     rpm, _, _ = self.ctrl.computeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-        #                                          cur_pos=state[0:3],
-        #                                          cur_quat=state[3:7],
-        #                                          cur_vel=state[10:13],
-        #                                          cur_ang_vel=state[13:16],
-        #                                          target_pos=state[0:3], # same as the current position
-        #                                          target_rpy=np.array([0,0,state[9]]), # keep current yaw
-        #                                          target_vel=self.SPEED_LIMIT * np.abs(action[3]) * v_unit_vector # target the desired velocity vector
-        #                                          )
-        #     return rpm
-        # elif self.ACT_TYPE == ActionType.ONE_D_RPM:
-        #     return np.repeat(self.HOVER_RPM * (1+0.05*action), 4)
-        # elif self.ACT_TYPE == ActionType.ONE_D_DYN:
-        #     return nnlsRPM(thrust=(self.GRAVITY*(1+0.05*action[0])),
-        #                    x_torque=0,
-        #                    y_torque=0,
-        #                    z_torque=0,
-        #                    counter=self.step_counter,
-        #                    max_thrust=self.MAX_THRUST,
-        #                    max_xy_torque=self.MAX_XY_TORQUE,
-        #                    max_z_torque=self.MAX_Z_TORQUE,
-        #                    a=self.A,
-        #                    inv_a=self.INV_A,
-        #                    b_coeff=self.B_COEFF,
-        #                    gui=self.GUI
-        #                    )
-        # elif self.ACT_TYPE == ActionType.ONE_D_PID:
-            
-        #     state = self._getDroneStateVector(0)
-        #     rpm, _, _ = self.ctrl.computeControl(control_timestep=self.AGGR_PHY_STEPS*self.TIMESTEP, 
-        #                                          cur_pos=state[0:3],
-        #                                          cur_quat=state[3:7],
-        #                                          cur_vel=state[10:13],
-        #                                          cur_ang_vel=state[13:16],
-        #                                          target_pos=state[0:3]+0.1*np.array([0,0,action[0]])
-        #                                          )
-        #     return rpm
-        # elif self.ACT_TYPE == ActionType.LD:
-        #     state = self._getDroneStateVector(0)
-        #     #set up the low level attitude controller
-        #     # print('target_rpy',action[1:4])
-            
-        #     targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.TIMESTEP, 
-        #                                          thrust=self.MAX_THRUST/2*(action[0]+1), #gravity:4.9; thrust :9.8,   self.MAX_THRUST/2*(action[0]+1) ;;;self.GRAVITY*(1+0.1*action[0])
-        #                                          cur_quat=state[3:7],
-        #                                         #  target_rpy=np.array([action[1]/10,action[2]/10,action[3]/10])
-        #                                          target_rpy=np.array([action[1]*self.MAX_ROLL_PITCH,action[2]*self.MAX_ROLL_PITCH,action[3]*self.MAX_ROLL_PITCH/5]) #MAX_ROLL_PITCH=30 deg
-        #                                          )
-        #     # print('rpm',rpm)
-        #     # print('targettorque',targettorque)
-        #     return rpm
-
-        # else:
-        #     print("[ERROR] in BaseSingleAgentAviary._preprocessAction()")
-        state = self._getDroneStateVector(0)
-            #set up the low level attitude controller
-            # print('target_rpy',action[1:4])
+        
             
         targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.TIMESTEP, 
                                                 thrust=self.MAX_THRUST/2*(action[0]+1), #gravity:4.9; thrust :9.8,   self.MAX_THRUST/2*(action[0]+1) ;;;self.GRAVITY*(1+0.1*action[0])
-                                                cur_quat=state[3:7],
+                                                cur_quat= np.array(self.quat[0, :]).reshape(4,),
                                             #  target_rpy=np.array([action[1]/10,action[2]/10,action[3]/10])
                                                 target_rpy=np.array([action[1]*self.MAX_ROLL_PITCH,action[2]*self.MAX_ROLL_PITCH,action[3]*self.MAX_ROLL_PITCH/5]) #MAX_ROLL_PITCH=30 deg
                                                 )
-            # print('rpm',rpm)
-            # print('targettorque',targettorque)
         return rpm
 
     ################################################################################
@@ -375,19 +275,21 @@ class BaseSingleAgentAviary(BaseAviary):
                               dtype=np.uint8
                               )
         elif self.OBS_TYPE == ObservationType.KIN:
+            # ############################################################
+            # #### OBS OF SIZE 23 (WITH QUATERNION AND Roll\Yaw\Pitch)
+            # #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ       A0            A1            A2            A3        F_ex        F_ey         F_ez
+            # obs_lower_bound = np.array([-1,      -1,      0,      -1,  -1,  -1,  -1,  -1,     -1,     -1,     -1,      -1,      -1,      -1,      -1,      -1,      -1,           -1,           -1,           -1,       -1,            -1,        -1])
+            # obs_upper_bound = np.array([1,       1,       1,      1,   1,   1,   1,   1,      1,      1,      1,       1,       1,       1,       1,       1,       1,            1,            1,            1,         1,            1,        1])          
+            # return spaces.Box( low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32 )
+
+
             ############################################################
-            #### OBS OF SIZE 23 (WITH QUATERNION AND RPMS)
-            #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ       A0            A1            A2            A3        F_ex        F_ey         F_ez
-            obs_lower_bound = np.array([-1,      -1,      0,      -1,  -1,  -1,  -1,  -1,     -1,     -1,     -1,      -1,      -1,      -1,      -1,      -1,      -1,           -1,           -1,           -1,       -1,            -1,        -1])
-            obs_upper_bound = np.array([1,       1,       1,      1,   1,   1,   1,   1,      1,      1,      1,       1,       1,       1,       1,       1,       1,            1,            1,            1,         1,            1,        1])          
+            #### OBS OF SIZE 25 (WITH Rotation matrix)
+            #### Observation vector ### X        Y        Z       M1   M2   M3   M4   M5       M6      M7    M8    M9     VX       VY       VZ       WX       WY       WZ       A0            A1            A2            A3        F_ex        F_ey         F_ez
+            obs_lower_bound = np.array([-1,      -1,      0,      -1,  -1,  -1,  -1,  -1,     -1,     -1,   -1,    -1,    -1,      -1,      -1,      -1,      -1,      -1,      -1,           -1,           -1,           -1,       -1,            -1,        -1])
+            obs_upper_bound = np.array([1,       1,       1,       1,   1,   1,   1,   1,      1,      1,    1,     1,     1,       1,       1,       1,       1,       1,       1,            1,            1,            1,         1,            1,        1])          
             return spaces.Box( low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32 )
-            ############################################################
-            #### OBS SPACE OF SIZE 12
-            # return spaces.Box(low=np.array([-1,-1,0, -1,-1,-1, -1,-1,-1, -1,-1,-1]),
-            #                   high=np.array([1,1,1, 1,1,1, 1,1,1, 1,1,1]),
-            #                   dtype=np.float32
-            #                   )
-            ############################################################
+            
         else:
             print("[ERROR] in BaseSingleAgentAviary._observationSpace()")
     
@@ -406,7 +308,7 @@ class BaseSingleAgentAviary(BaseAviary):
         
         # obs_ = self._clipAndNormalizeState(self._getDroneStateVector(0))
         
-        obs=np.reshape(self._getDroneStateVector(0), (1, 23))
+        obs=np.reshape(self._getDroneStateVector(0), (1, 25))
         self.obs_rms_new.update(obs)
 
         # update running mean and standard deivation for state normalization
@@ -422,13 +324,13 @@ class BaseSingleAgentAviary(BaseAviary):
         obs_ = self.normalize_obs(obs)
         
 
-        obs_=np.reshape(obs_, ( 23))
-        print("#############################################")
-        print("drone real state:",(self._getDroneStateVector(0)))
-        # print("hand shipping mean",self._clipAndNormalizeState(self._getDroneStateVector(0)))
-        print('self.obs_rms ',self.obs_rms.mean )
-        print("running mean, the return obs_",obs_)
-        print("#############################################")
+        obs_=np.reshape(obs_, ( 25))
+        # print("#############################################")
+        # print("drone real state:",(self._getDroneStateVector(0)))
+        # # print("hand shipping mean",self._clipAndNormalizeState(self._getDroneStateVector(0)))
+        # print('self.obs_rms ',self.obs_rms.mean )
+        # print("running mean, the return obs_",obs_)
+        # print("#############################################")
         return obs_
            
         

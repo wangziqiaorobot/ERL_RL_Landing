@@ -127,26 +127,10 @@ if __name__ == "__main__":
                      num_drones=1
                     )
     obs = test_env.reset()
+   
     start = time.time()
     
-    # for i in range(3*int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS)): # Up to 6''
-    #     # print('test',test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS,'#####################################')
-    #     action, _states = model.predict(obs,
-    #                                     deterministic=True # OPTIONAL 'deterministic=False'
-    #                                     )
-    #     obs, reward, done, info = test_env.step(action)
-    #     test_env.render()
-    #     if OBS==ObservationType.KIN:
-    #         logger.log(drone=0,
-    #                    timestamp=i/test_env.SIM_FREQ,
-    #                    state= np.hstack([obs[0:3], np.zeros(4), obs[3:15],  np.resize(action, (4))]),
-    #                    control=np.zeros(12)
-    #                    )
-    #     sync(np.floor(i*test_env.AGGR_PHY_STEPS), start, test_env.TIMESTEP)
-    #     # if done: obs = test_env.reset() # OPTIONAL EPISODE HALT
-    # test_env.close()
-    # logger.save_as_csv("sa") # Optional CSV save
-    # logger.plot()
+    
 
     # new log try ####
     test_steps=800
