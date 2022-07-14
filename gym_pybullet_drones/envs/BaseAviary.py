@@ -775,7 +775,7 @@ class BaseAviary(gym.Env):
     ###############################################################################  
     def update_rms(self):
         self.obs_rms = self.obs_rms_new
-        print("update_rms",self.obs_rms)
+        
     
     ############################################################################### 
     def save_rms(self, save_dir, n_iter) -> None:
@@ -807,10 +807,11 @@ class BaseAviary(gym.Env):
         The video is saved under folder `files/videos`.
 
         """
-        if self.RECORD and self.iterate % 500: #and self.GUI
+        if self.RECORD and self.iterate % 100==0: #and self.GUI
             print('start recording ....')
+            
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
-                                                fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+str(self.iterate)+".mp4",
+                                                fileName=self.filepath+"/video"+"/iter_{0:05d}".format(self.iterate)+".mp4",
                                                 physicsClientId=self.CLIENT
                                                 )
         # if self.iterate % 100 == 0:
