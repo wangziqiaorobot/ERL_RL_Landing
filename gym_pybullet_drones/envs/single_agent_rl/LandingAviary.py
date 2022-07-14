@@ -109,6 +109,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
         # slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
+        
         if (self.Fcontact[2]) >0: #if have contact np.linalg.norm(state[22]) >0: 
             contactReward=0 #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
             self.bool_contact_history=True
@@ -160,7 +161,7 @@ class LandingAviary(BaseSingleAgentAviary):
         
         if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
             self.iterate= self.iterate+1
-            print("iterate",self.iterate)
+            
        
             return True
         else:
