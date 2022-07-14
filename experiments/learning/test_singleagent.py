@@ -29,7 +29,9 @@ from stable_baselines3 import TD3
 from stable_baselines3 import DDPG
 from stable_baselines3.common.policies import ActorCriticPolicy as a2cppoMlpPolicy
 from stable_baselines3.common.policies import ActorCriticCnnPolicy as a2cppoCnnPolicy
+from stable_baselines3.common.utils import get_device
 from stable_baselines3.sac.policies import SACPolicy as sacMlpPolicy
+from gym_pybullet_drones.control.mlp_policy import RPGMlpPolicy
 from stable_baselines3.sac import CnnPolicy as sacCnnPolicy
 from stable_baselines3.td3 import MlpPolicy as td3ddpgMlpPolicy
 from stable_baselines3.td3 import CnnPolicy as td3ddpgCnnPolicy
@@ -44,12 +46,14 @@ from gym_pybullet_drones.envs.single_agent_rl.TuneAviary import TuneAviary
 from gym_pybullet_drones.envs.single_agent_rl.LandingAviary import LandingAviary
 from gym_pybullet_drones.envs.single_agent_rl.BaseSingleAgentAviary import ActionType, ObservationType
 
+
 import shared_constants
 
 if __name__ == "__main__":
 
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning example script using TakeoffAviary')
+    parser.add_argument("--iter", type=int, default=2000, help="PPO iter number")
     parser.add_argument('--exp',                           type=str,            help='The experiment folder written as ./results/save-<env>-<algo>-<obs>-<act>-<time_date>', metavar='')
     ARGS = parser.parse_args()
 
@@ -61,71 +65,53 @@ if __name__ == "__main__":
     elif os.path.isfile(ARGS.exp+'/best_model.zip'):
         path = ARGS.exp+'/best_model.zip'
     else:
-        print("[ERROR]: no model under the specified path", ARGS.exp)
-    if algo == 'a2c':
-        model = A2C.load(path)
+        path=ARGS.exp+"/tb/SAC_1/Policy/iter_{0:05d}.pth".format(ARGS.iter)
+ 
     if algo == 'ppo':
         model = PPO.load(path)
-        print("################## model ########################",model)
     if algo == 'sac':
-        model = SAC.load(path)
-    if algo == 'td3':
-        model = TD3.load(path)
-    if algo == 'ddpg':
-        model = DDPG.load(path)
+        # model = SAC.load(path)
+
+        ###########
+        weight = ARGS.exp+"/tb/SAC_1/Policy/iter_{0:05d}.pth".format(ARGS.iter)
+        # env_rms="/home/ziqiao/RL/ERL_RL_Landing/experiments/learning/results/save-landing-sac-kin-ld-07.13.2022_23.20.06/RMS/iter_20.npz"
+        env_rms =ARGS.exp+"/RMS/iter_{0:05d}.npz".format(ARGS.iter)
+        print("weight",weight)
+        print("rms",env_rms)
+        device = get_device("cpu")
+        saved_variables = torch.load(weight, map_location=device)
+        
+        # Create policy object
+        policy = RPGMlpPolicy(saved_variables["data"],device)
+        
+        
+        
+        # Load weights
+        policy.load_weights(saved_variables["state_dict"])
+        
+        
+        ###################################
 
     #### Parameters to recreate the environment ################
     env_name = ARGS.exp.split("-")[1]+"-aviary-v0"
-    OBS = ObservationType.KIN if ARGS.exp.split("-")[3] == 'kin' else ObservationType.RGB
-    if ARGS.exp.split("-")[4] == 'rpm':
-        ACT = ActionType.RPM
-    elif ARGS.exp.split("-")[4] == 'dyn':
-        ACT = ActionType.DYN
-    elif ARGS.exp.split("-")[4] == 'pid':
-        ACT = ActionType.PID
-    elif ARGS.exp.split("-")[4] == 'vel':
-        ACT = ActionType.VEL
-    elif ARGS.exp.split("-")[4] == 'tun':
-        ACT = ActionType.TUN
-    elif ARGS.exp.split("-")[4] == 'one_d_rpm':
-        ACT = ActionType.ONE_D_RPM
-    elif ARGS.exp.split("-")[4] == 'one_d_dyn':
-        ACT = ActionType.ONE_D_DYN
-    elif ARGS.exp.split("-")[4] == 'one_d_pid':
-        ACT = ActionType.ONE_D_PID
-    elif ARGS.exp.split("-")[4] == 'ld':
-        ACT = ActionType.LD
+    OBS = ObservationType.KIN 
+    ACT = ActionType.LD
     #### Evaluate the model ####################################
-    eval_env = gym.make(env_name,
-                        aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
-                        obs=OBS,
-                        act=ACT
-                        )
-    # mean_reward, std_reward = evaluate_policy(model,
-    #                                           eval_env,
-    #                                           n_eval_episodes=1
-    #                                           )
-    # print("\n\n\nMean reward ", mean_reward, " +- ", std_reward, "\n\n")
     
-    #### Show, record a video, and log the model's performance #
-    # test_env = gym.make(env_name,
-    #                     gui=True,
-    #                     record=True,
-    #                     aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
-    #                     obs=OBS,
-    #                     act=ACT
-    #                     )
     test_env= LandingAviary(
                          gui=True,
                          record=True,
-                         
                          aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS
-                         
                          )
     
     logger = Logger(logging_freq_hz=int(test_env.SIM_FREQ/test_env.AGGR_PHY_STEPS),
                      num_drones=1
                     )
+    # policy just in time compliation
+    dummy_inputs = torch.rand(1, test_env.observation_space, device=device)
+    policy = torch.jit.trace(policy, dummy_inputs)
+    test_env.load_rms(env_rms)
+    #############
     obs = test_env.reset()
    
     start = time.time()
@@ -146,8 +132,7 @@ if __name__ == "__main__":
         shape=(8, test_steps), dtype=np.float32)
     for i in range(test_steps):
         
-        action, _states = model.predict(obs,
-                                        deterministic=True # OPTIONAL 'deterministic=False'
+        action, _states = policy.forward(obs
                                         )
         obs, reward, done, info = test_env.step(action)
         test_env.render()
