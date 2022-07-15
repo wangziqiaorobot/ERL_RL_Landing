@@ -807,13 +807,21 @@ class BaseAviary(gym.Env):
         The video is saved under folder `files/videos`.
 
         """
+        ### for tranning
         if self.RECORD and self.iterate % 100==0: #and self.GUI
             print('start recording ....')
-            
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
-                                                fileName=self.filepath+"/video"+"/iter_{0:05d}".format(self.iterate)+".mp4",
+                                                fileName=self.filepath+"/iter_{0:05d}".format(self.iterate)+".mp4",
+                                                physicsClientId=self.CLIENT)
+        
+        ### for testing                                        
+        if self.RECORD and self.iterate==1:
+            self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
+                                                fileName=self.filepath+"/test-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+".mp4",
                                                 physicsClientId=self.CLIENT
                                                 )
+
+
         # if self.iterate % 100 == 0:
         #     print('start recording ....')
         #     self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
