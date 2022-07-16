@@ -133,7 +133,7 @@ if __name__ == "__main__":
     
 
     # new log try ####
-    test_steps=400
+    test_steps=1000
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     time_plt = np.zeros(
         shape=(1, test_steps), dtype=np.float32)
     infos = np.zeros(
-        shape=(8, test_steps), dtype=np.float32)
+        shape=(27, test_steps), dtype=np.float32)
     for i in range(test_steps):
         # obs_numpy = np.array(obs) # construct your observation as a numpy array
         # print("obs_numpy",obs_numpy)
