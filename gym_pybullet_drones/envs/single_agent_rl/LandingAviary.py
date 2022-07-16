@@ -97,7 +97,7 @@ class LandingAviary(BaseSingleAgentAviary):
         actionsmoothRewardCoeff=-0.01
         actionlimitRewardCoeff=-0.00001#*time
         contactgroundRewardCoeff=-0.00001
-        contactReward=-0.009#-0.018#*time
+        contactReward=-0.019#-0.018#*time
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
         else:
