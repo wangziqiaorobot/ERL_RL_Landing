@@ -158,10 +158,7 @@ if __name__ == "__main__":
         test_env.render()
         actions[:,i]=action_numpy
         unnormalized_obs[:,i]=test_env._unnormalize_obs(obs,test_env.obs_rms)
-        print("unnormalized_obs",unnormalized_obs)
-        
         observation[:,i]=obs
-        print("observation",observation)
         rewards[:,i]=reward
         infos[:,i]=info
         time_plt[:,i]=i*test_env.AGGR_PHY_STEPS/240
@@ -178,118 +175,100 @@ if __name__ == "__main__":
     
 #     ############### Plot the states & actions
     save_path = os.path.join(ARGS.exp)
-#     plt.figure()
-#     plt.plot(time_plt[0,:],test_env.GRAVITY*(0.1*actions[0,:]+1),label="thrust")
-#     #plt.plot((actions[0,:]),label="b")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('action0_thrust')
-#     plt.savefig(save_path + '/action0_thrust.jpg')
+
+    ### plot the output commands, calculate from the actions
+    plt.figure()
+    plt.plot(time_plt[0,:],test_env.GRAVITY*(0.1*actions[0,:]+1),label="thrust")
+    #plt.plot((actions[0,:]),label="b")
+    plt.grid()
+    plt.legend()
+    plt.title('action0_thrust')
+    plt.savefig(save_path + '/action0_thrust.jpg')
     
-#     plt.figure()
-#     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-#     plt.plot(time_plt[0,:],(actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="roll")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('action1_roll')
-#     plt.savefig(save_path + '/action1_roll.jpg')
+    plt.figure()
+    # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
+    plt.plot(time_plt[0,:],(actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="roll")
+    plt.grid()
+    plt.legend()
+    plt.title('action1_roll')
+    plt.savefig(save_path + '/action1_roll.jpg')
 
-#     plt.figure()
-#     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-#     plt.plot(time_plt[0,:],(actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="pitch")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('action2_pitch')
-#     plt.savefig(save_path + '/action2_pitch.jpg')
+    plt.figure()
+    # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
+    plt.plot(time_plt[0,:],(actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="pitch")
+    plt.grid()
+    plt.legend()
+    plt.title('action2_pitch')
+    plt.savefig(save_path + '/action2_pitch.jpg')
 
-#     plt.figure()
-#     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
-#     plt.plot(time_plt[0,:],(actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi/5*180),label="yaw")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('action3_yaw')
-#     plt.savefig(save_path + '/action3_yaw.jpg')
+    plt.figure()
+    # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
+    plt.plot(time_plt[0,:],(actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi/5*180),label="yaw")
+    plt.grid()
+    plt.legend()
+    plt.title('action3_yaw')
+    plt.savefig(save_path + '/action3_yaw.jpg')
 
-#     ## observation
-#     MAX_LIN_VEL_XY = 2 
-#     MAX_LIN_VEL_Z = 1
 
-#     MAX_XY = 1
-#     MAX_Z = 3
-#     MAX_PITCH_ROLL = np.pi/2 # Full range
     
+#----------------- the drone real states ----------------------#
+## position
+    plt.figure()
+    plt.plot(time_plt[0,:],infos[8,:],label="x")
+    plt.plot(time_plt[0,:],infos[9,:],label="y")
+    plt.plot(time_plt[0,:],infos[10,:],label="z")
+    plt.grid()
+    plt.legend()
+    plt.title('states_position')
+    plt.savefig(save_path + '/states_position.jpg')
 
-# ##### x\y\z
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[0,:]*MAX_XY,label="x")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('obs0_x')
-#     plt.savefig(save_path + '/obs0_x.jpg')
+## attitude
+    plt.figure()
+    plt.plot(time_plt[0,:],infos[11,:]/math.pi*180,label="roll")
+    plt.plot(time_plt[0,:],infos[12,:]/math.pi*180,label="pitch")
+    plt.plot(time_plt[0,:],infos[13,:]/math.pi*180,label="yaw")
+    plt.grid()
+    plt.legend()
+    plt.title('states_attitude')
+    plt.savefig(save_path + '/states_attitude.jpg')
 
-
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[1,:]*MAX_XY,label="y")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('obs1_y')
-#     plt.savefig(save_path + '/obs1_y.jpg')
-
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[2,:]*MAX_Z,label="z")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('obs2_z')
-#     plt.savefig(save_path + '/obs2_z.jpg')
-
-# ##### r\p\y
-
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[7,:]*MAX_PITCH_ROLL/math.pi*180,label="roll")
-#     plt.plot(time_plt[0,:],(actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_roll")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('obs3_roll')
-#     plt.savefig(save_path + '/obs3_roll.jpg')
-
-
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[8,:]*MAX_PITCH_ROLL/math.pi*180,label="pitch")
-#     plt.plot(time_plt[0,:],(actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_pitch")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('obs4_pitch')
-#     plt.savefig(save_path + '/obs4_pitch.jpg')
-
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[9,:]/math.pi*180,label="yaw")
-#     plt.plot(time_plt[0,:],(actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi/5*180),label="command(action)_yaw")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('obs5_yaw')
-#     plt.savefig(save_path + '/obs5_yaw.jpg')
-
-# ### line_v
-
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[10,:]*MAX_LIN_VEL_XY,label="x_vel")
-#     plt.plot(time_plt[0,:],observation[11,:]*MAX_LIN_VEL_XY,label="y_vel")
-#     plt.plot(time_plt[0,:],observation[12,:]*MAX_LIN_VEL_Z,label="z_vel")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('lin_vel')
-#     plt.savefig(save_path + '/lin_vel.jpg')
-
-# ## ang_vel
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[13,:],label="x_ang_vel")
-#     plt.plot(time_plt[0,:],observation[14,:],label="y_ang_vel")
-#     plt.plot(time_plt[0,:],observation[15,:],label="z_ang_vel")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('ang_vel')
-#     plt.savefig(save_path + '/ang_vel.jpg')
-
+## linear velocity
+    plt.figure()
+    plt.plot(time_plt[0,:],infos[14,:],label="V_x")
+    plt.plot(time_plt[0,:],infos[15,:],label="V_y")
+    plt.plot(time_plt[0,:],infos[16,:],label="V_z")
+    plt.grid()
+    plt.legend()
+    plt.title('states_linear_velocity')
+    plt.savefig(save_path + '/states_linear_velocity.jpg')
+## angular velocity
+    plt.figure()
+    plt.plot(time_plt[0,:],infos[17,:],label="W_x")
+    plt.plot(time_plt[0,:],infos[18,:],label="W_y")
+    plt.plot(time_plt[0,:],infos[19,:],label="W_z")
+    plt.grid()
+    plt.legend()
+    plt.title('states_angular_velocity')
+    plt.savefig(save_path + '/states_angular_velocity.jpg')
+## last step action
+    plt.figure()
+    plt.plot(time_plt[0,:],infos[20,:],label="A_1")
+    plt.plot(time_plt[0,:],infos[21,:],label="A_2")
+    plt.plot(time_plt[0,:],infos[22,:],label="A_3")
+    plt.plot(time_plt[0,:],infos[23,:],label="A_4")
+    plt.grid()
+    plt.legend()
+    plt.title('states_last_action')
+    plt.savefig(save_path + '/states_last_action.jpg')
+## force
+    plt.figure()
+    plt.plot(time_plt[0,:],infos[24,:],label="F_x")
+    plt.plot(time_plt[0,:],infos[25,:],label="F_y")
+    plt.plot(time_plt[0,:],infos[26,:],label="F_z")
+    plt.grid()
+    plt.legend()
+    plt.title('states_force')
+    plt.savefig(save_path + '/states_force.jpg')
 ## rewards
 
     plt.figure()
@@ -307,18 +286,6 @@ if __name__ == "__main__":
     plt.savefig(save_path + '/reward.jpg')
     
     
-#     MAX_F_XY=5  #max external froce in xy axis in robot frame
-#     MAX_F_Z=11.76 ##max external froce in z axis in robot frame
-# ## force 
-#     plt.figure()
-#     plt.plot(time_plt[0,:],observation[20,:]*MAX_F_XY,label="fx")
-#     plt.plot(time_plt[0,:],observation[21,:]*MAX_F_XY,label="fy")
-#     plt.plot(time_plt[0,:],observation[22,:]*MAX_F_Z,label="fz")
-#     plt.grid()
-#     plt.legend()
-#     plt.title('Force')
-#     plt.savefig(save_path + '/Force.jpg')
-
 
 
 ####################### polt the observation ###############################

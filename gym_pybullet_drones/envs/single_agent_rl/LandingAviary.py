@@ -79,16 +79,12 @@ class LandingAviary(BaseSingleAgentAviary):
             The reward.
 
         """
-        # state = self._getDroneStateVector(0) ### self._computeObs() need or not???
+        
         diff_act= self.current_action-np.array(self.last_action[0][0:4])
-        time=self.step_counter*self.TIMESTEP
         p.performCollisionDetection(physicsClientId=self.CLIENT)
         L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
-        ############## for the hovering task #############
-        # return 0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
+    
 
-        ########### for the landing task ############# 
-        # L_vel + W_vel + Contact_force + energy_consanpution
         balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
         slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
         # contactRewardCoeff=0.01*time
@@ -251,9 +247,9 @@ class LandingAviary(BaseSingleAgentAviary):
         V_z=self.vel[0,2]
 
         #anguler velocity
-        W_x=self.vel[0,0]
-        W_y=self.vel[0,1]
-        W_z=self.vel[0,2]
+        W_x=self.ang_v[0,0]
+        W_y=self.ang_v[0,1]
+        W_z=self.ang_v[0,2]
 
         #last step action
         Action_1=self.last_action[0,0]
