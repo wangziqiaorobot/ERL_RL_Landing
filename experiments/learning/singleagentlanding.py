@@ -103,7 +103,7 @@ if __name__ == "__main__":
                            ) # or None
     #### Off-policy algorithms #################################
     offpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
-                            net_arch=dict(qf=[512, 512], pi=[512, 512])
+                            net_arch=dict(qf=[256,256,256,128], pi=[256,256,256,128])
                             ) 
    
     if ARGS.algo == 'ppo':
