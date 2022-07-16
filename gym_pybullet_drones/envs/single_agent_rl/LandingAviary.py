@@ -80,64 +80,89 @@ class LandingAviary(BaseSingleAgentAviary):
 
         """
         
-        diff_act= self.current_action-np.array(self.last_action[0][0:4])
-        p.performCollisionDetection(physicsClientId=self.CLIENT)
-        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
-    
+        
 
-        balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-        slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
-        # contactRewardCoeff=0.01*time
-        linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
-        angulervelocityRewardCoeff=0.003#*time
-        actionsmoothRewardCoeff=-0.01
-        actionlimitRewardCoeff=-0.00001#*time
-        contactgroundRewardCoeff=-0.00001
+        
+        """ Contact Reward
+        
+        A sparse reward function is used to reward the drone for making contact with a tree branch
+        """
+    
         contactReward=-0.019#-0.018#*time
+        if (self.Fcontact[2]) >0: #if Force in z-axis > 0
+            contactReward=0 
+            self.bool_contact_history=True
+
+
+        """ Balancing Reward
+
+        In order to keep the Roll, Pitch and Yaw at 0 degrees before the vehicle makes contact with the tree branch.
+        """
+        balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
+        if self.bool_contact_history==True:
+            balancingRewardCoeff = 0.01
+        
+        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-np.array(self.rpy).reshape(1,3))**6)-1)
+        
+        """ Slippage Reward
+        Keep the drone at the same x,y position as the initial one;
+            i.e. keep it vertical when landing;
+                 No relative sliding after contact with the tree branch
+        """
+        slippageRewardCoeff=1.2
+        # 
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
         else:
+        # to keep the x,y as the init_xy
             slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-np.array(self.pos[0][0:2]))**8)-1) ##^14
-        # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
-        # if state[23]==0:
-        # slippageReward=slippageRewardCoeff*(-10)
-        # else:
-
-        # slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
-        # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
         
-        if (self.Fcontact[2]) >0: #if have contact np.linalg.norm(state[22]) >0: 
-            contactReward=0 #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
-            self.bool_contact_history=True
-        if self.bool_contact_history==True:
-            balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
-
-        # else:
-        # contactReward=time*-0.02
-        # balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-
-        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-np.array(self.rpy).reshape(1,3))**6)-1)
+        """ Linear Velocity Reward
+        Make the velocity of the drone in xyz direction as zero as possible;
+        Because we don't want to move in the xy direction; and we want to land as slowly as possible
+        """
+        linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
         linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-np.array(self.vel).reshape(1,3))**4)-1)
+        
+        """ Anguler Velocity  Reward
+        Don't want the drone's attitude to change too quickly
+        """
+        angulervelocityRewardCoeff=0.003#*time
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-np.array(self.ang_v).reshape(1,3))**4)-1)
+
+        """ Action Smooth  Reward
+        Smoothing the output action     
+        """
+        diff_act= self.current_action-np.array(self.last_action[0][0:4])
+        actionsmoothRewardCoeff=-0.01
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
+
+        """ Action Limit  Reward
+        Limiting thurust output        
+        """
+        actionlimitRewardCoeff=-0.00001#*time
         actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3])**2
+
+        """ Chrash  Reward
+        Preventing drone crashes       
+        """
+
+        p.performCollisionDetection(physicsClientId=self.CLIENT)
+        # L is the contact point on the ground, 
+        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
+
         if len(L) !=0:
             contactgroundReward=-(10)
             print("fall down to the ground")
         else:
             contactgroundReward=0
+        
+
+
+
         return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.0005
         
-        #   self.step_counter*self.TIMESTEP
-        
-
-
-
-
-
-        # return  0.05*(np.exp(- np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.005
-        # return -1 *(np.exp(-(0-state[0])**2)-3+np.exp(-(0-state[1])**2)+np.exp(-(0.5-state[2])**2))
-        # return  -1 * ((0-state[0])**2+(0-state[1])**2+(0.5-state[2])**2)*0.5                  #-1 * np.linalg.norm(np.array([0, 0, 1])-state[0:3])**2*0.01
+     
 
     ################################################################################
     
@@ -155,7 +180,7 @@ class LandingAviary(BaseSingleAgentAviary):
         p.performCollisionDetection(physicsClientId=self.CLIENT)
         L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
         
-        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
+        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             self.iterate= self.iterate+1
             
        
@@ -177,56 +202,80 @@ class LandingAviary(BaseSingleAgentAviary):
 
     #     """
 
-        diff_act= self.current_action-np.array(self.last_action[0][0:4])
-        time=self.step_counter*self.TIMESTEP
-        p.performCollisionDetection(physicsClientId=self.CLIENT)
-        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
-        ############## for the hovering task #############
-        # return 0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
+        """ Contact Reward
+        
+        A sparse reward function is used to reward the drone for making contact with a tree branch
+        """
+    
+        contactReward=-0.019#-0.018#*time
+        if (self.Fcontact[2]) >0: #if Force in z-axis > 0
+            contactReward=0 
+            self.bool_contact_history=True
 
-        ########### for the landing task ############# 
-        # L_vel + W_vel + Contact_force + energy_consanpution
+
+        """ Balancing Reward
+
+        In order to keep the Roll, Pitch and Yaw at 0 degrees before the vehicle makes contact with the tree branch.
+        """
         balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-        slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
-        # contactRewardCoeff=0.01*time
-        linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
-        angulervelocityRewardCoeff=0.003#*time
-        actionsmoothRewardCoeff=-0.01
-        actionlimitRewardCoeff=-0.00001#*time
-        contactgroundRewardCoeff=-0.00001
-        contactReward=-0.009#-0.018#*time
+        if self.bool_contact_history==True:
+            balancingRewardCoeff = 0.01
+        
+        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-np.array(self.rpy).reshape(1,3))**6)-1)
+        
+        """ Slippage Reward
+        Keep the drone at the same x,y position as the initial one;
+            i.e. keep it vertical when landing;
+                 No relative sliding after contact with the tree branch
+        """
+        slippageRewardCoeff=1.2
+        # 
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
         else:
+        # to keep the x,y as the init_xy
             slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-np.array(self.pos[0][0:2]))**8)-1) ##^14
-        # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
-        # if state[23]==0:
-        # slippageReward=slippageRewardCoeff*(-10)
-        # else:
-
-        # slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
-        # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
         
-        if (self.Fcontact[2]) >0: #if have contact np.linalg.norm(state[22]) >0: 
-            contactReward=0 #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
-            self.bool_contact_history=True
-        if self.bool_contact_history==True:
-            balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
-
-        # else:
-        # contactReward=time*-0.02
-        # balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-
-        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-np.array(self.rpy).reshape(1,3))**6)-1)
+        """ Linear Velocity Reward
+        Make the velocity of the drone in xyz direction as zero as possible;
+        Because we don't want to move in the xy direction; and we want to land as slowly as possible
+        """
+        linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
         linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-np.array(self.vel).reshape(1,3))**4)-1)
+        
+        """ Anguler Velocity  Reward
+        Don't want the drone's attitude to change too quickly
+        """
+        angulervelocityRewardCoeff=0.003#*time
         angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-np.array(self.ang_v).reshape(1,3))**4)-1)
+
+        """ Action Smooth  Reward
+        Smoothing the output action     
+        """
+        diff_act= self.current_action-np.array(self.last_action[0][0:4])
+        actionsmoothRewardCoeff=-0.01
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
+
+        """ Action Limit  Reward
+        Limiting thurust output        
+        """
+        actionlimitRewardCoeff=-0.00001#*time
         actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3])**2
+
+        """ Chrash  Reward
+        Preventing drone crashes       
+        """
+
+        p.performCollisionDetection(physicsClientId=self.CLIENT)
+        # L is the contact point on the ground, 
+        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
+
         if len(L) !=0:
             contactgroundReward=-(10)
             print("fall down to the ground")
         else:
             contactgroundReward=0
+        
         
         
         ###-----------------------the drone's real states ----------------------------###
