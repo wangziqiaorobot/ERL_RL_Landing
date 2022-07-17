@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning example script using TakeoffAviary')
-    parser.add_argument("--iter", type=int, default=2000, help="PPO iter number")
+    parser.add_argument("--iter", type=int, default=2000, help="iter number")
     parser.add_argument('--exp',                           type=str,            help='The experiment folder written as ./results/save-<env>-<algo>-<obs>-<act>-<time_date>', metavar='')
     ARGS = parser.parse_args()
 
@@ -78,7 +78,6 @@ if __name__ == "__main__":
         env_rms =ARGS.exp+"/RMS/iter_{0:05d}.npz".format(ARGS.iter)
         print("weight",weight)
         print("rms",env_rms)
-
 
         if torch.cuda.is_available():
             device = "cuda:0"
@@ -118,8 +117,8 @@ if __name__ == "__main__":
                      num_drones=1
                     )
     # # policy just in time compliation
-    dummy_inputs = torch.rand(1, 25, device=device)
-    print("dummy input",dummy_inputs.size)
+    # dummy_inputs = torch.rand(1, 25, device=device)
+    # print("dummy input",dummy_inputs.size)
 
     # policy = torch.jit.trace(policy, dummy_inputs)
     # print("torch.jit policy",policy)
@@ -133,7 +132,7 @@ if __name__ == "__main__":
     
 
     # new log try ####
-    test_steps=1000
+    test_steps=500
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
@@ -151,9 +150,9 @@ if __name__ == "__main__":
         # print("obs_numpy",obs_numpy)
         # obs_tensor = torch.as_tensor(obs_numpy).to(device)
         # print("obs_tensor",obs_tensor.size)
-        # action_numpy = policy.forward(obs_tensor).detach().cpu().numpy()
+        action_numpy,_states = policy.forward(obs)#.detach().cpu().numpy()
         
-        action_numpy, _states = model.predict(obs)
+        # action_numpy, _states = model.predict(obs,deterministic=True)
         obs, reward, done, info = test_env.step(action_numpy)
         test_env.render()
         actions[:,i]=action_numpy
