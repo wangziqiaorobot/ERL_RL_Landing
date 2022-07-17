@@ -9,8 +9,8 @@ class RPGMlpPolicy(torch.nn.Module):
         super(RPGMlpPolicy, self).__init__()
         self.policy = SACPolicy(**save_variables) 
         # self.policy =MlpPolicy(**save_variables)
-        self.policy.actor = torch.nn.Sequential(self.policy.actor,
-                                                     torch.nn.Tanh())
+        # self.policy.net_arch = torch.nn.Sequential(self.policy.net_arch,
+                                                    #  torch.nn.Tanh())
         self.device = device
 
     def load_weights(self, state_dict):
@@ -18,5 +18,5 @@ class RPGMlpPolicy(torch.nn.Module):
         self.policy.to(device=self.device)
 
     def forward(self, obs: torch.Tensor):
-        action = self.policy._predict(obs, deterministic=True)
+        action = self.policy.predict(obs, deterministic=True)
         return action
