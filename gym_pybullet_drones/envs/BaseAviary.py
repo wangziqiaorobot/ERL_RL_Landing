@@ -810,8 +810,9 @@ class BaseAviary(gym.Env):
         ### for tranning
         if self.RECORD and self.iterate % 100==0: #and self.GUI
             print('start recording ....')
+            os.makedirs(self.filepath, exist_ok=True)
             self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,
-                                                fileName=self.filepath+"/iter_{0:05d}".format(self.iterate)+".mp4",
+                                                fileName=self.filepath+ "/RMS"+"/iter_{0:05d}".format(self.iterate)+".mp4",
                                                 physicsClientId=self.CLIENT)
         
         ### for testing                                        
