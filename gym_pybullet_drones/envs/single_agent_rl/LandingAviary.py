@@ -85,7 +85,7 @@ class LandingAviary(BaseSingleAgentAviary):
         linearvelocityRewardCoeff=-0.25 #0.05#0.03/(time+0.5)
         angulervelocityRewardCoeff=-0.003#*time
         
-        actionlimitRewardCoeff=-0.0001#*time
+        actionlimitRewardCoeff=-0.00001#*time
         slippageRewardCoeff=-1.2
         actionsmoothRewardCoeff=-0.5
 
@@ -208,7 +208,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
 
 
-        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+1
+        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.1
         
      
 
@@ -255,99 +255,99 @@ class LandingAviary(BaseSingleAgentAviary):
         A sparse reward function is used to reward the drone for making contact with a tree branch
         """
     
-        contactReward=-0.08#-0.018#*time
-        balancingRewardCoeff=-0.1#/(time+0.5)#0.001*(time);0.01
-        linearvelocityRewardCoeff=-0.25 #0.05#0.03/(time+0.5)
-        angulervelocityRewardCoeff=-0.003#*time
+        # contactReward=-0.2#-0.018#*time
+        # balancingRewardCoeff=-0.1#/(time+0.5)#0.001*(time);0.01
+        # linearvelocityRewardCoeff=-0.15 #0.05#0.03/(time+0.5)
+        # angulervelocityRewardCoeff=-0.003#*time
         
-        actionlimitRewardCoeff=-0.0001#*time
-        slippageRewardCoeff=-1.2
-        actionsmoothRewardCoeff=-0.5
+        # actionlimitRewardCoeff=-0.0001#*time
+        # slippageRewardCoeff=-1.2
+        # actionsmoothRewardCoeff=-0.1
 
   
-        Linear_Vz_ref=-0.1
-        diff_act= self.current_action-np.array(self.last_action[0][0:4])
+        # Linear_Vz_ref=-0.1
+        # diff_act= self.current_action-np.array(self.last_action[0][0:4])
 
-        if (self.Fcontact[2]) >0: #if Force in z-axis > 0
-            contactReward=0 
-            self.bool_contact_history=True
+        # if (self.Fcontact[2]) >0: #if Force in z-axis > 0
+        #     contactReward=0 
+        #     self.bool_contact_history=True
 
-        if self.bool_contact_history==True:
-            balancingRewardCoeff = 0.001
-            Linear_Vz_ref=0
+        # if self.bool_contact_history==True:
+        #     balancingRewardCoeff = 0.001
+        #     Linear_Vz_ref=0
 
 
-        balancingReward=balancingRewardCoeff*np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-np.array(self.rpy).reshape(1,3))**2
-        linearvelocityReward=linearvelocityRewardCoeff*np.linalg.norm(np.array([0, 0, Linear_Vz_ref])-np.array(self.vel).reshape(1,3))**2
+        # balancingReward=balancingRewardCoeff*np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-np.array(self.rpy).reshape(1,3))**2
+        # linearvelocityReward=linearvelocityRewardCoeff*np.linalg.norm(np.array([0, 0, Linear_Vz_ref])-np.array(self.vel).reshape(1,3))**2
         
         
-        if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
-            slippageReward=-15
-        else:
-        # to keep the x,y as the init_xy
-            slippageReward=slippageRewardCoeff* np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-np.array(self.pos[0][0:2]))**2 ##^14
+        # if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
+        #     slippageReward=-15
+        # else:
+        # # to keep the x,y as the init_xy
+        #     slippageReward=slippageRewardCoeff* np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-np.array(self.pos[0][0:2]))**2 ##^14
 
-        angulervelocityReward=angulervelocityRewardCoeff*np.linalg.norm(np.array([0, 0,0])-np.array(self.ang_v).reshape(1,3))**2
-        actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
-        actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.MAX_THRUST/2*(self.current_action[0]+1)-self.GRAVITY)**2
+        # angulervelocityReward=angulervelocityRewardCoeff*np.linalg.norm(np.array([0, 0,0])-np.array(self.ang_v).reshape(1,3))**2
+        # actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
+        # actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.MAX_THRUST/2*(self.current_action[0]+1)-self.GRAVITY)**2
         
 
-        p.performCollisionDetection(physicsClientId=self.CLIENT)
-        # L is the contact point on the ground, 
-        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
-        if len(L) !=0:
-            contactgroundReward=-(10)
-            print("fall down to the ground")
-        else:
-            contactgroundReward=0
+        # p.performCollisionDetection(physicsClientId=self.CLIENT)
+        # # L is the contact point on the ground, 
+        # L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
+        # if len(L) !=0:
+        #     contactgroundReward=-(10)
+        #     print("fall down to the ground")
+        # else:
+        #     contactgroundReward=0
         
         
-        # ###-----------------------the drone's real states ----------------------------###
+        # # ###-----------------------the drone's real states ----------------------------###
 
-        #position
-        Pos_x=self.pos[0,0]
-        Pos_y=self.pos[0,1]
-        Pos_z=self.pos[0,2]
+        # #position
+        # Pos_x=self.pos[0,0]
+        # Pos_y=self.pos[0,1]
+        # Pos_z=self.pos[0,2]
 
-        #attitude
-        Rpy_r=self.rpy[0,0]
-        Rpy_p=self.rpy[0,1]
-        Rpy_y=self.rpy[0,2]
+        # #attitude
+        # Rpy_r=self.rpy[0,0]
+        # Rpy_p=self.rpy[0,1]
+        # Rpy_y=self.rpy[0,2]
 
-        #linear velocity
-        V_x=self.vel[0,0]
-        V_y=self.vel[0,1]
-        V_z=self.vel[0,2]
+        # #linear velocity
+        # V_x=self.vel[0,0]
+        # V_y=self.vel[0,1]
+        # V_z=self.vel[0,2]
 
-        #anguler velocity
-        W_x=self.ang_v[0,0]
-        W_y=self.ang_v[0,1]
-        W_z=self.ang_v[0,2]
+        # #anguler velocity
+        # W_x=self.ang_v[0,0]
+        # W_y=self.ang_v[0,1]
+        # W_z=self.ang_v[0,2]
 
-        #last step action
-        Action_1=self.last_action[0,0]
-        Action_2=self.last_action[0,1]
-        Action_3=self.last_action[0,2]
-        Action_4=self.last_action[0,3]
+        # #last step action
+        # Action_1=self.last_action[0,0]
+        # Action_2=self.last_action[0,1]
+        # Action_3=self.last_action[0,2]
+        # Action_4=self.last_action[0,3]
 
-        #force
-        F_x=self.Fcontact[0]
-        F_y=self.Fcontact[1]
-        F_z=self.Fcontact[2]
+        # #force
+        # F_x=self.Fcontact[0]
+        # F_y=self.Fcontact[1]
+        # F_z=self.Fcontact[2]
 
 
 
-        info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,
-                        actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward,
-                         Pos_x,Pos_y,Pos_z,
-                         Rpy_r,Rpy_p,Rpy_y,
-                         V_x,V_y,V_z,
-                         W_x,W_y,W_z,
-                         Action_1,Action_2,Action_3,Action_4,
-                         F_x,F_y,F_z
-                        ])
+        # info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,
+        #                 actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward,
+        #                  Pos_x,Pos_y,Pos_z,
+        #                  Rpy_r,Rpy_p,Rpy_y,
+        #                  V_x,V_y,V_z,
+        #                  W_x,W_y,W_z,
+        #                  Action_1,Action_2,Action_3,Action_4,
+        #                  F_x,F_y,F_z
+        #                 ])
 
-        return info #{"answer": 42} #info
+        return {"answer": 42} #{"answer": 42} #info
     ################################################################################
     
     def _clipAndNormalizeState(self,
