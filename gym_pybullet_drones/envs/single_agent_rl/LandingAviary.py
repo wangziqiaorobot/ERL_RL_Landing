@@ -80,14 +80,14 @@ class LandingAviary(BaseSingleAgentAviary):
 
         """
     
-        contactReward=-0.2#-0.018#*time
+        contactReward=-0.08#-0.018#*time
         balancingRewardCoeff=-0.1#/(time+0.5)#0.001*(time);0.01
         linearvelocityRewardCoeff=-0.25 #0.05#0.03/(time+0.5)
         angulervelocityRewardCoeff=-0.003#*time
         
-        actionlimitRewardCoeff=-0.00001#*time
+        actionlimitRewardCoeff=-0.0001#*time
         slippageRewardCoeff=-1.2
-        actionsmoothRewardCoeff=-0.01
+        actionsmoothRewardCoeff=-0.5
 
   
         Linear_Vz_ref=-0.1
@@ -208,7 +208,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
 
 
-        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+0.05
+        return balancingReward+slippageReward+contactReward+linearvelocityReward+angulervelocityReward+actionsmoothReward+actionlimitReward+contactgroundReward+1
         
      
 
@@ -255,14 +255,14 @@ class LandingAviary(BaseSingleAgentAviary):
         A sparse reward function is used to reward the drone for making contact with a tree branch
         """
     
-        contactReward=-0.2#-0.018#*time
+        contactReward=-0.08#-0.018#*time
         balancingRewardCoeff=-0.1#/(time+0.5)#0.001*(time);0.01
         linearvelocityRewardCoeff=-0.25 #0.05#0.03/(time+0.5)
         angulervelocityRewardCoeff=-0.003#*time
         
-        actionlimitRewardCoeff=-0.00001#*time
+        actionlimitRewardCoeff=-0.0001#*time
         slippageRewardCoeff=-1.2
-        actionsmoothRewardCoeff=-0.01
+        actionsmoothRewardCoeff=-0.5
 
   
         Linear_Vz_ref=-0.1
@@ -302,8 +302,7 @@ class LandingAviary(BaseSingleAgentAviary):
             contactgroundReward=0
         
         
-        
-        ###-----------------------the drone's real states ----------------------------###
+        # ###-----------------------the drone's real states ----------------------------###
 
         #position
         Pos_x=self.pos[0,0]

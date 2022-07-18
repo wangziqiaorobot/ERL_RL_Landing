@@ -86,7 +86,7 @@ class BaseSingleAgentAviary(BaseAviary):
         dynamics_attributes = True if act in [ActionType.DYN, ActionType.ONE_D_DYN, ActionType.LD] else False
         self.OBS_TYPE = obs
         self.ACT_TYPE = act
-        self.EPISODE_LEN_SEC = 5 # the longth of each epsoid
+        self.EPISODE_LEN_SEC = 10 # the longth of each epsoid
         
 
         #### Create integrated controllers #########################

@@ -70,7 +70,7 @@ if __name__ == "__main__":
     if algo == 'ppo':
         model = PPO.load(path)
     if algo == 'sac':
-        model = SAC.load(path)
+        # model = SAC.load(path)
 
         ###########
         weight = ARGS.exp+"/tb/SAC_1/Policy/iter_{0:05d}.pth".format(ARGS.iter)
