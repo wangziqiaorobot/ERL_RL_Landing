@@ -86,7 +86,7 @@ class BaseSingleAgentAviary(BaseAviary):
         dynamics_attributes = True if act in [ActionType.DYN, ActionType.ONE_D_DYN, ActionType.LD] else False
         self.OBS_TYPE = obs
         self.ACT_TYPE = act
-        self.EPISODE_LEN_SEC = 10 # the longth of each epsoid
+        self.EPISODE_LEN_SEC = 5 # the longth of each epsoid
         
 
         #### Create integrated controllers #########################
@@ -312,7 +312,7 @@ class BaseSingleAgentAviary(BaseAviary):
         self.obs_rms_new.update(obs)
 
         # update running mean and standard deivation for state normalization
-        if self.iterate % 10 == 0 and self.iterate <= 1500:
+        if self.iterate % 10 == 0 and self.iterate <= 400:
                 self.update_rms()
 
         if self.iterate % 100 == 0:
