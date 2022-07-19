@@ -124,14 +124,18 @@ if __name__ == "__main__":
     
 
     #### Create eveluation environment #########################
-    eval_env = gym.make("landing-aviary-v0",
-                            aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
-                            obs=ARGS.obs,
-                            act=ARGS.act,
-                            gui=True,
-                            record=True
-                            )
-    
+    # eval_env = gym.make("landing-aviary-v0",
+    #                         aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
+    #                         obs=ARGS.obs,
+    #                         act=ARGS.act,
+    #                         gui=True,
+    #                         record=True
+    #                         )
+    eval_env = make_vec_env("landing-aviary-v0",
+                                    env_kwargs=sa_env_kwargs,
+                                    n_envs=1,
+                                    seed=0
+                                    )
     
         
 
