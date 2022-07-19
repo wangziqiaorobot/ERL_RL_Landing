@@ -136,7 +136,7 @@ class LandingAviary(BaseSingleAgentAviary):
         A sparse reward function is used to reward the drone for making contact with a tree branch
         """
         
-        contactReward=-0.019#-0.018#*time
+        contactReward=-0.009#-0.018#*time
         if (self.Fcontact[2]) >0: #if Force in z-axis > 0
             contactReward=0 
             self.bool_contact_history=True
