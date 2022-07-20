@@ -58,7 +58,7 @@ if __name__ == "__main__":
     #### Define and parse (optional) arguments for the script ##
     parser = argparse.ArgumentParser(description='Single agent reinforcement learning experiments script')
     parser.add_argument('--env',        default='landing',      type=str,             choices=['takeoff', 'hover', 'flythrugate', 'tune'], help='Task (default: hover)', metavar='')
-    parser.add_argument('--algo',       default='ppo',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
+    parser.add_argument('--algo',       default='sac',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
     parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
     parser.add_argument('--cpu',        default='10',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
@@ -70,6 +70,8 @@ if __name__ == "__main__":
         os.makedirs(filename+'/')
 
 
+    if ARGS.algo == 'sac':
+        ARGS.cpu=1
 
     #### Warning ###############################################
 
@@ -97,14 +99,16 @@ if __name__ == "__main__":
     
     train_env = make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
-                                 n_envs=ARGS.cpu,# The number of Parallel environments
+                                 n_envs=10,# The number of Parallel environments
                                  seed=6
                                  )
    
     print("[INFO] Action space:", train_env.action_space)
     print("[INFO] Observation space:", train_env.observation_space)
     # check_env(train_env, warn=True, skip_render_check=True)
-    
+    offpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
+                            net_arch=dict(qf=[256,256,256,128], pi=[256,256,256,128])
+                            )
     #### On-policy algorithms ##################################
     onpolicy_kwargs = dict(activation_fn=torch.nn.Tanh,
                            net_arch=[256, 256, dict(vf=[256,128], pi=[256,128])] #c 256/512/1024
@@ -124,15 +128,22 @@ if __name__ == "__main__":
                                                                   verbose=1
                                                                   )
 
-    
+    if ARGS.algo == 'sac':
+        model = SAC(sacMlpPolicy,
+                    train_env,
+                    policy_kwargs=offpolicy_kwargs,
+                    gradient_steps=-1,
+                    tensorboard_log=filename+'/tb/',
+                    verbose=1
+                    )
 
     #### Create eveluation environment #########################
     eval_env = gym.make("landing-aviary-v0",
                             aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
                             obs=ARGS.obs,
                             act=ARGS.act,
-                            gui=True,
-                            record=True
+                            gui=False,
+                            record=False
                             )
     
     
@@ -152,9 +163,9 @@ if __name__ == "__main__":
                                  deterministic=True,
                                  render=False
                                  )
-    model.learn(total_timesteps=1000*8000, #int(1e12),
+    model.learn(total_timesteps=1000*2500, #int(1e12),
                 callback=eval_callback,
-                log_interval=100,
+                log_interval=10,
                 )
 
     #### Save the model ########################################
