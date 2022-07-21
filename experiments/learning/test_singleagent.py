@@ -159,7 +159,7 @@ if __name__ == "__main__":
     time_plt = np.zeros(
         shape=(1, test_steps), dtype=np.float32)
     infos = np.zeros(
-        shape=(8, test_steps), dtype=np.float32)
+        shape=(27, test_steps), dtype=np.float32)
     for i in range(test_steps):
         
         action, _states = model.predict(obs,

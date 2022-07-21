@@ -164,7 +164,7 @@ class LandingAviary(BaseSingleAgentAviary):
         
         if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
             self.iterate= self.iterate+1
-            print("iterate",self.iterate)
+           
         # Alternative done condition, see PR #32
         # if (self.step_counter/self.SIM_FREQ > (self.EPISODE_LEN_SEC)) or ((self._getDroneStateVector(0))[2] < 0.05):
             return True
@@ -352,14 +352,7 @@ class LandingAviary(BaseSingleAgentAviary):
         
 
 
-        #TODO rewrite the normalized obs with runing_mean_std
-        normaledposxy=RunningMeanStd(1e-4,2)
-        print("##################################")
         
-        normaledposxy.update(clipped_pos_xy)
-        print(normaledposxy.mean)
-        print(clipped_pos_xy)
-        print("##################################")
 
         return norm_and_clipped
     

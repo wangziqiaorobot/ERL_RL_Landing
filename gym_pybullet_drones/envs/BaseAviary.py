@@ -542,7 +542,6 @@ class BaseAviary(gym.Env):
         self._saveLastAction(action)
         #### Advance the step counter ##############################
         self.step_counter = self.step_counter + (1 * self.AGGR_PHY_STEPS)
-        print("step:",self.step_counter)
         return obs, reward, done, info
     
     ################################################################################

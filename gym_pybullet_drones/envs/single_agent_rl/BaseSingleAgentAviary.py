@@ -412,7 +412,7 @@ class BaseSingleAgentAviary(BaseAviary):
             return self.rgb[0]
         elif self.OBS_TYPE == ObservationType.KIN: 
             obs = self._clipAndNormalizeState(self._getDroneStateVector(0))
-            print("obs_lastact",obs)
+            
             ############################################################
             #### OBS OF SIZE 20 (WITH QUATERNION AND RPMS)
             return obs
