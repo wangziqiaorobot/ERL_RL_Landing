@@ -14,6 +14,7 @@ from distutils.log import INFO
 import os
 import time
 import matplotlib.pyplot as plt
+import matplotlib.colors as color
 import math
 from datetime import datetime
 import argparse
@@ -162,14 +163,14 @@ if __name__ == "__main__":
         Landing_time=Landing_timestep*test_env.AGGR_PHY_STEPS/240
         print("---------------------Iteration",j,"-----------------")
         print("The contact suss rate in iteration", j,"is:",contact_time/480)
-        print("The stability in x in", j,"iteration is:", np.sqrt(np.mean(x_displacement)),"var",np.var(x_displacement))
-        print("The stability in y in", j,"iteration is:", np.sqrt(np.mean(y_displacement)),"var",np.var(y_displacement))
+        print("The stability in x in", j,"iteration is:", np.sqrt(np.mean(x_displacement)),"var",np.var(np.sqrt(x_displacement)))
+        print("The stability in y in", j,"iteration is:", np.sqrt(np.mean(y_displacement)),"var",np.var(np.sqrt(y_displacement)))
     
         # save the detail landing informations
         Landing_info[j,0]=j+1 # iteration
-        Landing_info[j,1]=test_env.INIT_XYZS[0][0]# init_x
-        Landing_info[j,2]=test_env.INIT_XYZS[0][1]# init_y
-        Landing_info[j,3]=test_env.INIT_XYZS[0][2]# init_z
+        Landing_info[j,1]=infos[8,1]# init_x
+        Landing_info[j,2]=infos[9,1]# init_y
+        Landing_info[j,3]=infos[10,1]# init_z
         Landing_info[j,4]=test_env.pd4branch[4]#stiffness of branch
         Landing_info[j,5]=Landing_time#time before landing
         Landing_info[j,6]=Landing_speed /Landing_timestep#average landing speed
@@ -177,10 +178,14 @@ if __name__ == "__main__":
         Landing_info[j,8]=np.var(F_z)
         Landing_info[j,9]=success_rate[0,j]#success rate 
 
+        fig=plt.scatter(Landing_info[j,1], Landing_info[j,2],color=[1-success_rate[0,j],success_rate[0,j],0],marker='o')
+
      
     print("The contact success rate in Total:",contact_time_total/(480*test_iteration))
-    print("The stability in x-axis:",np.sqrt(np.mean(x_stability)),np.var(x_stability))
-    print("The stability in y-axis:",np.sqrt(np.mean(y_stability)),np.var(y_stability))
+    print("The stability in x-axis:",np.sqrt(np.mean(x_stability)),np.var(np.sqrt(x_stability)))
+    print("The stability in y-axis:",np.sqrt(np.mean(y_stability)),np.var(np.sqrt(y_stability)))
+    print("The average landing speed is:",(np.mean(Landing_info[:,6])))
+    print("The average & var contact force is:",np.mean(Landing_info[:,7]),np.var(Landing_info[:,7]))
     
     
     
@@ -189,11 +194,11 @@ if __name__ == "__main__":
   
     #save the evaluation results to xlsx files
     df=pd.DataFrame(data=success_rate.reshape(test_iteration,1), columns=['success rate'])
-    filepath=path+'success_rate.xlsx'
+    filepath=ARGS.exp+'success_rate.xlsx'
     df.to_excel(filepath, index=False)
 
     df=pd.DataFrame(data=Landing_info ,columns=['iteration','init_x','int_y','init_z','K of branch','time before landing','average landing speed','average contact force','force var','success rate'])
-    filepath=path+'landing_info.xlsx'
+    filepath=ARGS.exp+'landing_info.xlsx'
     df.to_excel(filepath, index=False)
 
     
@@ -204,18 +209,18 @@ if __name__ == "__main__":
     
     test_env.close()
 
-
-
-    # with np.load(ARGS.exp+'/evaluations.npz') as data:
-    #     print(data.files)
-    #     print(data['timesteps'])
-    #     print(data['results'])
-    #     print(data['ep_lengths'])
+    # c1=color.rgb2hex([1, 0, 0])
+    # plt.scatter(Landing_info[:,1], Landing_info[:,2],c=[[1, 0, 0],[0,1,0]],marker='o')
+  
+    plt.axis([-0.1, 0.1, -0.1, 0.1])
+    plt.grid()
+    plt.title('Success Rate Top Veiw')
+    # 
     
-   
+    plt.savefig(ARGS.exp + '/Success_Rate_Top_Veiw.jpg',dpi=600)
+    
+    plt.show()
 
-
-
-
+  
 
  

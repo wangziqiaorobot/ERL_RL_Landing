@@ -387,7 +387,7 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,100,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=[0,0.08,1,0,1,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
             # pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
@@ -646,7 +646,11 @@ class BaseAviary(gym.Env):
         #### Random Initialize the drones position information ##########
         # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
         #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+        #                                 np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)
+
+        self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+                                        np.array([float(np.random.uniform(-0.1,0.1))]), \
+                                        np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
         #### Initialize the branch friction friction coefficient ##########
         self.lateralFriction=float(np.random.uniform(0.8,0.1))
         #### Initialize the drones contact force information ##########
@@ -663,7 +667,7 @@ class BaseAviary(gym.Env):
         # np.random.uniform(5,1000),##random p value in z-axis
         # np.random.uniform(0.5,1),##random d value in z-axis
         # np.random.uniform(3,10)]##random max_force
-        self.pd4branch=[0,0.08,1,0,100,1,5]
+        self.pd4branch=[0,0.08,1,0,1,1,5]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 
