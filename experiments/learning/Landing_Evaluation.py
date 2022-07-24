@@ -81,7 +81,7 @@ if __name__ == "__main__":
                      num_drones=1
                     )
     test_steps=720
-    test_iteration=2
+    test_iteration=100
     contact_time_total=0
     x_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
     y_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
@@ -115,7 +115,7 @@ if __name__ == "__main__":
         Contact_start_time=0
         contact_time=0
         #for calculate the landing time 
-        Landing_timestep=0
+        Landing_timestep=0.001
         Landing_time=0
         Landing_speed=0
         for i in range(test_steps):
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     filepath=path+'success_rate.xlsx'
     df.to_excel(filepath, index=False)
 
-    df=pd.DataFrame(data=Landing_info )#columns=['iteration','init_x','int_y','K of branch','time before landing','average landing speed','average contact force','success rate']
+    df=pd.DataFrame(data=Landing_info ,columns=['iteration','init_x','int_y','init_z','K of branch','time before landing','average landing speed','average contact force','force var','success rate'])
     filepath=path+'landing_info.xlsx'
     df.to_excel(filepath, index=False)
 
