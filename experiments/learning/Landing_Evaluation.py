@@ -86,7 +86,7 @@ if __name__ == "__main__":
                      num_drones=1
                     )
     test_steps=720
-    test_iteration=100
+    test_iteration=1000
     contact_time_total=0
     x_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
     y_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
@@ -265,7 +265,22 @@ if __name__ == "__main__":
     plt.savefig(ARGS.exp + '/Success_Rate_Top_Veiw.jpg',dpi=600)
     
     plt.show()
-
-  
-
- 
+    
+    # fig2,ax2=plt.subplots(figsize=(1, 6))
+    # fig2.subplots_adjust(bottom=0.2)
+    # sm = cm.ScalarMappable(norm=norm,cmap=map_vir)  # norm设置最大最小值
+    # sm.set_array([])
+    # plt.colorbar(sm,cax=ax2)#,orientation='horizontal'
+    # plt.title('Success Rate [%]]')
+    # plt.savefig( ARGS.exp +'/Success_Rate_bar.jpg',dpi=600)
+    # plt.show()
+    plt.figure() 
+    
+    plt.grid()
+    plt.title('Success Rate Top Veiw')
+    plt.xlabel('K')
+    plt.ylabel('Saccess Rate [%]')
+    plt.scatter(Landing_info[:,4], Landing_info[:,9],marker='o')
+    plt.savefig(ARGS.exp + '/Success_Rate_Diff_K.jpg',dpi=600)
+    
+    plt.show()
