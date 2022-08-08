@@ -186,8 +186,8 @@ class BaseAviary(gym.Env):
                 p.configureDebugVisualizer(i, 0, physicsClientId=self.CLIENT)
                 # p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0)
             p.resetDebugVisualizerCamera(cameraDistance=2.5,
-                                         cameraYaw=-10,
-                                         cameraPitch=-30,
+                                         cameraYaw=-90,
+                                         cameraPitch=-20,
                                          cameraTargetPosition=[0, 0, 1],
                                          physicsClientId=self.CLIENT
                                          )
@@ -213,8 +213,8 @@ class BaseAviary(gym.Env):
                 self.FRAME_PER_SEC = 24
                 self.CAPTURE_FREQ = int(self.SIM_FREQ/self.FRAME_PER_SEC)
                 self.CAM_VIEW = p.computeViewMatrixFromYawPitchRoll(distance=3,
-                                                                    yaw=-30,
-                                                                    pitch=-30,
+                                                                    yaw=-30,#-30,
+                                                                    pitch=-30,#-30,
                                                                     roll=0,
                                                                     cameraTargetPosition=[0, 0, 0],
                                                                     upAxisIndex=2,
@@ -387,8 +387,8 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            # pd4branch=[0,0.08,1,0,100,1,5]    #pd4branch=[0,0.079,1,0,1,1,13]
-            pd4branch=self.pd4branch
+            pd4branch=[0,0.08,1,0,1,1,20]    #pd4branch=[0,0.079,1,0,1,1,13]
+            # pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
             p_joint1=float(pd4branch[1])
@@ -427,6 +427,7 @@ class BaseAviary(gym.Env):
             ############ Collision Detection and Visualization #######################
             p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
+            # print("drone friction", p.getDynamicsInfo(self.DRONE_IDS[0],-1)) # the drone firction coff is 0.5
             # print(L)
             
             # print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
@@ -445,6 +446,9 @@ class BaseAviary(gym.Env):
                                         lineWidth=100,
                                         lifeTime=0.05,
                                         physicsClientId=self.CLIENT)
+                self.force_contact_world[0]=L[0][9]
+                self.force_contact_world[1]=L[0][10]
+                self.force_contact_world[2]=L[0][12]
                 # ### Normal Force ###
                 # p.addUserDebugLine(     lineFromXYZ=L[0][6],
                 #                         lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
@@ -648,29 +652,31 @@ class BaseAviary(gym.Env):
         #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
         #                                 np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)
 
-        # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
-        self.INIT_XYZS = np.vstack([np.array([float(0)]), \
-                                        np.array([float(0)]), \
+        self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+                                        np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
+        # self.INIT_XYZS = np.vstack([np.array([float(0)]), \
+        #                                 np.array([float(0)]), \
+        #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
         #### Initialize the branch friction friction coefficient ##########
-        self.lateralFriction=float(np.random.uniform(0.8,0.1))
+        self.lateralFriction=float(np.random.uniform(0.5,1))
+        # self.lateralFriction=0.1
         #### Initialize the drones contact force information ##########
         self.Fcontact= np.zeros(3)
+        self.force_contact_world=np.zeros(3)
 
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### reset the branch parameter
-        self.pd4branch=[ 
-        np.random.uniform(-0.01,0.01),##random pos value in x-axis,
-        np.random.uniform(0.02,0.1),##random p value in x-axis,
-        np.random.uniform(0.8,1.2),##random d value in x-axis,
-        np.random.uniform(-0.05,0.05), ##random pos in z-axis
-        np.random.uniform(1,1000),##random p value in z-axis
-        np.random.uniform(0.5,1),##random d value in z-axis
-        np.random.uniform(3,10)]##random max_force
-        # self.pd4branch=[0,0.08,1,0,100,1,5]
+        # self.pd4branch=[ 
+        # np.random.uniform(-0.01,0.01),##random pos value in x-axis,
+        # np.random.uniform(0.02,0.1),##random p value in x-axis,
+        # np.random.uniform(0.8,1.2),##random d value in x-axis,
+        # np.random.uniform(-0.05,0.05), ##random pos in z-axis
+        # np.random.uniform(5,1000),##random p value in z-axis
+        # np.random.uniform(0.5,1),##random d value in z-axis
+        # np.random.uniform(3,10)]##random max_force
+        self.pd4branch=[0,0.08,1,0,1,1,5]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 
@@ -751,6 +757,7 @@ class BaseAviary(gym.Env):
                                                 fileName=os.path.dirname(os.path.abspath(__file__))+"/../../files/videos/video-"+datetime.now().strftime("%m.%d.%Y_%H.%M.%S")+str(self.iterate)+".mp4",
                                                 physicsClientId=self.CLIENT
                                                 )
+       
         # if self.iterate % 100 == 0:
         #     print('start recording ....')
         #     self.VIDEO_ID = p.startStateLogging(loggingType=p.STATE_LOGGING_VIDEO_MP4,

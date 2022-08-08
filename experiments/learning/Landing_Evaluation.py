@@ -86,14 +86,14 @@ if __name__ == "__main__":
                      num_drones=1
                     )
     test_steps=720
-    test_iteration=1000
+    test_iteration=100
     contact_time_total=0
     x_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
     y_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
     success_rate= np.zeros(shape=(1, test_iteration), dtype=np.float32)
-    Landing_info=np.zeros(shape=(test_iteration,13 ), dtype=np.float32)# |iteration|init_x|int_y|K of branch|time before landing|average landing speed|average contact force|success rate|
+    Landing_info=np.zeros(shape=(test_iteration,14 ), dtype=np.float32)# |iteration|init_x|int_y|K of branch|time before landing|average landing speed|average contact force|success rate|
     z_push=np.zeros(shape=( 1,test_iteration), dtype=np.float32)
-
+    slippage= np.zeros(shape=(1, test_iteration), dtype=np.float32)
 
     for j in range(test_iteration):
         obs = test_env.reset()
@@ -104,16 +104,18 @@ if __name__ == "__main__":
         observation = np.zeros(shape=(test_env.observation_space.shape[0], test_steps), dtype=np.float32)
         rewards = np.zeros(shape=(1, test_steps), dtype=np.float32)
         time_plt = np.zeros(shape=(1, test_steps), dtype=np.float32)
-        infos = np.zeros(shape=(27, test_steps), dtype=np.float32)
+        infos = np.zeros(shape=(30, test_steps), dtype=np.float32)
         
         
         x_displacement=np.zeros(shape=(1, 480), dtype=np.float32)
         y_displacement=np.zeros(shape=( 1,480), dtype=np.float32)
+        z_displacement=np.zeros(shape=( 1,480), dtype=np.float32)
         
         x_pos_after_contact=np.zeros(shape=( 1,480), dtype=np.float32)
         y_pos_after_contact=np.zeros(shape=( 1,480), dtype=np.float32)
+        z_pos_after_contact=np.zeros(shape=( 1,480), dtype=np.float32)
         F_z=np.zeros(shape=(1,480), dtype=np.float32)
-
+        
         
         # for calculate the contact time
         Contactflag=False
@@ -128,6 +130,9 @@ if __name__ == "__main__":
         # calculate how much could dorne push during the 10sec contact
         z_firstcontact=0
         z_final=0
+        # counter for slipage
+        slippage_counter=0
+
 
         for i in range(test_steps):
             
@@ -163,17 +168,29 @@ if __name__ == "__main__":
             # ---------- calculate the stability -------------
                 x_pos_after_contact[0,(Contact_start_timestep-1)]=infos[8,i]
                 y_pos_after_contact[0,(Contact_start_timestep-1)]=infos[9,i]
+                z_pos_after_contact[0,(Contact_start_timestep-1)]=infos[10,i]
                 x_displacement[0,(Contact_start_timestep-1)]=((infos[8,i]-x_pos_after_contact[0][0])**2)
-                y_displacement[0,(Contact_start_timestep-1)]=((infos[9,i]-y_pos_after_contact[0][1])**2)
+                y_displacement[0,(Contact_start_timestep-1)]=((infos[9,i]-y_pos_after_contact[0][0])**2)
+                # z_displacement[0,(Contact_start_timestep-1)]=((infos[10,i]-z_pos_after_contact[0][0])**2)
                 z_final=infos[10,i]
 
                 F_z[0,(Contact_start_timestep-1)]=infos[26,i]
 
-        
+
+                print("test_env.lateralFriction:",test_env.lateralFriction)
+                print("normal force:",infos[27,i],infos[28,i],infos[29,i], np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]))
+                if infos[27,i]*(test_env.lateralFriction+0.5/2) < np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]) :
+                    slippage_counter=slippage_counter+1
+
+
+
+
+        # z_final=min(z_pos_after_contact[0,:])
         contact_time_total=contact_time_total+contact_time
         x_stability[0,j]=np.sqrt(np.mean(x_displacement))
         y_stability[0,j]=np.sqrt(np.mean(y_displacement))
-        z_push[0,j]=z_final-z_firstcontact
+        z_push[0,j]=z_final-z_pos_after_contact[0][0]
+        slippage[0,j]=slippage_counter/contact_time
         success_rate[0,j]=contact_time/480
         Landing_time=Landing_timestep*test_env.AGGR_PHY_STEPS/240
         print("---------------------Iteration",j,"-----------------")
@@ -192,11 +209,12 @@ if __name__ == "__main__":
         Landing_info[j,7]=np.mean(F_z)#average contact force in Z-axis
         Landing_info[j,8]=np.var(F_z)
         Landing_info[j,9]=success_rate[0,j]#success rate 
-        
-        
         Landing_info[j,10]=x_stability[0,j]
         Landing_info[j,11]=y_stability[0,j]
         Landing_info[j,12]=z_push[0,j]
+        Landing_info[j,13]=slippage[0,j]
+        
+        
         
         #for ppo color
         # fig=plt.scatter(Landing_info[j,1], Landing_info[j,2],color=[1-success_rate[0,j],success_rate[0,j],0],marker='o')
@@ -227,6 +245,7 @@ if __name__ == "__main__":
     print("The average landing speed is:",(np.mean(Landing_info[:,6])))
     print("The average & var contact force is:",np.mean(Landing_info[:,7]),np.var(Landing_info[:,7]))
     print("The average & var displacement(after contact) in z-axis is:",np.mean(z_push),np.var(z_push))
+    print("the slippage is" ,np.mean(slippage),np.var(slippage))
 
     
     
@@ -239,7 +258,7 @@ if __name__ == "__main__":
     filepath=ARGS.exp+'success_rate.xlsx'
     df.to_excel(filepath, index=False)
 
-    df=pd.DataFrame(data=Landing_info ,columns=['iteration','init_x','int_y','init_z','K of branch','time before landing','average landing speed','average contact force','force var','success rate','x_stability','y_stability','Z_push'])
+    df=pd.DataFrame(data=Landing_info ,columns=['iteration','init_x','int_y','init_z','K of branch','time before landing','average landing speed','average contact force','force var','success rate','x_stability','y_stability','Z_push','Sliding'])
     filepath=ARGS.exp+'landing_info.xlsx'
     df.to_excel(filepath, index=False)
 

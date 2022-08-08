@@ -273,13 +273,18 @@ class LandingAviary(BaseSingleAgentAviary):
         F_x=self.Fcontact[0]
         F_y=self.Fcontact[1]
         F_z=self.Fcontact[2]
+        #normal force and lateralFriction
+        normal_force=self.force_contact_world[0]
+        lateralFriction1=self.force_contact_world[1]
+        lateralFriction2=self.force_contact_world[2]
         info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward,
                          Pos_x,Pos_y,Pos_z,
                          Rpy_r,Rpy_p,Rpy_y,
                          V_x,V_y,V_z,
                          W_x,W_y,W_z,
                          Action_1,Action_2,Action_3,Action_4,
-                         F_x,F_y,F_z
+                         F_x,F_y,F_z,
+                         normal_force,lateralFriction1,lateralFriction2
         ])
         return info #{"answer": 42} #info
     ################################################################################

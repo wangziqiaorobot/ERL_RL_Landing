@@ -19,6 +19,7 @@ import argparse
 import re
 import numpy as np
 import gym
+from psutil import disk_partitions
 import torch
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.cmd_util import make_vec_env 
@@ -159,8 +160,8 @@ if __name__ == "__main__":
     time_plt = np.zeros(
         shape=(1, test_steps), dtype=np.float32)
     infos = np.zeros(
-        shape=(27, test_steps), dtype=np.float32)
-    for i in range(test_steps):
+        shape=(30, test_steps), dtype=np.float32)
+    for i in range(720):
         
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
@@ -226,6 +227,9 @@ if __name__ == "__main__":
     MAX_PITCH_ROLL = np.pi/2 # Full range
     
 
+
+
+
 ##### x\y\z
     plt.figure()
     plt.plot(time_plt[0,:],observation[0,:]*MAX_XY,label="x")
@@ -248,7 +252,19 @@ if __name__ == "__main__":
     plt.legend()
     plt.title('obs2_z')
     plt.savefig(save_path + '/obs2_z.jpg')
+##position
 
+    plt.figure()
+    plt.plot(time_plt[0,:],observation[0,:]*MAX_XY,label="x")
+    plt.plot(time_plt[0,:],observation[1,:]*MAX_XY,label="y")
+    plt.plot(time_plt[0,:],observation[2,:]*MAX_Z,label="z")
+
+    plt.grid()
+    plt.legend()
+    plt.title('position')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Position [m]')
+    plt.savefig(save_path + '/position.jpg',dpi=600)
 ##### r\p\y
 
     plt.figure()
@@ -276,6 +292,23 @@ if __name__ == "__main__":
     plt.title('obs5_yaw')
     plt.savefig(save_path + '/obs5_yaw.jpg')
 
+
+
+### rpy and commend
+    plt.figure()
+    plt.plot(time_plt[0,:],observation[7,:]*MAX_PITCH_ROLL/math.pi*180,label="roll")
+    plt.plot(time_plt[0,:],(actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_roll")
+    plt.plot(time_plt[0,:],observation[8,:]*MAX_PITCH_ROLL/math.pi*180,label="pitch")
+    plt.plot(time_plt[0,:],(actions[2,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="command(action)_pitch")
+    plt.plot(time_plt[0,:],observation[9,:]/math.pi*180,label="yaw")
+    plt.plot(time_plt[0,:],(actions[3,:]*test_env.MAX_ROLL_PITCH/math.pi/5*180),label="command(action)_yaw")
+    
+    plt.grid()
+    plt.legend()
+    plt.title('Attitude')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Degree [deg]')
+    plt.savefig(save_path + '/attitude.jpg',dpi=600)
 ### line_v
 
     plt.figure()
@@ -285,7 +318,9 @@ if __name__ == "__main__":
     plt.grid()
     plt.legend()
     plt.title('lin_vel')
-    plt.savefig(save_path + '/lin_vel.jpg')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Velocity [m/s]')
+    plt.savefig(save_path + '/lin_vel.jpg',dpi=600)
 
 ## ang_vel
     plt.figure()
@@ -324,7 +359,9 @@ if __name__ == "__main__":
     plt.grid()
     plt.legend()
     plt.title('Force')
-    plt.savefig(save_path + '/Force.jpg')
+    plt.xlabel('Time [s]')
+    plt.ylabel('Force [N]')
+    plt.savefig(save_path + '/Force.jpg',dpi=600)
 
 ## polt the observation
 ######## xyz
