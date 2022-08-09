@@ -310,7 +310,7 @@ class BaseSingleAgentAviary(BaseAviary):
         
         obs=np.reshape(self._getDroneStateVector(0), (1, 25))
         self.obs_rms_new.update(obs)
-
+        print("the iterate is",self.iterate)
         # update running mean and standard deivation for state normalization
         if self.iterate % 10 == 0 and self.iterate <= 400:
                 self.update_rms()

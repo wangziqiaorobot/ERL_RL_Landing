@@ -62,7 +62,7 @@ if __name__ == "__main__":
     parser.add_argument('--algo',       default='sac',        type=str,             choices=['a2c', 'ppo', 'sac', 'td3', 'ddpg'],        help='RL agent (default: ppo)', metavar='')
     parser.add_argument('--obs',        default='kin',        type=ObservationType,                                                      help='Observation space (default: kin)', metavar='')
     parser.add_argument('--act',        default='ld',  type=ActionType,                                                           help='Action space (default: one_d_rpm)', metavar='')
-    parser.add_argument('--cpu',        default='10',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
+    parser.add_argument('--cpu',        default='1',          type=int,                                                                  help='Number of training environments (default: 1)', metavar='')        
     ARGS = parser.parse_args()
 
     #### Save directory ########################################
@@ -75,8 +75,8 @@ if __name__ == "__main__":
     sa_env_kwargs = dict(aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act,filepath=filename)
     # train_env = gym.make(LandingAviary, aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS, obs=ARGS.obs, act=ARGS.act) # single environment instead of a vectorized one    
     
-    if ARGS.algo == 'sac':
-        ARGS.cpu=1
+    # if ARGS.algo == 'sac':
+    #     ARGS.cpu=1
 
     train_env =make_vec_env(LandingAviary,
                                  env_kwargs=sa_env_kwargs,
@@ -157,7 +157,7 @@ if __name__ == "__main__":
                 callback=eval_callback,
                 log_interval=10,
                 )
-
+    
     #### Save the model ########################################
     model.save(filename+'/success_model.zip')
     model.policy.save(filename + "/policy.pth")

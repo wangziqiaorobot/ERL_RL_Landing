@@ -40,7 +40,7 @@ from gym_pybullet_drones.utils.Logger import Logger
 
 from gym_pybullet_drones.envs.single_agent_rl.LandingAviary import LandingAviary
 from gym_pybullet_drones.envs.single_agent_rl.BaseSingleAgentAviary import ActionType, ObservationType
-from gym_pybullet_drones.control.LandingEvaulation import evaluate_landing_policy 
+# from gym_pybullet_drones.control.LandingEvaulation import evaluate_landing_policy 
 import shared_constants
 import pandas as pd
 
