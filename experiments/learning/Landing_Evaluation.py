@@ -86,7 +86,7 @@ if __name__ == "__main__":
                      num_drones=1
                     )
     test_steps=720
-    test_iteration=100
+    test_iteration=10
     contact_time_total=0
     x_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
     y_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
                 print("test_env.lateralFriction:",test_env.lateralFriction)
                 print("normal force:",infos[27,i],infos[28,i],infos[29,i], np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]))
-                if infos[27,i]*(test_env.lateralFriction+0.5/2) < np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]) :
+                if infos[27,i]*(test_env.lateralFriction+0.5/2) == np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]) :
                     slippage_counter=slippage_counter+1
 
 
