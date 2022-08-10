@@ -175,11 +175,11 @@ if __name__ == "__main__":
                 z_final=infos[10,i]
 
                 F_z[0,(Contact_start_timestep-1)]=infos[26,i]
-
+                mu=(test_env.lateralFriction+0.5/2)
 
                 print("test_env.lateralFriction:",test_env.lateralFriction)
                 print("normal force:",infos[27,i],infos[28,i],infos[29,i], np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]))
-                if infos[27,i]*(test_env.lateralFriction+0.5/2) == np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]) :
+                if infos[27,i]*mu < np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i])+0.0001 :
                     slippage_counter=slippage_counter+1
 
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
         x_stability[0,j]=np.sqrt(np.mean(x_displacement))
         y_stability[0,j]=np.sqrt(np.mean(y_displacement))
         z_push[0,j]=z_final-z_pos_after_contact[0][0]
-        slippage[0,j]=slippage_counter/contact_time
+        slippage[0,j]=1-slippage_counter/contact_time
         success_rate[0,j]=contact_time/480
         Landing_time=Landing_timestep*test_env.AGGR_PHY_STEPS/240
         print("---------------------Iteration",j,"-----------------")
