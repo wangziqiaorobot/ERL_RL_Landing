@@ -74,10 +74,10 @@ if __name__ == "__main__":
 
         ###########
         weight = ARGS.exp+"/tb/SAC_1/Policy/iter_{0:05d}.pth".format(ARGS.iter)
-        # env_rms="/home/ziqiao/RL/ERL_RL_Landing/experiments/learning/results/save-landing-sac-kin-ld-07.13.2022_23.20.06/RMS/iter_20.npz"
-        env_rms =ARGS.exp+"/RMS/iter_{0:05d}.npz".format(ARGS.iter)
-        print("weight",weight)
-        print("rms",env_rms)
+        # # env_rms="/home/ziqiao/RL/ERL_RL_Landing/experiments/learning/results/save-landing-sac-kin-ld-07.13.2022_23.20.06/RMS/iter_20.npz"
+        # env_rms =ARGS.exp+"/RMS/iter_{0:05d}.npz".format(ARGS.iter)
+        # print("weight",weight)
+        # print("rms",env_rms)
 
         if torch.cuda.is_available():
             device = "cuda:0"
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # policy = torch.jit.trace(policy, dummy_inputs)
     # print("torch.jit policy",policy)
 
-    test_env.load_rms(env_rms)
+    # test_env.load_rms(env_rms)
     #############
     obs = test_env.reset()
    
