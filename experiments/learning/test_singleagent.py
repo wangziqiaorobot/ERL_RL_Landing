@@ -187,7 +187,7 @@ if __name__ == "__main__":
     ############### Plot the states & actions
     save_path = os.path.join(ARGS.exp)
     plt.figure()
-    plt.plot(time_plt[0,:],test_env.GRAVITY*(0.1*actions[0,:]+1),label="thrust")
+    plt.plot(time_plt[0,:],test_env.MAX_THRUST*(actions[0,:]+1)/2,label="thrust")
     #plt.plot((actions[0,:]),label="b")
     plt.grid()
     plt.legend()
