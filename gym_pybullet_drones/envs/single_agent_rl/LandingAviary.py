@@ -277,6 +277,21 @@ class LandingAviary(BaseSingleAgentAviary):
         normal_force=self.force_contact_world[0]
         lateralFriction1=self.force_contact_world[1]
         lateralFriction2=self.force_contact_world[2]
+        
+        rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
+            # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
+            # print('the Fz is',self.Fcontact[2])
+            # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
+            # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
+        print(rot_mat)
+        print(rot_mat.T)
+        Rthrust=np.dot(rot_mat,[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]
+        # Rthrust=(rot_mat*[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]
+        # RFz=np.dot(rot_mat.T,self.Fcontact)[2] #self.Fcontact[2]
+        # RFz=(rot_mat*self.Fcontact)[2] #self.Fcontact[2]
+        # Rthrust=np.dot(rot_mat.T,[0,0,self.GRAVITY])[2]
+        RFz=self.Fcontact[2]
+
         info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward,
                          Pos_x,Pos_y,Pos_z,
                          Rpy_r,Rpy_p,Rpy_y,
@@ -284,7 +299,8 @@ class LandingAviary(BaseSingleAgentAviary):
                          W_x,W_y,W_z,
                          Action_1,Action_2,Action_3,Action_4,
                          F_x,F_y,F_z,
-                         normal_force,lateralFriction1,lateralFriction2
+                         normal_force,lateralFriction1,lateralFriction2,
+                         Rthrust,RFz
         ])
         return info #{"answer": 42} #info
     ################################################################################

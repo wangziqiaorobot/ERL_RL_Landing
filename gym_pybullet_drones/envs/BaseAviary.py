@@ -364,8 +364,9 @@ class BaseAviary(gym.Env):
             #         self._physics(clipped_action[i, :], i)
             #     elif self.PHYSICS == Physics.DYN:
             #         self._dynamics(clipped_action[i, :], i)
-                
             
+           
+
             #### PyBullet computes the new state, unless Physics.DYN， Dyn will computes the state by a hand write lib ###
             # p.stepSimulation(physicsClientId=self.CLIENT)
             # if self.PHYSICS != Physics.DYN:
@@ -387,7 +388,7 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,1,1,20]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=[0,0.08,1,0,100,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
             # pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
@@ -439,7 +440,7 @@ class BaseAviary(gym.Env):
 
             if len(L) !=0 :
                 
-                #contact point
+                #contact point/ pybullet can not draw a point, so draw a short line here
                 p.addUserDebugLine(     lineFromXYZ=L[0][6],
                                         lineToXYZ=(L[0][6][0]+0.01,L[0][6][1],L[0][6][2]),
                                         lineColorRGB=[1, 0, 0],
@@ -489,7 +490,10 @@ class BaseAviary(gym.Env):
                 #                         # lifeTime=0.5,
                 #                         physicsClientId=self.CLIENT
                 #                                         )
-                contact_start=L[0][6]
+                contact_start=L[0][6] #contact points on drone 
+                #L13 lateralFrictionDir2  L12 lateralFriction2;
+                #L11 lateralFrictionDir1  L10 lateralFriction1;
+                #L7 normal force          L9 normal force;
                 contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9]),L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9]),L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9]))
                 # print(contact_start+self.pos[0, :],contact_end)
                 ###move the force from the contact point to the center of mass
@@ -523,6 +527,22 @@ class BaseAviary(gym.Env):
                                                       )
             else:
                 self.Fcontact= np.zeros(3) ### set the contact force to zero if there if no contact##
+            
+             #T + F_z = R^T *mg 
+            
+            rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
+            # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
+            # print('the Fz is',self.Fcontact[2])
+            # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
+            # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
+
+
+            print('R*thrust is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            print('R*Fz is',np.dot(rot_mat,self.Fcontact))
+            print('mg', [0,0,self.GRAVITY])
+            print('F+T',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+
+
             # print("contact force:", self.Fcontact,self.Fcontact[1])
             # print("wall clock",time.time()-self.RESET_TIME,"sim time:",self.step_counter*self.TIMESTEP)
 
@@ -659,7 +679,7 @@ class BaseAviary(gym.Env):
         #                                 np.array([float(0)]), \
         #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
         #### Initialize the branch friction friction coefficient ##########
-        self.lateralFriction=float(np.random.uniform(0.5,1))
+        self.lateralFriction=float(np.random.uniform(0.8,0.1))
         # self.lateralFriction=0.1
         #### Initialize the drones contact force information ##########
         self.Fcontact= np.zeros(3)
@@ -676,7 +696,7 @@ class BaseAviary(gym.Env):
         # np.random.uniform(5,1000),##random p value in z-axis
         # np.random.uniform(0.5,1),##random d value in z-axis
         # np.random.uniform(3,10)]##random max_force
-        self.pd4branch=[0,0.08,1,0,1,1,5]
+        self.pd4branch=[0,0.08,1,0,100,1,5]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 
