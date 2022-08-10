@@ -160,8 +160,8 @@ if __name__ == "__main__":
     time_plt = np.zeros(
         shape=(1, test_steps), dtype=np.float32)
     infos = np.zeros(
-        shape=(30, test_steps), dtype=np.float32)
-    for i in range(720):
+        shape=(32, test_steps), dtype=np.float32)
+    for i in range(400):
         
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'
@@ -185,6 +185,8 @@ if __name__ == "__main__":
     #     print(data['ep_lengths'])
     
     ############### Plot the states & actions
+   
+   
     save_path = os.path.join(ARGS.exp)
     plt.figure()
     plt.plot(time_plt[0,:],test_env.MAX_THRUST*(actions[0,:]+1)/2,label="thrust")
@@ -192,8 +194,29 @@ if __name__ == "__main__":
     plt.grid()
     plt.legend()
     plt.title('action0_thrust')
+    
     plt.savefig(save_path + '/action0_thrust.jpg')
     
+    # print(infos[31,:])
+    # print(infos[30,:])
+    # plt.figure()
+    # plt.plot(time_plt[0,:], test_env.MAX_THRUST*(actions[0,:]+1)/2+infos[31,:]-infos[30,:])
+    # #plt.plot((actions[0,:]),label="b")
+    # plt.grid()
+    # plt.legend()
+    # plt.title('R*T+R*F_z-G')
+    # plt.savefig(save_path + '/test.jpg')
+    print(infos[31,:])
+    print(infos[30,:])
+    plt.figure()
+    plt.plot(time_plt[0,:],-test_env.GRAVITY+infos[31,:]+infos[30,:])
+    #plt.plot((actions[0,:]),label="b")
+    plt.grid()
+    plt.legend()
+    plt.title('R*T+R*F_z-G')
+    plt.savefig(save_path + '/test.jpg')
+
+
     plt.figure()
     # plt.plot(test_env.MAX_THRUST/2*(actions[1,:]*0.05+1),label="roll")
     plt.plot(time_plt[0,:],(actions[1,:]*test_env.MAX_ROLL_PITCH/math.pi*180),label="roll")
