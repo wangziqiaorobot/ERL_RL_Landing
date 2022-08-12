@@ -193,6 +193,7 @@ class BaseMultiagentAviary(BaseAviary, MultiAgentEnv):
 
         """
         rpm = np.zeros((self.NUM_DRONES,4))
+        self.A = np.array([ [1, 1, 1, 1], [1/np.sqrt(2), 1/np.sqrt(2), -1/np.sqrt(2), -1/np.sqrt(2)], [-1/np.sqrt(2), 1/np.sqrt(2), 1/np.sqrt(2), -1/np.sqrt(2)], [-1, 1, -1, 1] ])
         for k, v in action.items():
             if self.ACT_TYPE == ActionType.RPM: 
                 rpm[int(k),:] = np.array(self.HOVER_RPM * (1+0.05*v))

@@ -315,34 +315,10 @@ class BaseAviary(gym.Env):
         """
         
         
-
+        #save the current action
         self.current_action = action
 
-        #### Read the GUI's input parameters #######################
-        if self.GUI and self.USER_DEBUG:
-            current_input_switch = p.readUserDebugParameter(self.INPUT_SWITCH, physicsClientId=self.CLIENT)
-            if current_input_switch > self.last_input_switch:
-                self.last_input_switch = current_input_switch
-                self.USE_GUI_RPM = True if self.USE_GUI_RPM == False else False
-        if self.USE_GUI_RPM:
-            for i in range(4):
-                self.gui_input[i] = p.readUserDebugParameter(int(self.SLIDERS[i]), physicsClientId=self.CLIENT)
-            clipped_action = np.tile(self.gui_input, (self.NUM_DRONES, 1))
-            if self.step_counter%(self.SIM_FREQ/2) == 0:
-                self.GUI_INPUT_TEXT = [p.addUserDebugText("Using GUI RPM",
-                                                          textPosition=[0, 0, 0],
-                                                          textColorRGB=[1, 0, 0],
-                                                          lifeTime=1,
-                                                          textSize=2,
-                                                          parentObjectUniqueId=self.DRONE_IDS[i],
-                                                          parentLinkIndex=-1,
-                                                          replaceItemUniqueId=int(self.GUI_INPUT_TEXT[i]),
-                                                          physicsClientId=self.CLIENT
-                                                          ) for i in range(self.NUM_DRONES)]
-        #### Save, preprocess, and clip the action to the max. RPM #
-        # else:
-            # self._saveLastAction(action)
-            # clipped_action = np.reshape(self._preprocessAction(action), (self.NUM_DRONES, 4))
+        
        
         #### Repeat for as many as the aggregate physics steps #####
         for _ in range(self.AGGR_PHY_STEPS):
@@ -429,7 +405,7 @@ class BaseAviary(gym.Env):
             p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
             # print("drone friction", p.getDynamicsInfo(self.DRONE_IDS[0],-1)) # the drone firction coff is 0.5
-            # print(L)
+            print(L)
             
             # print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
             # P=p.getContactPoints((self.tree))
@@ -493,7 +469,10 @@ class BaseAviary(gym.Env):
                 contact_start=L[0][6] #contact points on drone 
                 #L13 lateralFrictionDir2  L12 lateralFriction2;
                 #L11 lateralFrictionDir1  L10 lateralFriction1;
-                #L7 normal force          L9 normal force;
+                #L7 normal forceDir          L9 normal force;
+                
+                forcedir=(L[0][6][0]-L[0][5][0],L[0][6][1]-L[0][5][1],L[0][6][2]-L[0][5][2])
+                print('test dir',forcedir/ np.sqrt(forcedir[0]*forcedir[0]+forcedir[1]*forcedir[1]+forcedir[2]*forcedir[2]))
                 contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9]),L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9]),L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9]))
                 # print(contact_start+self.pos[0, :],contact_end)
                 ###move the force from the contact point to the center of mass
@@ -509,8 +488,9 @@ class BaseAviary(gym.Env):
 
                 rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
 
-                
+                #-np.array(contact_start)+self.pos[0, :]
                 contact_r_frame=  np.dot(rot_mat.T,(np.array(contact_end)-np.array(contact_start)+self.pos[0, :]))-np.dot(rot_mat.T,self.pos[0, :]) 
+                # contact_r_frame=  np.dot(rot_mat.T,(np.array(contact_end)))-np.dot(rot_mat.T,L[0][6]) 
                 # print("in robot frame:",contact_r_frame,type(self.Fcontact),type(contact_r_frame))
                 self.Fcontact=contact_r_frame
                 
@@ -536,11 +516,13 @@ class BaseAviary(gym.Env):
             # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
             # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
 
-
-            print('R*thrust is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
-            print('R*Fz is',np.dot(rot_mat,self.Fcontact))
+            print('the force applyed on the drone in world frame:',np.dot(rot_mat,[0,0,np.sum(self.applyedforce)]))
+            print('thrust world frame is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            print('thrust in robot fame is',([0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            print('F_contact in world frame is',np.dot(rot_mat,self.Fcontact))
+            print('F_contact in robot frame is',(self.Fcontact))
             print('mg', [0,0,self.GRAVITY])
-            print('F+T',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            print('(F+T) in world fame',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
 
 
             # print("contact force:", self.Fcontact,self.Fcontact[1])
@@ -684,6 +666,7 @@ class BaseAviary(gym.Env):
         #### Initialize the drones contact force information ##########
         self.Fcontact= np.zeros(3)
         self.force_contact_world=np.zeros(3)
+        self.applyedforce=np.zeros(4)
 
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
@@ -945,9 +928,12 @@ class BaseAviary(gym.Env):
 
         """
         forces = np.array(rpm**2)*self.KF
+        self.applyedforce=forces
+        print("the real force:",forces)
         torques = np.array(rpm**2)*self.KM
         z_torque = (-torques[0] + torques[1] - torques[2] + torques[3])
         for i in range(4):
+
             p.applyExternalForce(self.DRONE_IDS[nth_drone],
                                  i,
                                  forceObj=[0, 0, forces[i]],

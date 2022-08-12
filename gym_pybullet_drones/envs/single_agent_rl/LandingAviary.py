@@ -283,15 +283,16 @@ class LandingAviary(BaseSingleAgentAviary):
             # print('the Fz is',self.Fcontact[2])
             # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
             # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
-        print(rot_mat)
-        print(rot_mat.T)
-        Rthrust=np.dot(rot_mat,[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]
+        
+
+        Rthrust=np.dot(rot_mat,[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]#np.dot(rot_mat,[0,0,np.sum(self.applyedforce)])[2]#
         # Rthrust=(rot_mat*[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]
         # RFz=np.dot(rot_mat.T,self.Fcontact)[2] #self.Fcontact[2]
         # RFz=(rot_mat*self.Fcontact)[2] #self.Fcontact[2]
         # Rthrust=np.dot(rot_mat.T,[0,0,self.GRAVITY])[2]
         RFz=self.Fcontact[2]
-
+        lateralFriction1=np.sum(self.applyedforce)
+        
         info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward,
                          Pos_x,Pos_y,Pos_z,
                          Rpy_r,Rpy_p,Rpy_y,

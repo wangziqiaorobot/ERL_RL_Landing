@@ -190,6 +190,7 @@ if __name__ == "__main__":
     save_path = os.path.join(ARGS.exp)
     plt.figure()
     plt.plot(time_plt[0,:],test_env.MAX_THRUST*(actions[0,:]+1)/2,label="thrust")
+    plt.plot(time_plt[0,:],infos[28,:],label="real_force")
     #plt.plot((actions[0,:]),label="b")
     plt.grid()
     plt.legend()
