@@ -78,7 +78,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
         """
         state = self._getDroneStateVector(0)  ###  self._computeObs() need or not???
-        diff_act= self.current_action-state[16:20]
+        diff_act= self.current_action-state[18:22]
 
         time=self.step_counter*self.TIMESTEP
         p.performCollisionDetection(physicsClientId=self.CLIENT)
@@ -113,7 +113,7 @@ class LandingAviary(BaseSingleAgentAviary):
 
         #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
-        if (state[22]) >0: #if have contact np.linalg.norm(state[22]) >0: 
+        if (state[24]) >0: #if have contact np.linalg.norm(state[22]) >0: 
             contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
             self.bool_contact_history=True
         if  self.bool_contact_history==True:
@@ -123,9 +123,9 @@ class LandingAviary(BaseSingleAgentAviary):
         #     contactReward=time*-0.02
         #     balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
 
-        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-state[7:10])**6)-1)
-        linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[10:13])**4)-1)
-        angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)
+        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-[self.rpy[0][0],self.rpy[0][1],self.rpy[0][2]])**6)-1)
+        linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[12:15])**4)-1)
+        angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[15:18])**4)-1)
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
         actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3])**2
         if len(L) !=0:
@@ -315,12 +315,12 @@ class LandingAviary(BaseSingleAgentAviary):
         Parameters
         ----------
         state : ndarray
-            (20,)-shaped array of floats containing the non-normalized state of a single drone.
+            (25,)-shaped array of floats containing the non-normalized state of a single drone.
 
         Returns
         -------
         ndarray
-            (20,)-shaped array of floats containing the normalized state of a single drone.
+            (25,)-shaped array of floats containing the normalized state of a single drone.
 
         """
         MAX_LIN_VEL_XY = 2 
@@ -337,41 +337,39 @@ class LandingAviary(BaseSingleAgentAviary):
 
         clipped_pos_xy = np.clip(state[0:2], -MAX_XY, MAX_XY)
         clipped_pos_z = np.clip(state[2], 0, MAX_Z)
-        clipped_rp = np.clip(state[7:9], -MAX_PITCH_ROLL, MAX_PITCH_ROLL)
-        clipped_vel_xy = np.clip(state[10:12], -MAX_LIN_VEL_XY, MAX_LIN_VEL_XY)
-        clipped_vel_z = np.clip(state[12], -MAX_LIN_VEL_Z, MAX_LIN_VEL_Z)
-        clipped_F_xy_External=np.clip(state[20:22],-MAX_F_XY, MAX_F_XY)
-        clipped_F_z_External=np.clip(state[22],-MAX_F_Z, MAX_F_Z)
+        # clipped_rp = np.clip(state[7:9], -MAX_PITCH_ROLL, MAX_PITCH_ROLL)
+        clipped_vel_xy = np.clip(state[12:14], -MAX_LIN_VEL_XY, MAX_LIN_VEL_XY)
+        clipped_vel_z = np.clip(state[14], -MAX_LIN_VEL_Z, MAX_LIN_VEL_Z)
+        clipped_F_xy_External=np.clip(state[22:24],-MAX_F_XY, MAX_F_XY)
+        clipped_F_z_External=np.clip(state[24],-MAX_F_Z, MAX_F_Z)
         if self.GUI:
             self._clipAndNormalizeStateWarning(state,
                                                clipped_pos_xy,
                                                clipped_pos_z,
-                                               clipped_rp,
+                                            #    clipped_rp,
                                                clipped_vel_xy,
                                                clipped_vel_z
                                                )
 
         normalized_pos_xy = clipped_pos_xy / MAX_XY
         normalized_pos_z = clipped_pos_z / MAX_Z
-        normalized_rp = clipped_rp / MAX_PITCH_ROLL      
-        normalized_y =  state[9]  #state[9] / np.pi # No reason to clip
+        # normalized_rp = clipped_rp / MAX_PITCH_ROLL      
+        # normalized_y =  state[9]  #state[9] / np.pi # No reason to clip
         normalized_vel_xy = clipped_vel_xy / MAX_LIN_VEL_XY
         normalized_vel_z = clipped_vel_z / MAX_LIN_VEL_XY
-        normalized_ang_vel = state[13:16]/np.linalg.norm(state[13:16]) if np.linalg.norm(state[13:16]) != 0 else state[13:16]
+        normalized_ang_vel = state[15:18]/np.linalg.norm(state[15:18]) if np.linalg.norm(state[13:16]) != 0 else state[15:18]
         normalized_fxy_external= clipped_F_xy_External/MAX_F_XY
         normalized_fz_external= clipped_F_z_External/MAX_F_Z
         norm_and_clipped = np.hstack([normalized_pos_xy,
                                       normalized_pos_z,
-                                      state[3:7],
-                                      normalized_rp,
-                                      normalized_y,
+                                      state[3:12],
                                       normalized_vel_xy,
                                       normalized_vel_z,
                                       normalized_ang_vel,
-                                      state[16:20],
+                                      state[18:22],
                                       normalized_fxy_external,
                                       normalized_fz_external
-                                      ]).reshape(23,)
+                                      ]).reshape(25,)
         
 
 
@@ -398,11 +396,11 @@ class LandingAviary(BaseSingleAgentAviary):
             print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped xy position [{:.2f} {:.2f}]".format(state[0], state[1]))
         if not(clipped_pos_z == np.array(state[2])).all():
             print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped z position [{:.2f}]".format(state[2]))
-        if not(clipped_rp == np.array(state[7:9])).all():
-            print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped roll/pitch [{:.2f} {:.2f}]".format(state[7], state[8]))
-        if not(clipped_vel_xy == np.array(state[10:12])).all():
-            print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped xy velocity [{:.2f} {:.2f}]".format(state[10], state[11]))
-        if not(clipped_vel_z == np.array(state[12])).all():
-            print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped z velocity [{:.2f}]".format(state[12]))
+        # if not(clipped_rp == np.array(state[7:9])).all():
+        #     print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped roll/pitch [{:.2f} {:.2f}]".format(state[9], state[8]))
+        if not(clipped_vel_xy == np.array(state[12:14])).all():
+            print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped xy velocity [{:.2f} {:.2f}]".format(state[12], state[13]))
+        if not(clipped_vel_z == np.array(state[14])).all():
+            print("[WARNING] it", self.step_counter, "in LandingAviary._clipAndNormalizeState(), clipped z velocity [{:.2f}]".format(state[14]))
 
     

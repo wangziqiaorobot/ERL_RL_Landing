@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
 
     if ARGS.algo == 'sac':
-        ARGS.cpu=1
+        ARGS.cpu=10
 
     #### Warning ###############################################
 
@@ -127,7 +127,6 @@ if __name__ == "__main__":
                                                                   tensorboard_log=filename+'/tb/',
                                                                   verbose=1
                                                                   )
-
     if ARGS.algo == 'sac':
         model = SAC(sacMlpPolicy,
                     train_env,

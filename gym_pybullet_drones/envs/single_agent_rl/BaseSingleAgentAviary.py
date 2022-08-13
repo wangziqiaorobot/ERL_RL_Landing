@@ -251,7 +251,7 @@ class BaseSingleAgentAviary(BaseAviary):
             
         targettorque, rpm = self.ctrl._simplePIDAttitudeControl(control_timestep=self.TIMESTEP, 
                                                 thrust=self.MAX_THRUST/2*(action[0]+1), #gravity:4.9; thrust :9.8,   self.MAX_THRUST/2*(action[0]+1) ;;;self.GRAVITY*(1+0.1*action[0])
-                                                cur_quat=state[3:7],
+                                                cur_quat=self.quat[0],
                                             #  target_rpy=np.array([action[1]/10,action[2]/10,action[3]/10])
                                                 target_rpy=np.array([action[1]*self.MAX_ROLL_PITCH,action[2]*self.MAX_ROLL_PITCH,action[3]*self.MAX_ROLL_PITCH/5]) #MAX_ROLL_PITCH=30 deg
                                                 )
@@ -278,10 +278,10 @@ class BaseSingleAgentAviary(BaseAviary):
                               )
         elif self.OBS_TYPE == ObservationType.KIN:
             ############################################################
-            #### OBS OF SIZE 23 (WITH QUATERNION AND RPMS)
-            #### Observation vector ### X        Y        Z       Q1   Q2   Q3   Q4   R       P       Y       VX       VY       VZ       WX       WY       WZ       A0            A1            A2            A3        F_ex        F_ey         F_ez
-            obs_lower_bound = np.array([-1,      -1,      0,      -1,  -1,  -1,  -1,  -1,     -1,     -1,     -1,      -1,      -1,      -1,      -1,      -1,      -1,           -1,           -1,           -1,       -1,            -1,        -1])
-            obs_upper_bound = np.array([1,       1,       1,      1,   1,   1,   1,   1,      1,      1,      1,       1,       1,       1,       1,       1,       1,            1,            1,            1,         1,            1,        1])          
+            #### OBS OF SIZE 25 (WITH Rotation matrix)
+            #### Observation vector ### X        Y        Z       M1   M2   M3   M4   M5       M6      M7    M8    M9     VX       VY       VZ       WX       WY       WZ       A0            A1            A2            A3        F_ex        F_ey         F_ez
+            obs_lower_bound = np.array([-1,      -1,      0,      -1,  -1,  -1,  -1,  -1,     -1,     -1,   -1,    -1,    -1,      -1,      -1,      -1,      -1,      -1,      -1,           -1,           -1,           -1,       -1,            -1,        -1])
+            obs_upper_bound = np.array([1,       1,       1,       1,   1,   1,   1,   1,      1,      1,    1,     1,     1,       1,       1,       1,       1,       1,       1,            1,            1,            1,         1,            1,        1])       
             return spaces.Box( low=obs_lower_bound, high=obs_upper_bound, dtype=np.float32 )
             ############################################################
             #### OBS SPACE OF SIZE 12
