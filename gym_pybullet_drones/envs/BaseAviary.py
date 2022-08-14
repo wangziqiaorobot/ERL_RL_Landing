@@ -227,12 +227,12 @@ class BaseAviary(gym.Env):
                                                             )
         #### Set initial poses #####################################
         if initial_xyzs is None:
-            # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-            #                             np.array([float(np.random.uniform(-0.1,0.1))]), \
-            #                             np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.5))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+            # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+            #                             np.array([float(np.random.uniform(-0.1,0.1))]), \
+            #                             np.ones(self.NUM_DRONES) *float(np.random.uniform(2.5))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             # self.INIT_XYZS = np.vstack([np.array([0]), \
             #                             np.array([0]), \
             #                             np.ones(self.NUM_DRONES) *2.6]).transpose().reshape(self.NUM_DRONES, 3)
@@ -364,8 +364,8 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,100,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
-            # pd4branch=self.pd4branch
+            # pd4branch=[0,0.08,1,0,100,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
             p_joint1=float(pd4branch[1])
@@ -510,19 +510,19 @@ class BaseAviary(gym.Env):
             
              #T + F_z = R^T *mg 
             
-            rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
-            # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
-            # print('the Fz is',self.Fcontact[2])
-            # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
-            # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
+            # rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
+            # # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
+            # # print('the Fz is',self.Fcontact[2])
+            # # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
+            # # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
 
-            print('the force applyed on the drone in world frame:',np.dot(rot_mat,[0,0,np.sum(self.applyedforce)]))
-            print('thrust world frame is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
-            print('thrust in robot fame is',([0,0,self.MAX_THRUST*(action[0]+1)/2]))
-            print('F_contact in world frame is',np.dot(rot_mat,self.Fcontact))
-            print('F_contact in robot frame is',(self.Fcontact))
-            print('mg', [0,0,self.GRAVITY])
-            print('(F+T) in world fame',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            # print('the force applyed on the drone in world frame:',np.dot(rot_mat,[0,0,np.sum(self.applyedforce)]))
+            # print('thrust world frame is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            # print('thrust in robot fame is',([0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            # print('F_contact in world frame is',np.dot(rot_mat,self.Fcontact))
+            # print('F_contact in robot frame is',(self.Fcontact))
+            # print('mg', [0,0,self.GRAVITY])
+            # print('(F+T) in world fame',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
 
 
             # print("contact force:", self.Fcontact,self.Fcontact[1])
@@ -651,13 +651,13 @@ class BaseAviary(gym.Env):
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
         #### Random Initialize the drones position information ##########
-        # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)
-
         self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)
+
+        # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+        #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
+        #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
         # self.INIT_XYZS = np.vstack([np.array([float(0)]), \
         #                                 np.array([float(0)]), \
         #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
@@ -672,15 +672,15 @@ class BaseAviary(gym.Env):
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### reset the branch parameter
-        # self.pd4branch=[ 
-        # np.random.uniform(-0.01,0.01),##random pos value in x-axis,
-        # np.random.uniform(0.02,0.1),##random p value in x-axis,
-        # np.random.uniform(0.8,1.2),##random d value in x-axis,
-        # np.random.uniform(-0.05,0.05), ##random pos in z-axis
-        # np.random.uniform(5,1000),##random p value in z-axis
-        # np.random.uniform(0.5,1),##random d value in z-axis
-        # np.random.uniform(3,10)]##random max_force
-        self.pd4branch=[0,0.08,1,0,100,1,5]
+        self.pd4branch=[ 
+        np.random.uniform(-0.01,0.01),##random pos value in x-axis,
+        np.random.uniform(0.02,0.1),##random p value in x-axis,
+        np.random.uniform(0.8,1.2),##random d value in x-axis,
+        np.random.uniform(-0.05,0.05), ##random pos in z-axis
+        np.random.uniform(5,1000),##random p value in z-axis
+        np.random.uniform(0.5,1),##random d value in z-axis
+        np.random.uniform(3,15)]##random max_force
+        # self.pd4branch=[0,0.08,1,0,100,1,5]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 

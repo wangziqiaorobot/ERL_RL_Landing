@@ -54,8 +54,8 @@ class SimplePIDControl(BaseControl):
         # self.MAX_THRUST = (4*self.KF*self.MAX_RPM**2)
         self.MAX_XY_TORQUE = (self.L*self.KF*self.MAX_RPM**2)*3#*14
         self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)#*14
-        # self.A = np.array([ [1, 1, 1, 1], [0, 1, 0, -1], [-1, 0, 1, 0], [-1, 1, -1, 1] ])
-        self.A =np.array([ [1, 1, 1, 1], [1/np.sqrt(2), 1/np.sqrt(2), -1/np.sqrt(2), -1/np.sqrt(2)], [-1/np.sqrt(2), 1/np.sqrt(2), 1/np.sqrt(2), -1/np.sqrt(2)], [-1, 1, -1, 1] ])
+        self.A = np.array([ [1, 1, 1, 1], [0, 1, 0, -1], [-1, 0, 1, 0], [-1, 1, -1, 1] ])
+        # self.A =np.array([ [1, 1, 1, 1], [1/np.sqrt(2), 1/np.sqrt(2), -1/np.sqrt(2), -1/np.sqrt(2)], [-1/np.sqrt(2), 1/np.sqrt(2), 1/np.sqrt(2), -1/np.sqrt(2)], [-1, 1, -1, 1] ])
         self.INV_A = np.linalg.inv(self.A)
         self.B_COEFF = np.array([1/self.KF, 1/(self.KF*self.L), 1/(self.KF*self.L), 1/self.KM])
         self.reset()
