@@ -91,20 +91,21 @@ class LandingAviary(BaseSingleAgentAviary):
         ########### for the landing task ############# 
         # L_vel + W_vel + Contact_force + energy_consanpution
         
-        balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-        slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
+        balancingRewardCoeff=-0.01#/(time+0.5)#0.001*(time);0.01
+        slippageRewardCoeff=-0.12#*time#0.8;0.5;0.3
         # contactRewardCoeff=0.01*time
-        linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
-        angulervelocityRewardCoeff=0.003#*time
-        actionsmoothRewardCoeff=-0.01
-        actionlimitRewardCoeff=-0.00001#*time
-        contactgroundRewardCoeff=-0.00001
-        contactReward=-0.009#-0.018#*time
+        linearvelocityRewardCoeff=-0.025 #0.05#0.03/(time+0.5)
+        angulervelocityRewardCoeff=-0.0003#*time
+        actionsmoothRewardCoeff=-0.001
+        actionlimitRewardCoeff=-0.000001#*time
+        contactgroundRewardCoeff=-0.000001
+        contactReward=-0.0009#-0.018#*time
+        ref_vz=-0.15
           
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
         else:
-            slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**8)-1) ##^14
+            slippageReward=slippageRewardCoeff* ( np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**2) ##^14
         # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
         # if state[23]==0:
         
@@ -113,21 +114,22 @@ class LandingAviary(BaseSingleAgentAviary):
 
         #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
-        if (state[24]) >0: #if have contact np.linalg.norm(state[22]) >0: 
-            contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
+        if (state[24]) >0.3: #if have contact np.linalg.norm(state[22]) >0: 
+            contactReward=1   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
             self.bool_contact_history=True
         if  self.bool_contact_history==True:
-            balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
+            balancingRewardCoeff = balancingRewardCoeff*(0.01)
+            ref_vz=0
 
         # else:
         #     contactReward=time*-0.02
         #     balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
 
-        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-[self.rpy[0][0],self.rpy[0][1],self.rpy[0][2]])**6)-1)
-        linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[12:15])**4)-1)
-        angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[15:18])**4)-1)
+        balancingReward=balancingRewardCoeff*( np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-[self.rpy[0][0],self.rpy[0][1],self.rpy[0][2]])**2)
+        linearvelocityReward=linearvelocityRewardCoeff*( np.linalg.norm(np.array([0, 0, ref_vz])-state[12:15])**2)
+        angulervelocityReward=angulervelocityRewardCoeff*(np.linalg.norm(np.array([0, 0,0])-state[15:18])**2)
         actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
-        actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3])**2
+        actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3]-self.GRAVITY)**2
         if len(L) !=0:
             contactgroundReward=-(10)
             print("fall down to the ground")
