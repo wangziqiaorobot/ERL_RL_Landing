@@ -357,6 +357,7 @@ class LandingAviary(BaseSingleAgentAviary):
         # normalized_y =  state[9]  #state[9] / np.pi # No reason to clip
         normalized_vel_xy = clipped_vel_xy / MAX_LIN_VEL_XY
         normalized_vel_z = clipped_vel_z / MAX_LIN_VEL_XY
+        normalized_rotation=state[3:12]/np.linalg.norm(state[3:12]) if np.linalg.norm(state[3:12]) != 0 else state[3:12]
         normalized_ang_vel = state[15:18]/np.linalg.norm(state[15:18]) if np.linalg.norm(state[13:16]) != 0 else state[15:18]
         normalized_fxy_external= clipped_F_xy_External/MAX_F_XY
         normalized_fz_external= clipped_F_z_External/MAX_F_Z

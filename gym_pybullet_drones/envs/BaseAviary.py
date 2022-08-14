@@ -679,7 +679,7 @@ class BaseAviary(gym.Env):
         np.random.uniform(-0.05,0.05), ##random pos in z-axis
         np.random.uniform(5,1000),##random p value in z-axis
         np.random.uniform(0.5,1),##random d value in z-axis
-        np.random.uniform(3,15)]##random max_force
+        np.random.uniform(3,20)]##random max_force
         # self.pd4branch=[0,0.08,1,0,100,1,5]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
