@@ -405,7 +405,7 @@ class BaseAviary(gym.Env):
             p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
             # print("drone friction", p.getDynamicsInfo(self.DRONE_IDS[0],-1)) # the drone firction coff is 0.5
-            print(L)
+            # print(L)
             
             # print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
             # P=p.getContactPoints((self.tree))
@@ -472,7 +472,7 @@ class BaseAviary(gym.Env):
                 #L7 normal forceDir          L9 normal force;
                 
                 forcedir=(L[0][6][0]-L[0][5][0],L[0][6][1]-L[0][5][1],L[0][6][2]-L[0][5][2])
-                print('test dir',forcedir/ np.sqrt(forcedir[0]*forcedir[0]+forcedir[1]*forcedir[1]+forcedir[2]*forcedir[2]))
+                # print('test dir',forcedir/ np.sqrt(forcedir[0]*forcedir[0]+forcedir[1]*forcedir[1]+forcedir[2]*forcedir[2]))
                 contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9]),L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9]),L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9]))
                 # print(contact_start+self.pos[0, :],contact_end)
                 ###move the force from the contact point to the center of mass
@@ -680,7 +680,7 @@ class BaseAviary(gym.Env):
         # np.random.uniform(5,1000),##random p value in z-axis
         # np.random.uniform(0.5,1),##random d value in z-axis
         # np.random.uniform(3,20)]##random max_force
-        self.pd4branch=[0,0.08,1,0,100,1,5]
+        self.pd4branch=[0,0.08,1,0,100,1,15]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 
@@ -929,7 +929,7 @@ class BaseAviary(gym.Env):
         """
         forces = np.array(rpm**2)*self.KF
         self.applyedforce=forces
-        print("the real force:",forces)
+        # print("the real force:",forces)
         torques = np.array(rpm**2)*self.KM
         z_torque = (-torques[0] + torques[1] - torques[2] + torques[3])
         for i in range(4):
