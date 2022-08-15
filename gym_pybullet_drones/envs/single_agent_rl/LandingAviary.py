@@ -426,10 +426,6 @@ class LandingAviary(BaseSingleAgentAviary):
                                       normalized_fxy_external,
                                       normalized_fz_external
                                       ]).reshape(25,)
-        
-
-
-        
 
         return norm_and_clipped
     
