@@ -86,7 +86,7 @@ if __name__ == "__main__":
                      num_drones=1
                     )
     test_steps=720
-    test_iteration=10
+    test_iteration=100
     contact_time_total=0
     x_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
     y_stability= np.zeros(shape=(1, test_iteration), dtype=np.float32)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         observation = np.zeros(shape=(test_env.observation_space.shape[0], test_steps), dtype=np.float32)
         rewards = np.zeros(shape=(1, test_steps), dtype=np.float32)
         time_plt = np.zeros(shape=(1, test_steps), dtype=np.float32)
-        infos = np.zeros(shape=(30, test_steps), dtype=np.float32)
+        infos = np.zeros(shape=(32, test_steps), dtype=np.float32)
         
         
         x_displacement=np.zeros(shape=(1, 480), dtype=np.float32)
@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
                 print("test_env.lateralFriction:",test_env.lateralFriction)
                 print("normal force:",infos[27,i],infos[28,i],infos[29,i], np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i]))
-                if infos[27,i]*mu < np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i])+0.0001 :
+                if infos[27,i]*mu > np.sqrt(infos[28,i]*infos[28,i]+infos[29,i]*infos[29,i])+0.01 :
                     slippage_counter=slippage_counter+1
 
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
         x_stability[0,j]=np.sqrt(np.mean(x_displacement))
         y_stability[0,j]=np.sqrt(np.mean(y_displacement))
         z_push[0,j]=z_final-z_pos_after_contact[0][0]
-        slippage[0,j]=1-slippage_counter/contact_time
+        slippage[0,j]=np.abs(1-slippage_counter/contact_time)
         success_rate[0,j]=contact_time/480
         Landing_time=Landing_timestep*test_env.AGGR_PHY_STEPS/240
         print("---------------------Iteration",j,"-----------------")

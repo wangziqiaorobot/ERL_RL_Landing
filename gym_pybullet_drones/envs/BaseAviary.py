@@ -364,8 +364,8 @@ class BaseAviary(gym.Env):
             #     print('the joints',i,p.getJointState(self.tree, i))
             
             ###########    Control the branch joints   ###############
-            pd4branch=[0,0.08,1,0,100,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
-            # pd4branch=self.pd4branch
+            # pd4branch=[0,0.08,1,0,100,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
+            pd4branch=self.pd4branch
             # print("pd4branch",pd4branch)
             desiredPosPole=float(pd4branch[0])
             p_joint1=float(pd4branch[1])
@@ -405,7 +405,7 @@ class BaseAviary(gym.Env):
             p.performCollisionDetection(physicsClientId=self.CLIENT)
             L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
             # print("drone friction", p.getDynamicsInfo(self.DRONE_IDS[0],-1)) # the drone firction coff is 0.5
-            print(L)
+            # print(L)
             
             # print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
             # P=p.getContactPoints((self.tree))
@@ -472,7 +472,7 @@ class BaseAviary(gym.Env):
                 #L7 normal forceDir          L9 normal force;
                 
                 forcedir=(L[0][6][0]-L[0][5][0],L[0][6][1]-L[0][5][1],L[0][6][2]-L[0][5][2])
-                print('test dir',forcedir/ np.sqrt(forcedir[0]*forcedir[0]+forcedir[1]*forcedir[1]+forcedir[2]*forcedir[2]))
+                # print('test dir',forcedir/ np.sqrt(forcedir[0]*forcedir[0]+forcedir[1]*forcedir[1]+forcedir[2]*forcedir[2]))
                 contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9]),L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9]),L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9]))
                 # print(contact_start+self.pos[0, :],contact_end)
                 ###move the force from the contact point to the center of mass
@@ -510,19 +510,19 @@ class BaseAviary(gym.Env):
             
              #T + F_z = R^T *mg 
             
-            rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
+            # rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
             # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
             # print('the Fz is',self.Fcontact[2])
             # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
             # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
 
-            print('the force applyed on the drone in world frame:',np.dot(rot_mat,[0,0,np.sum(self.applyedforce)]))
-            print('thrust world frame is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
-            print('thrust in robot fame is',([0,0,self.MAX_THRUST*(action[0]+1)/2]))
-            print('F_contact in world frame is',np.dot(rot_mat,self.Fcontact))
-            print('F_contact in robot frame is',(self.Fcontact))
-            print('mg', [0,0,self.GRAVITY])
-            print('(F+T) in world fame',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            # print('the force applyed on the drone in world frame:',np.dot(rot_mat,[0,0,np.sum(self.applyedforce)]))
+            # print('thrust world frame is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            # print('thrust in robot fame is',([0,0,self.MAX_THRUST*(action[0]+1)/2]))
+            # print('F_contact in world frame is',np.dot(rot_mat,self.Fcontact))
+            # print('F_contact in robot frame is',(self.Fcontact))
+            # print('mg', [0,0,self.GRAVITY])
+            # print('(F+T) in world fame',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
 
 
             # print("contact force:", self.Fcontact,self.Fcontact[1])
@@ -679,7 +679,7 @@ class BaseAviary(gym.Env):
         # np.random.uniform(5,1000),##random p value in z-axis
         # np.random.uniform(0.5,1),##random d value in z-axis
         # np.random.uniform(3,10)]##random max_force
-        self.pd4branch=[0,0.08,1,0,100,1,5]
+        self.pd4branch=[0,0.08,1,0,1000,1,15]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 
@@ -929,7 +929,7 @@ class BaseAviary(gym.Env):
         """
         forces = np.array(rpm**2)*self.KF
         self.applyedforce=forces
-        print("the real force:",forces)
+        # print("the real force:",forces)
         torques = np.array(rpm**2)*self.KM
         z_torque = (-torques[0] + torques[1] - torques[2] + torques[3])
         for i in range(4):
