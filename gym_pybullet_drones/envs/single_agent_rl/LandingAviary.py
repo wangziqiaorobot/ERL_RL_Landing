@@ -1,5 +1,6 @@
 # from cv2 import exp
 from calendar import c
+from random import random
 import numpy as np
 from gym import spaces
 import pybullet as p
@@ -100,7 +101,7 @@ class LandingAviary(BaseSingleAgentAviary):
         actionsmoothRewardCoeff=-0.01
         actionlimitRewardCoeff=-0.00001#*time
         contactgroundRewardCoeff=-0.00001
-        contactReward=-0.009#-0.018#*time
+        contactReward=-0.009 #-0.018#*time
           
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
@@ -112,7 +113,7 @@ class LandingAviary(BaseSingleAgentAviary):
         #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
         if (state[24]) >0: #if have contact np.linalg.norm(state[22]) >0: 
-            contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
+            contactReward=0  #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
             self.bool_contact_history=True
         if  self.bool_contact_history==True:
             balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
@@ -263,7 +264,7 @@ class LandingAviary(BaseSingleAgentAviary):
         actionsmoothRewardCoeff=-0.01
         actionlimitRewardCoeff=-0.00001#*time
         contactgroundRewardCoeff=-0.00001
-        contactReward=-0.009#-0.018#*time
+        contactReward=-0.009 #-0.018#*time
           
         if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
             slippageReward=-15
@@ -275,7 +276,7 @@ class LandingAviary(BaseSingleAgentAviary):
         #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
         # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
         if (state[24]) >0: #if have contact np.linalg.norm(state[22]) >0: 
-            contactReward=0   #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
+            contactReward=0  #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
             self.bool_contact_history=True
         if  self.bool_contact_history==True:
             balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
@@ -294,7 +295,6 @@ class LandingAviary(BaseSingleAgentAviary):
             print("fall down to the ground")
         else:
             contactgroundReward=0
-
 
         #position
         Pos_x=self.pos[0,0]
@@ -403,6 +403,20 @@ class LandingAviary(BaseSingleAgentAviary):
                                                clipped_vel_xy,
                                                clipped_vel_z
                                                )
+        if self.noise ==True:
+            clipped_pos_xy=clipped_pos_xy+0.005*np.random.uniform(-1,1)
+            clipped_pos_z=clipped_pos_z+0.005*np.random.uniform(-1,1)
+            clipped_vel_xy=clipped_vel_xy+0.05*np.random.uniform(-1,1)
+            clipped_vel_z=clipped_vel_z+0.05*np.random.uniform(-1,1)
+            clipped_F_xy_External=clipped_F_xy_External+2*np.random.uniform(-1,1)
+            clipped_F_z_External=clipped_F_z_External+1*np.random.uniform(-1,1)
+            state[15]=state[15]+0.26*np.random.uniform(-1,1)
+            state[16]=state[16]+0.26*np.random.uniform(-1,1)
+            state[17]=state[17]+0.26*np.random.uniform(-1,1)
+            noise_R=self.rpy[0][0]+0.05*np.random.uniform(-1,1)
+            noise_P=self.rpy[0][1]+0.05*np.random.uniform(-1,1)
+            noise_Y=self.rpy[0][2]+0.05*np.random.uniform(-1,1)
+            state[3:12]=np.array(p.getMatrixFromQuaternion(p.getQuaternionFromEuler([noise_R,noise_P,noise_Y]))).reshape(9,)
 
         normalized_pos_xy = clipped_pos_xy / MAX_XY
         normalized_pos_z = clipped_pos_z / MAX_Z
