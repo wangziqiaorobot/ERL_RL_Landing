@@ -154,6 +154,7 @@ class BaseAviary(gym.Env):
         self.MAX_Z_TORQUE = (2*self.KM*self.MAX_RPM**2)
         self.GND_EFF_H_CLIP = 0.25 * self.PROP_RADIUS * np.sqrt((15 * self.MAX_RPM**2 * self.KF * self.GND_EFF_COEFF) / self.MAX_THRUST)
         self.MAX_ROLL_PITCH = np.pi/18
+        self.Fcontact= np.zeros(3)
         #### Create attributes for vision tasks ####################
         self.VISION_ATTR = vision_attributes
         if self.VISION_ATTR:
@@ -227,12 +228,10 @@ class BaseAviary(gym.Env):
                                                             )
         #### Set initial poses #####################################
         if initial_xyzs is None:
-            # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-            #                             np.array([float(np.random.uniform(-0.1,0.1))]), \
-            #                             np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
-            self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.5))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+            self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-5,5))]), \
+                                        np.array([float(np.random.uniform(-5,5))]), \
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(0.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+            
             # self.INIT_XYZS = np.vstack([np.array([0]), \
             #                             np.array([0]), \
             #                             np.ones(self.NUM_DRONES) *2.6]).transpose().reshape(self.NUM_DRONES, 3)
@@ -354,192 +353,7 @@ class BaseAviary(gym.Env):
 
             #### Save the last applied action (e.g. to compute drag) ###
             self.last_clipped_action = clipped_action
-
-
-
-            #tree branch 
-            for i in range(p.getNumJoints(self.tree)):
-                #disable default constraint-based motors
-                p.setJointMotorControl2(self.tree, i, p.VELOCITY_CONTROL,  force=0,physicsClientId=self.CLIENT)
-            
-            # # print the branch joints states
-            # for i in range(p.getNumJoints(self.tree)):    
-            #     print('the joints',i,p.getJointState(self.tree, i))
-            
-            ###########    Control the branch joints   ###############
-            # pd4branch=[0,0.08,1,0,1000,1,15]    #pd4branch=[0,0.079,1,0,1,1,13]
-            pd4branch=self.pd4branch
-            # print("pd4branch",pd4branch)
-            desiredPosPole=float(pd4branch[0])
-            p_joint1=float(pd4branch[1])
-            d_joint1=float(pd4branch[2])
-            desiredPosPole2=float(pd4branch[3])
-            p_joint2=float(pd4branch[4])
-            d_joint2=float(pd4branch[5])
-            maxForce=float(pd4branch[6])
-            link = 0
-            p.setJointMotorControl2(bodyUniqueId=self.tree,
-                                jointIndex=link,
-                                controlMode=p.POSITION_CONTROL, #PD_CONTROL,POSITION_CONTROL
-                                targetPosition=desiredPosPole,
-                                targetVelocity=0,
-                                force=maxForce,
-                                positionGain=p_joint1,
-                                velocityGain=d_joint1,
-                                physicsClientId=self.CLIENT)
-            link = 1
-            
-            p.setJointMotorControl2(bodyUniqueId=self.tree,
-                                jointIndex=link,
-                                controlMode=p.PD_CONTROL,#PD_CONTROL,
-                                targetPosition=desiredPosPole2,
-                                targetVelocity=0,
-                                force=maxForce,
-                                positionGain=p_joint2,
-                                velocityGain=d_joint2,
-                                physicsClientId=self.CLIENT)
-
-            
-            
-            
-            
-            
-            ############ Collision Detection and Visualization #######################
-            p.performCollisionDetection(physicsClientId=self.CLIENT)
-            L=p.getContactPoints((self.DRONE_IDS[0]),physicsClientId=self.CLIENT)
-            # print("drone friction", p.getDynamicsInfo(self.DRONE_IDS[0],-1)) # the drone firction coff is 0.5
-            # print(L)
-            
-            # print(p.getDynamicsInfo(self.tree,linkIndex=1,physicsClientId=self.CLIENT))
-            # P=p.getContactPoints((self.tree))
-            # print("rotation mat.:", np.array(p.getMatrtrixFromQuaternion(self.quat[0, :])).reshape(3, 3))
-            # print("drone position:",self.pos[0, :],self.pos[0, 0],self.pos[0, 1])
-
-            
-
-            if len(L) !=0 :
-                
-                #contact point/ pybullet can not draw a point, so draw a short line here
-                p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                                        lineToXYZ=(L[0][6][0]+0.01,L[0][6][1],L[0][6][2]),
-                                        lineColorRGB=[1, 0, 0],
-                                        lineWidth=100,
-                                        lifeTime=0.05,
-                                        physicsClientId=self.CLIENT)
-                self.force_contact_world[0]=L[0][9]
-                self.force_contact_world[1]=L[0][10]
-                self.force_contact_world[2]=L[0][12]
-                # ### Normal Force ###
-                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                #                         lineToXYZ=(L[0][6][0]+L[0][7][0]*L[0][9]*0.03,L[0][6][1]+L[0][7][1]*L[0][9]*0.03,L[0][6][2]+L[0][7][2]*L[0][9]*0.03),
-                #                         lineColorRGB=[0, 1, 0],
-                #                         lineWidth=5,
-                #                         # lifeTime=0.5,
-                #                         physicsClientId=self.CLIENT)
-                # ### Lateral Friction 1 ###                
-                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                #                         lineToXYZ=(L[0][6][0]+L[0][11][0]*L[0][10]*0.03,L[0][6][1]+L[0][11][1]*L[0][10]*0.03,L[0][6][2]+L[0][11][2]*L[0][10]*0.03),
-                #                         lineColorRGB=[1, 1, 0],
-                #                         lineWidth=5,
-                #                         # lifeTime=0.5,
-                #                         physicsClientId=self.CLIENT
-                #                                         )
-                # ### Lateral Friction 2 ###  
-                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                #                         lineToXYZ=(L[0][6][0]+L[0][13][0]*L[0][12]*0.03,L[0][6][1]+L[0][13][1]*L[0][12]*0.03,L[0][6][2]+L[0][13][2]*L[0][12]*0.03),
-                #                         lineColorRGB=[1, 1, 1],
-                #                         lineWidth=5,
-                #                         # lifeTime=0.5,
-                #                         physicsClientId=self.CLIENT
-                #                                         )
-                # ### External Force in world coordinates ###
-                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                #                         lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
-                #                         lineColorRGB=[1, 0.64, 0],
-                #                         lineWidth=5,addUserDebugLine
-                #                         # lifeTime=0.5,
-                #                         physicsClientId=self.CLIENT
-                #                                         )
-                ### External Force in robot coordinates ###
-                
-                # p.addUserDebugLine(     lineFromXYZ=L[0][6],
-                #                         lineToXYZ=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9])*0.03,L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9])*0.03,L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9])*0.03),
-                #                         lineColorRGB=[1, 0.64, 0],
-                #                         lineWidth=5,
-                #                         # lifeTime=0.5,
-                #                         physicsClientId=self.CLIENT
-                #                                         )
-                contact_start=L[0][6] #contact points on drone 
-                #L13 lateralFrictionDir2  L12 lateralFriction2;
-                #L11 lateralFrictionDir1  L10 lateralFriction1;
-                #L7 normal forceDir          L9 normal force;
-                
-                forcedir=(L[0][6][0]-L[0][5][0],L[0][6][1]-L[0][5][1],L[0][6][2]-L[0][5][2])
-                # print('test dir',forcedir/ np.sqrt(forcedir[0]*forcedir[0]+forcedir[1]*forcedir[1]+forcedir[2]*forcedir[2]))
-                contact_end=(L[0][6][0]+(L[0][13][0]*L[0][12]+L[0][11][0]*L[0][10]+L[0][7][0]*L[0][9]),L[0][6][1]+(L[0][13][1]*L[0][12]+L[0][6][1]+L[0][11][1]*L[0][10]+L[0][7][1]*L[0][9]),L[0][6][2]+(L[0][13][2]*L[0][12]+L[0][11][2]*L[0][10]+L[0][7][2]*L[0][9]))
-                # print(contact_start+self.pos[0, :],contact_end)
-                ###move the force from the contact point to the center of mass
-                # p.addUserDebugLine(     lineFromXYZ=self.pos[0, :],
-                #                         lineToXYZ= np.array(contact_end)-np.array(contact_start)+self.pos[0, :],
-                #                         lineColorRGB=[1, 0.64, 0],
-                #                         lineWidth=5,
-                #                         # lifeTime=0.5,
-                                        
-                #                         physicsClientId=self.CLIENT
-                #                                         )
-                ### homogeneous transformation matrix & calculate the transformal##
-
-                rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
-
-                #-np.array(contact_start)+self.pos[0, :]
-                contact_r_frame=  np.dot(rot_mat.T,(np.array(contact_end)-np.array(contact_start)+self.pos[0, :]))-np.dot(rot_mat.T,self.pos[0, :]) 
-                # contact_r_frame=  np.dot(rot_mat.T,(np.array(contact_end)))-np.dot(rot_mat.T,L[0][6]) 
-                # print("in robot frame:",contact_r_frame,type(self.Fcontact),type(contact_r_frame))
-                self.Fcontact=contact_r_frame
-                
-               
-                ## Visualization of external Force in robot frame ##### 
-                p.addUserDebugLine(                   lineFromXYZ=[0, 0, 0],
-                                                      lineToXYZ=contact_r_frame*0.07,
-                                                      lineColorRGB=[1, 0, 0],
-                                                      lineWidth=5,
-                                                      parentObjectUniqueId=self.DRONE_IDS[0],
-                                                      parentLinkIndex=-1,
-                                                      lifeTime=0.1,
-                                                      physicsClientId=self.CLIENT
-                                                      )
-            else:
-                self.Fcontact= np.zeros(3) ### set the contact force to zero if there if no contact##
-            
-             #T + F_z = R^T *mg 
-            
-            # rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
-            # # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
-            # # print('the Fz is',self.Fcontact[2])
-            # # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
-            # # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
-
-            # print('the force applyed on the drone in world frame:',np.dot(rot_mat,[0,0,np.sum(self.applyedforce)]))
-            # print('thrust world frame is',np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
-            # print('thrust in robot fame is',([0,0,self.MAX_THRUST*(action[0]+1)/2]))
-            # print('F_contact in world frame is',np.dot(rot_mat,self.Fcontact))
-            # print('F_contact in robot frame is',(self.Fcontact))
-            # print('mg', [0,0,self.GRAVITY])
-            # print('(F+T) in world fame',np.dot(rot_mat,self.Fcontact)+np.dot(rot_mat,[0,0,self.MAX_THRUST*(action[0]+1)/2]))
-
-
-            # print("contact force:", self.Fcontact,self.Fcontact[1])
-            # print("wall clock",time.time()-self.RESET_TIME,"sim time:",self.step_counter*self.TIMESTEP)
-
-                
-                
-
-
-
-
-
-
-
+             ### set the contact force to zero if there if no contact##
             
         #### Update and store the drones kinematic information #####
         self._updateAndStoreKinematicInformation()
@@ -655,38 +469,25 @@ class BaseAviary(gym.Env):
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
         #### Random Initialize the drones position information ##########
-        # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)
+        self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-5,5))]), \
+                                        np.array([float(np.random.uniform(-5,5))]), \
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(0.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)
 
-        self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
+        
         # self.INIT_XYZS = np.vstack([np.array([float(0)]), \
         #                                 np.array([float(0)]), \
         #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
         #### Initialize the branch friction friction coefficient ##########
-        self.lateralFriction=float(np.random.uniform(0.8,0.1))
-        # self.lateralFriction=0.1
+        
         #### Initialize the drones contact force information ##########
-        self.Fcontact= np.zeros(3)
-        self.force_contact_world=np.zeros(3)
-        self.applyedforce=np.zeros(4)
-        self.noise=True
-        self.delay=True
+     
+        self.noise=False
+        self.delay=False
 
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### reset the branch parameter
-        # self.pd4branch=[ 
-        # np.random.uniform(-0.01,0.01),##random pos value in x-axis,
-        # np.random.uniform(0.02,0.1),##random p value in x-axis,
-        # np.random.uniform(0.8,1.2),##random d value in x-axis,
-        # np.random.uniform(-0.05,0.05), ##random pos in z-axis
-        # np.random.uniform(5,1000),##random p value in z-axis
-        # np.random.uniform(0.5,1),##random d value in z-axis
-        # np.random.uniform(3,20)]##random max_force
-        self.pd4branch=[0,0.08,1,0,1,1,15]
+        
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 
@@ -703,16 +504,7 @@ class BaseAviary(gym.Env):
                                             #   flags = p.URDF_USE_INERTIA_FROM_FILE | p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
-        self.tree=p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/treebranch.urdf",
         
-                   [0, 1, 0],
-                   p.getQuaternionFromEuler([0, 0, 0]),
-                   physicsClientId=self.CLIENT,
-                   useFixedBase=True,
-                #    flags =p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT, #self collision
-                   )
-        #change the branch friction coefficient
-        p.changeDynamics(self.tree,linkIndex=1,physicsClientId=self.CLIENT,lateralFriction=self.lateralFriction)
         
         # add the local axes to the drone, but this will slows down the GUI
         self._showDroneLocalAxes(0)

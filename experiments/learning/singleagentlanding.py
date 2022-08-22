@@ -141,7 +141,7 @@ if __name__ == "__main__":
                             aggregate_phy_steps=shared_constants.AGGR_PHY_STEPS,
                             obs=ARGS.obs,
                             act=ARGS.act,
-                            gui=False,
+                            gui=True,
                             record=False
                             )
     
@@ -160,7 +160,7 @@ if __name__ == "__main__":
                                  log_path=filename+'/',
                                  eval_freq=int(2000),
                                  deterministic=True,
-                                 render=False
+                                 render=True
                                  )
     model.learn(total_timesteps=1000*2500, #int(1e12),
                 callback=eval_callback,
