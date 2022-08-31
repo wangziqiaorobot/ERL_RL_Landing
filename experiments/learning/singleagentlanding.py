@@ -162,7 +162,7 @@ if __name__ == "__main__":
                                  deterministic=True,
                                  render=False
                                  )
-    model.learn(total_timesteps=1000*2500, #int(1e12),
+    model.learn(total_timesteps=1000*5000, #int(1e12),
                 callback=eval_callback,
                 log_interval=10,
                 )

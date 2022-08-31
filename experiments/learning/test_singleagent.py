@@ -150,7 +150,7 @@ if __name__ == "__main__":
     # logger.plot()
 
     # new log try ####
-    test_steps=400
+    test_steps=500
     actions = np.zeros(
         shape=(test_env.action_space.shape[0], test_steps), dtype=np.float32)
     observation = np.zeros(
@@ -161,7 +161,7 @@ if __name__ == "__main__":
         shape=(1, test_steps), dtype=np.float32)
     infos = np.zeros(
         shape=(32, test_steps), dtype=np.float32)
-    for i in range(400):
+    for i in range(test_steps):
         
         action, _states = model.predict(obs,
                                         deterministic=True # OPTIONAL 'deterministic=False'

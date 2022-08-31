@@ -227,12 +227,12 @@ class BaseAviary(gym.Env):
                                                             )
         #### Set initial poses #####################################
         if initial_xyzs is None:
-            # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-            #                             np.array([float(np.random.uniform(-0.1,0.1))]), \
-            #                             np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(2.5))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(1.05,1.25))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
+            # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+            #                             np.array([float(np.random.uniform(-0.1,0.1))]), \
+            #                             np.ones(self.NUM_DRONES) *float(np.random.uniform(2.5))]).transpose().reshape(self.NUM_DRONES, 3)#z=np.ones(self.NUM_DRONES) * (self.COLLISION_H/2-self.COLLISION_Z_OFFSET+.1)
             # self.INIT_XYZS = np.vstack([np.array([0]), \
             #                             np.array([0]), \
             #                             np.ones(self.NUM_DRONES) *2.6]).transpose().reshape(self.NUM_DRONES, 3)
@@ -655,38 +655,38 @@ class BaseAviary(gym.Env):
         self.vel = np.zeros((self.NUM_DRONES, 3))
         self.ang_v = np.zeros((self.NUM_DRONES, 3))
         #### Random Initialize the drones position information ##########
-        # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
-        #                                 np.ones(self.NUM_DRONES) *float(np.random.uniform(2.4,2.6))]).transpose().reshape(self.NUM_DRONES, 3)
-
         self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
                                         np.array([float(np.random.uniform(-0.1,0.1))]), \
-                                        np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(1.05,1.25))]).transpose().reshape(self.NUM_DRONES, 3)
+
+        # self.INIT_XYZS = np.vstack([np.array([float(np.random.uniform(-0.1,0.1))]), \
+        #                                 np.array([float(np.random.uniform(-0.1,0.1))]), \
+        #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
         # self.INIT_XYZS = np.vstack([np.array([float(0)]), \
         #                                 np.array([float(0)]), \
         #                                 np.ones(self.NUM_DRONES) *float(2.5)]).transpose().reshape(self.NUM_DRONES, 3)
         #### Initialize the branch friction friction coefficient ##########
-        self.lateralFriction=float(np.random.uniform(0.8,0.1))
+        self.lateralFriction=float(np.random.uniform(0.5,1))
         # self.lateralFriction=0.1
         #### Initialize the drones contact force information ##########
         self.Fcontact= np.zeros(3)
         self.force_contact_world=np.zeros(3)
         self.applyedforce=np.zeros(4)
-        self.noise=True
-        self.delay=True
+        self.noise=False
+        self.delay=False
 
         if self.PHYSICS == Physics.DYN:
             self.rpy_rates = np.zeros((self.NUM_DRONES, 3))
         #### reset the branch parameter
-        # self.pd4branch=[ 
-        # np.random.uniform(-0.01,0.01),##random pos value in x-axis,
-        # np.random.uniform(0.02,0.1),##random p value in x-axis,
-        # np.random.uniform(0.8,1.2),##random d value in x-axis,
-        # np.random.uniform(-0.05,0.05), ##random pos in z-axis
-        # np.random.uniform(5,1000),##random p value in z-axis
-        # np.random.uniform(0.5,1),##random d value in z-axis
-        # np.random.uniform(3,20)]##random max_force
-        self.pd4branch=[0,0.08,1,0,1,1,15]
+        self.pd4branch=[ 
+        np.random.uniform(-0.01,0.01),##random pos value in x-axis,
+        np.random.uniform(0.02,0.1),##random p value in x-axis,
+        np.random.uniform(0.8,1.2),##random d value in x-axis,
+        np.random.uniform(-0.05,0.05), ##random pos in z-axis
+        np.random.uniform(5,1000),##random p value in z-axis
+        np.random.uniform(0.5,1),##random d value in z-axis
+        np.random.uniform(3,20)]##random max_force
+        # self.pd4branch=[0,0.08,1,0,1000,1,15]
         #### Set PyBullet's parameters #############################
         p.setGravity(0, 0, -self.G, physicsClientId=self.CLIENT)
 
@@ -697,15 +697,22 @@ class BaseAviary(gym.Env):
         #### Load ground plane, drone and obstacles models #########
         self.PLANE_ID = p.loadURDF("plane.urdf", physicsClientId=self.CLIENT)
         # p.createCollisionShape(p.GEOM_PLANE)
+
+        self.tree_XYZS = np.array([np.array([float(np.random.uniform(-5,5))]), \
+                                        np.array([float(np.random.uniform(-5,5))]), \
+                                        np.ones(self.NUM_DRONES) *float(np.random.uniform(0,4))]).transpose().reshape(self.NUM_DRONES, 3)
+        print("+self.tree_XYZS++++++",self.tree_XYZS)
+        
         self.DRONE_IDS = np.array([p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/"+self.URDF,
-                                              self.INIT_XYZS[i,:],
+                                              self.INIT_XYZS[i,:]+self.tree_XYZS[0],
                                               p.getQuaternionFromEuler(self.INIT_RPYS[i,:]),
                                             #   flags = p.URDF_USE_INERTIA_FROM_FILE | p.URDF_USE_SELF_COLLISION | p.URDF_USE_SELF_COLLISION_INCLUDE_PARENT,
                                               physicsClientId=self.CLIENT
                                               ) for i in range(self.NUM_DRONES)])
-        self.tree=p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/treebranch.urdf",
         
-                   [0, 1, 0],
+        print("+self.tree_XYZS------",self.INIT_XYZS[0,:]+self.tree_XYZS[0])
+        self.tree=p.loadURDF(os.path.dirname(os.path.abspath(__file__))+"/../assets/treebranch.urdf",
+                   [0, 1, 0]+self.tree_XYZS[0],
                    p.getQuaternionFromEuler([0, 0, 0]),
                    physicsClientId=self.CLIENT,
                    useFixedBase=True,

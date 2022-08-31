@@ -7,7 +7,7 @@
     <link name="base_link">
         <visual> 
             <geometry> 
-                <cylinder length="4" radius="0.25"/>
+                <cylinder length="2" radius="0.25"/>
             </geometry>
            <origin rpy="0 0 0" xyz="0 0 0"/>
            <material name="brown"/>
@@ -59,7 +59,8 @@
     </joint> -->
     <joint name="base_to_virtual_link" type="revolute">
         <axis xyz="0 0 1"/>
-        <origin rpy="0 0 0" xyz="0 0 1.75"/>
+        <origin rpy="0 0 0" xyz="0 0 0.6"/>
+        <!-- <origin rpy="0 0 0" xyz="0 0 1.75"/> -->
         <material name="brown"/>
         <parent link="base_link"/>
         <child link="virtual_link"/>

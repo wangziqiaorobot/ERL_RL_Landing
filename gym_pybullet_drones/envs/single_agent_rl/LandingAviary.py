@@ -103,10 +103,10 @@ class LandingAviary(BaseSingleAgentAviary):
         contactgroundRewardCoeff=-0.00001
         contactReward=-0.009 #-0.018#*time
           
-        if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
+        if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0]-self.tree_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1]-self.tree_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2]-self.tree_XYZS[0][2])>1:
             slippageReward=-15
         else:
-            slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**8)-1) ##^14
+            slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])+np.array(self.tree_XYZS[0][0:2])-state[0:2])**8)-1) ##^14
         # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
         # if state[23]==0:
 
@@ -219,7 +219,7 @@ class LandingAviary(BaseSingleAgentAviary):
         p.performCollisionDetection(physicsClientId=self.CLIENT)
         L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
         
-        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
+        if self.step_counter/self.SIM_FREQ > self.EPISODE_LEN_SEC or len(L) !=0 or np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0]-self.tree_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1]-self.tree_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2]-self.tree_XYZS[0][2])>1:# or ((self._getDroneStateVector(0))[2] < 0.05)  or ((self._getDroneStateVector(0))[2] > 1.5):
             self.iterate= self.iterate+1
            
         # Alternative done condition, see PR #32
@@ -242,122 +242,121 @@ class LandingAviary(BaseSingleAgentAviary):
 
     #     """
 
-        state = self._getDroneStateVector(0)  ###  self._computeObs() need or not???
-        diff_act= self.current_action-state[18:22]
+        # state = self._getDroneStateVector(0)  ###  self._computeObs() need or not???
+        # diff_act= self.current_action-state[18:22]
 
-        time=self.step_counter*self.TIMESTEP
-        p.performCollisionDetection(physicsClientId=self.CLIENT)
-        L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
-        ############## for the hovering task  #############
-        # return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
+        # time=self.step_counter*self.TIMESTEP
+        # p.performCollisionDetection(physicsClientId=self.CLIENT)
+        # L=p.getContactPoints(self.PLANE_ID,physicsClientId=self.CLIENT)
+        # ############## for the hovering task  #############
+        # # return  0.05*(np.exp(- 10*np.linalg.norm(np.array([0, 0, 0.5])-state[0:3])**4)-1) -0.02*np.linalg.norm(diff_act)**2-0.01*np.linalg.norm(self.current_action)**2+0.01*(np.exp(- np.linalg.norm(np.array([0, 0])-state[10:12])**4)-1)+0.01*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[13:16])**4)-1)+ 0.05
 
         
         
-        ########### for the landing task ############# 
-        # L_vel + W_vel + Contact_force + energy_consanpution
+        # ########### for the landing task ############# 
+        # # L_vel + W_vel + Contact_force + energy_consanpution
         
-        balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
-        slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
-        # contactRewardCoeff=0.01*time
-        linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
-        angulervelocityRewardCoeff=0.003#*time
-        actionsmoothRewardCoeff=-0.01
-        actionlimitRewardCoeff=-0.00001#*time
-        contactgroundRewardCoeff=-0.00001
-        contactReward=-0.009 #-0.018#*time
+        # balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
+        # slippageRewardCoeff=1.2#*time#0.8;0.5;0.3
+        # # contactRewardCoeff=0.01*time
+        # linearvelocityRewardCoeff=0.25 #0.05#0.03/(time+0.5)
+        # angulervelocityRewardCoeff=0.003#*time
+        # actionsmoothRewardCoeff=-0.01
+        # actionlimitRewardCoeff=-0.00001#*time
+        # contactgroundRewardCoeff=-0.00001
+        # contactReward=-0.009 #-0.018#*time
           
-        if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2])>1:
-            slippageReward=-15
-        else:
-            slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**8)-1) ##^14
-        # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
-        # if state[23]==0:
-
-        #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
-        # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
-        if (state[24]) >0: #if have contact np.linalg.norm(state[22]) >0: 
-            contactReward=0  #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
-            self.bool_contact_history=True
-        if  self.bool_contact_history==True:
-            balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
-
+        # if np.linalg.norm(self.pos[0,0]-self.INIT_XYZS[0][0]-self.tree_XYZS[0][0])>1 or np.linalg.norm(self.pos[0,1]-self.INIT_XYZS[0][1]-self.tree_XYZS[0][1])>1 or (self.pos[0,2]-self.INIT_XYZS[0][2]-self.tree_XYZS[0][2])>1:
+        #     slippageReward=-15
         # else:
-        #     contactReward=time*-0.02
-        #     balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
+        #     slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])+np.array(self.tree_XYZS[0][0:2])-state[0:2])**8)-1) ##^14
+        # # slippageReward=slippageRewardCoeff* (np.exp(- np.linalg.norm(np.array(self.INIT_XYZS[0][0:2])-state[0:2])**4)-1)
+        # # if state[23]==0:
 
-        balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-[self.rpy[0][0],self.rpy[0][1],self.rpy[0][2]])**6)-1)
-        linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[12:15])**4)-1)
-        angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[15:18])**4)-1)
-        actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
-        actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3])**2
-        if len(L) !=0:
-            contactgroundReward=-(10)
-            print("fall down to the ground")
-        else:
-            contactgroundReward=0
+        # #     slippageReward=slippageRewardCoeff*(np.exp(- np.linalg.norm(0-state[21:23])**4)-1)
+        # # if len(p.getContactPoints(self.tree,physicsClientId=self.CLIENT)) !=0: #if have contact
+        # if (state[24]) >0: #if have contact np.linalg.norm(state[22]) >0: 
+        #     contactReward=0  #contactRewardCoeff*(np.exp(- np.linalg.norm(0.3-state[22])**4)-1) 
+        #     self.bool_contact_history=True
+        # if  self.bool_contact_history==True:
+        #     balancingRewardCoeff = balancingRewardCoeff/(time+0.01)
 
-        #position
-        Pos_x=self.pos[0,0]
-        Pos_y=self.pos[0,1]
-        Pos_z=self.pos[0,2]
+        # # else:
+        # #     contactReward=time*-0.02
+        # #     balancingRewardCoeff=0.1#/(time+0.5)#0.001*(time);0.01
 
-        #attitude
-        Rpy_r=self.rpy[0,0]
-        Rpy_p=self.rpy[0,1]
-        Rpy_y=self.rpy[0,2]
+        # balancingReward=balancingRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,self.INIT_RPYS[0][2]])-[self.rpy[0][0],self.rpy[0][1],self.rpy[0][2]])**6)-1)
+        # linearvelocityReward=linearvelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0, 0])-state[12:15])**4)-1)
+        # angulervelocityReward=angulervelocityRewardCoeff*(np.exp(- np.linalg.norm(np.array([0, 0,0])-state[15:18])**4)-1)
+        # actionsmoothReward=actionsmoothRewardCoeff*np.linalg.norm(diff_act)**2
+        # actionlimitReward=actionlimitRewardCoeff*np.linalg.norm(self.current_action[3])**2
+        # if len(L) !=0:
+        #     contactgroundReward=-(10)
+        #     print("fall down to the ground")
+        # else:
+        #     contactgroundReward=0
+        # #position
+        # Pos_x=self.pos[0,0]
+        # Pos_y=self.pos[0,1]
+        # Pos_z=self.pos[0,2]
 
-        #linear velocity
-        V_x=self.vel[0,0]
-        V_y=self.vel[0,1]
-        V_z=self.vel[0,2]
+        # #attitude
+        # Rpy_r=self.rpy[0,0]
+        # Rpy_p=self.rpy[0,1]
+        # Rpy_y=self.rpy[0,2]
 
-        #anguler velocity
-        W_x=self.ang_v[0,0]
-        W_y=self.ang_v[0,1]
-        W_z=self.ang_v[0,2]
+        # #linear velocity
+        # V_x=self.vel[0,0]
+        # V_y=self.vel[0,1]
+        # V_z=self.vel[0,2]
 
-        #last step action
-        Action_1=self.last_action[0,0]
-        Action_2=self.last_action[0,1]
-        Action_3=self.last_action[0,2]
-        Action_4=self.last_action[0,3]
+        # #anguler velocity
+        # W_x=self.ang_v[0,0]
+        # W_y=self.ang_v[0,1]
+        # W_z=self.ang_v[0,2]
 
-        #force
-        F_x=self.Fcontact[0]
-        F_y=self.Fcontact[1]
-        F_z=self.Fcontact[2]
-        #normal force and lateralFriction
-        normal_force=self.force_contact_world[0]
-        lateralFriction1=self.force_contact_world[1]
-        lateralFriction2=self.force_contact_world[2]
+        # #last step action
+        # Action_1=self.last_action[0,0]
+        # Action_2=self.last_action[0,1]
+        # Action_3=self.last_action[0,2]
+        # Action_4=self.last_action[0,3]
+
+        # #force
+        # F_x=self.Fcontact[0]
+        # F_y=self.Fcontact[1]
+        # F_z=self.Fcontact[2]
+        # #normal force and lateralFriction
+        # normal_force=self.force_contact_world[0]
+        # lateralFriction1=self.force_contact_world[1]
+        # lateralFriction2=self.force_contact_world[2]
         
-        rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
-            # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
-            # print('the Fz is',self.Fcontact[2])
-            # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
-            # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
+        # rot_mat = np.array(p.getMatrixFromQuaternion(self.quat[0, :])).reshape(3, 3)
+        #     # print('the thrust is',rot_mat.T*self.MAX_THRUST*(action[0]+1)/2 )
+        #     # print('the Fz is',self.Fcontact[2])
+        #     # print('RT*mg', np.dot(rot_mat.T,[0,0,self.GRAVITY]))
+        #     # print('F+T',self.Fcontact[2]+self.MAX_THRUST*(action[0]+1)/2)
         
-        Rthrust=np.dot(rot_mat,[[0] ,[0] ,[np.sum(self.applyedforce)]])[2]#np.dot(rot_mat,[0,0,np.sum(self.applyedforce)])[2]#
+        # Rthrust=np.dot(rot_mat,[[0] ,[0] ,[np.sum(self.applyedforce)]])[2]#np.dot(rot_mat,[0,0,np.sum(self.applyedforce)])[2]#
 
-        # Rthrust=np.dot(rot_mat,[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]#np.dot(rot_mat,[0,0,np.sum(self.applyedforce)])[2]#
-        # Rthrust=(rot_mat*[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]
-        # RFz=np.dot(rot_mat.T,self.Fcontact)[2] #self.Fcontact[2]
-        # RFz=(rot_mat*self.Fcontact)[2] #self.Fcontact[2]
-        # Rthrust=np.dot(rot_mat.T,[0,0,self.GRAVITY])[2]
-        RFz=np.dot(rot_mat,[0,0,self.Fcontact[2]])[2]
-        # lateralFriction1=np.sum(self.applyedforce) #used to test the real force applyed on the drone.
+        # # Rthrust=np.dot(rot_mat,[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]#np.dot(rot_mat,[0,0,np.sum(self.applyedforce)])[2]#
+        # # Rthrust=(rot_mat*[[0] ,[0] ,[self.MAX_THRUST*(self.current_action[0]+1)/2]])[2]
+        # # RFz=np.dot(rot_mat.T,self.Fcontact)[2] #self.Fcontact[2]
+        # # RFz=(rot_mat*self.Fcontact)[2] #self.Fcontact[2]
+        # # Rthrust=np.dot(rot_mat.T,[0,0,self.GRAVITY])[2]
+        # RFz=np.dot(rot_mat,[0,0,self.Fcontact[2]])[2]
+        # # lateralFriction1=np.sum(self.applyedforce) #used to test the real force applyed on the drone.
         
-        info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward,
-                         Pos_x,Pos_y,Pos_z,
-                         Rpy_r,Rpy_p,Rpy_y,
-                         V_x,V_y,V_z,
-                         W_x,W_y,W_z,
-                         Action_1,Action_2,Action_3,Action_4,
-                         F_x,F_y,F_z,
-                         normal_force,lateralFriction1,lateralFriction2,
-                         Rthrust,RFz
-        ])
-        return info #{"answer": 42} #info
+        # info=np.hstack([ balancingReward, contactReward,linearvelocityReward,angulervelocityReward,actionsmoothReward,actionlimitReward,slippageReward,contactgroundReward,
+        #                  Pos_x,Pos_y,Pos_z,
+        #                  Rpy_r,Rpy_p,Rpy_y,
+        #                  V_x,V_y,V_z,
+        #                  W_x,W_y,W_z,
+        #                  Action_1,Action_2,Action_3,Action_4,
+        #                  F_x,F_y,F_z,
+        #                  normal_force,lateralFriction1,lateralFriction2,
+        #                  Rthrust,RFz
+        # ])
+        return {"answer": 42} #{"answer": 42} #info
     ################################################################################
     
     def _clipAndNormalizeState(self,
@@ -379,8 +378,8 @@ class LandingAviary(BaseSingleAgentAviary):
         MAX_LIN_VEL_XY = 2 
         MAX_LIN_VEL_Z = 1
 
-        MAX_XY =1 #MAX_LIN_VEL_XY*self.EPISODE_LEN_SEC
-        MAX_Z = 3 #MAX_LIN_VEL_Z*self.EPISODE_LEN_SEC
+        MAX_XY =5 #MAX_LIN_VEL_XY*self.EPISODE_LEN_SEC
+        MAX_Z = 5 #MAX_LIN_VEL_Z*self.EPISODE_LEN_SEC
 
         MAX_PITCH_ROLL = np.pi/2 # Full range
         
